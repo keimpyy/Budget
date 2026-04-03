@@ -699,27 +699,16 @@ async function safeJson(res){
   catch(e){ return { error: 'Parse fout: '+text.slice(0,200) }; }
 }
 
-// Apps Script: GET voor lezen, POST via form-encode voor schrijven (CORS-safe)
 async function sheetsPost(data){
   if(!sheetsUrl) return null;
   try {
-    // Stuur als form data — werkt wel door CORS bij Apps Script
-    const form = new FormData();
-    form.append('payload', JSON.stringify(data));
-    const res = await fetch(sheetsUrl, {
-      method: 'POST',
-      body: form,
-      redirect: 'follow',
-    });
+    // Alles via GET — meest betrouwbaar met Apps Script CORS
+    const url = sheetsUrl + '?payload=' + encodeURIComponent(JSON.stringify(data));
+    const res = await fetch(url, { redirect:'follow' });
     return await safeJson(res);
   } catch(e){
-    // Fallback: probeer via GET met verkorte payload
-    console.error('sheetsPost FormData fout:', e);
-    try {
-      const params = '?payload='+encodeURIComponent(JSON.stringify(data));
-      const res2 = await fetch(sheetsUrl+params, { redirect:'follow' });
-      return await safeJson(res2);
-    } catch(e2){ return { error: e2.message }; }
+    console.error('sheetsPost:', e);
+    return { error: e.message };
   }
 }
 
