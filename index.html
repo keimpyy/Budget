@@ -885,8 +885,10 @@ function varToRows(){
 function applySheets(data){
   if(data.inkomsten && data.inkomsten.length > 0){
     data.inkomsten.forEach(r => {
-      if(String(r.naam).trim()==='KT') kt = parseFloat(r.bedrag)||kt;
-      if(String(r.naam).trim()==='Ryanne') ryanne = parseFloat(r.bedrag)||ryanne;
+      const naam = String(r.naam||'').trim();
+      const bedrag = parseFloat(r.bedrag);
+      if(naam === 'KT' && !isNaN(bedrag)) kt = bedrag;
+      if(naam === 'Ryanne' && !isNaN(bedrag)) ryanne = bedrag;
     });
   }
   if(data.budget && data.budget.length > 0){
@@ -900,8 +902,8 @@ function applySheets(data){
   }
   if(data.leningen && data.leningen.length > 0){
     LENINGEN = data.leningen.map(r=>({
-      id:    String(r.id),
-      naam:  String(r.naam),
+      id:     String(r.id),
+      naam:   String(r.naam),
       totaal: parseFloat(r.totaal)||0,
       betaald:parseFloat(r.betaald)||0,
       kleur:  String(r.kleur||'#7c6af7'),
@@ -909,9 +911,10 @@ function applySheets(data){
     try{ localStorage.setItem('bv_leningen', JSON.stringify(LENINGEN)); }catch(e){}
   }
   saveState();
+  // Altijd alles opnieuw renderen zodat nieuwe waarden zichtbaar zijn
   renders.dashboard();
-  if(document.getElementById('v-budget').classList.contains('active')) renders.budget();
-  if(document.getElementById('v-leningen').classList.contains('active')) renderLeningen();
+  renders.budget();
+  if(document.getElementById('v-leningen')?.classList.contains('active')) renderLeningen();
 }
 
 async function saveToSheets(){
@@ -1038,18 +1041,14 @@ function loadState(){
 
 loadState();
 
-// Bij opstarten: laad uit Sheets als URL bekend is
-async function init(){
-  if(sheetsUrl){
-    const result = await sheetsGet();
-    if(result?.budget && result.budget.length > 0){
-      applySheets(result);
-      saveState();
-    }
-  }
-  renders.dashboard();
+// Direct dashboard tonen, Sheets op de achtergrond laden
+renders.dashboard();
+
+if(sheetsUrl){
+  sheetsGet().then(result=>{
+    if(result && !result.error) applySheets(result);
+  }).catch(()=>{});
 }
-init();
 </script>
 </body>
 </html>
