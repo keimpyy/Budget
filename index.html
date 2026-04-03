@@ -342,6 +342,14 @@ function go(name,btn){
   if(name==='instellingen') renderInstellingen();
   else if(name==='leningen') renderLeningen();
   else if(renders[name]) renders[name]();
+  // Haal op de achtergrond verse data op bij tabwisseling
+  if(sheetsUrl){
+    sheetsGet().then(result=>{
+      if(result?.budget && result.budget.length > 0){
+        applySheets(result);
+      }
+    }).catch(()=>{});
+  }
 }
 
 function openModal(name,data){
