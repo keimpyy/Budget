@@ -1039,7 +1039,8 @@ function loadState(){
   }catch(e){}
 }
 
-loadState();
+// Altijd starten met schone slate — alles komt uit Sheets
+localStorage.clear();
 
 // Toon laadscherm, wacht op Sheets, dan renderen
 document.getElementById('v-dashboard').innerHTML = `
@@ -1049,14 +1050,10 @@ document.getElementById('v-dashboard').innerHTML = `
   </div>
   <style>@keyframes spin{to{transform:rotate(360deg)}}</style>`;
 
-if(sheetsUrl){
-  sheetsGet().then(result=>{
-    if(result && !result.error) applySheets(result);
-    else renders.dashboard();
-  }).catch(()=>renders.dashboard());
-} else {
-  renders.dashboard();
-}
+sheetsGet().then(result=>{
+  if(result && !result.error) applySheets(result);
+  else renders.dashboard();
+}).catch(()=>renders.dashboard());
 </script>
 </body>
 </html>
