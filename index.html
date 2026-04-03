@@ -696,17 +696,33 @@ localStorage.setItem('bv_sheets_url', sheetsUrl);
 async function safeJson(res){
   const text = await res.text();
   try { return JSON.parse(text); }
-  catch(e){ return { error: 'Parse fout: '+text.slice(0,100) }; }
+  catch(e){ return { error: 'Parse fout: '+text.slice(0,200) }; }
 }
+
+// Apps Script: GET voor lezen, POST via form-encode voor schrijven (CORS-safe)
 async function sheetsPost(data){
   if(!sheetsUrl) return null;
   try {
-    // Apps Script: gebruik GET met data als query param (CORS-safe)
-    const params = encodeURIComponent(JSON.stringify(data));
-    const res = await fetch(sheetsUrl+'?payload='+params, { redirect:'follow' });
+    // Stuur als form data — werkt wel door CORS bij Apps Script
+    const form = new FormData();
+    form.append('payload', JSON.stringify(data));
+    const res = await fetch(sheetsUrl, {
+      method: 'POST',
+      body: form,
+      redirect: 'follow',
+    });
     return await safeJson(res);
-  } catch(e){ console.error('sheetsPost:', e); return { error: e.message }; }
+  } catch(e){
+    // Fallback: probeer via GET met verkorte payload
+    console.error('sheetsPost FormData fout:', e);
+    try {
+      const params = '?payload='+encodeURIComponent(JSON.stringify(data));
+      const res2 = await fetch(sheetsUrl+params, { redirect:'follow' });
+      return await safeJson(res2);
+    } catch(e2){ return { error: e2.message }; }
+  }
 }
+
 async function sheetsGet(){
   if(!sheetsUrl) return null;
   try {
@@ -769,8 +785,10 @@ async function saveToSheets(){
     if(status) status.textContent = 'Opgeslagen op '+new Date().toLocaleTimeString('nl')+' ✓';
     showToast('Opgeslagen in Sheets ✓');
   } else {
-    if(status) status.textContent = 'Opslaan mislukt — check Script URL';
-    showToast('Opslaan mislukt');
+    const err = result?.error || 'onbekend';
+    console.error('saveToSheets fout:', err);
+    if(status) status.textContent = 'Mislukt: '+err.slice(0,50);
+    showToast('Opslaan mislukt: '+err.slice(0,30));
   }
 }
 
