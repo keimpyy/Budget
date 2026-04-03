@@ -1051,9 +1051,11 @@ document.getElementById('v-dashboard').innerHTML = `
   <style>@keyframes spin{to{transform:rotate(360deg)}}</style>`;
 
 sheetsGet().then(result=>{
+  console.log('Sheets response:', JSON.stringify(result)?.slice(0,500));
+  console.log('Inkomsten:', JSON.stringify(result?.inkomsten));
   if(result && !result.error) applySheets(result);
   else renders.dashboard();
-}).catch(()=>renders.dashboard());
+}).catch(e=>{ console.error('Sheets fout:', e); renders.dashboard(); });
 </script>
 </body>
 </html>
