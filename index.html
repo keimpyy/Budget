@@ -857,9 +857,16 @@ async function sheetsPost(data){
 async function sheetsGet(){
   if(!sheetsUrl) return null;
   try {
-    const res = await fetch(sheetsUrl+'?action=getAll', { redirect:'follow' });
-    return await safeJson(res);
-  } catch(e){ console.error('sheetsGet:', e); return { error: e.message }; }
+    // Probeer eerst zonder redirect:follow (werkt beter op sommige mobiele browsers)
+    const res = await fetch(sheetsUrl+'?action=getAll');
+    const text = await res.text();
+    console.log('Sheets raw text:', text.slice(0,300));
+    try { return JSON.parse(text); }
+    catch(e){ return { error: 'Parse fout: '+text.slice(0,100) }; }
+  } catch(e){
+    console.error('sheetsGet fout:', e.message);
+    return { error: e.message };
+  }
 }
 
 // Converteer app state naar Sheets formaat
@@ -1053,9 +1060,20 @@ document.getElementById('v-dashboard').innerHTML = `
 sheetsGet().then(result=>{
   console.log('Sheets response:', JSON.stringify(result)?.slice(0,500));
   console.log('Inkomsten:', JSON.stringify(result?.inkomsten));
-  if(result && !result.error) applySheets(result);
-  else renders.dashboard();
-}).catch(e=>{ console.error('Sheets fout:', e); renders.dashboard(); });
+  if(result && !result.error){
+    applySheets(result);
+  } else {
+    const msg = result?.error || 'Geen response';
+    document.getElementById('v-dashboard').innerHTML +=
+      `<div style="background:#ff6b6b22;border:1px solid #ff6b6b;border-radius:12px;padding:12px;margin:16px;font-size:12px;color:#ff6b6b;font-family:monospace">Sheets fout: ${msg}</div>`;
+    renders.dashboard();
+  }
+}).catch(e=>{
+  console.error('Sheets catch:', e);
+  document.getElementById('v-dashboard').innerHTML +=
+    `<div style="background:#ff6b6b22;border:1px solid #ff6b6b;border-radius:12px;padding:12px;margin:16px;font-size:12px;color:#ff6b6b;font-family:monospace">Fetch fout: ${e.message}</div>`;
+  renders.dashboard();
+});
 </script>
 </body>
 </html>
