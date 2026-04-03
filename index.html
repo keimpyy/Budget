@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Budget">
 <meta name="theme-color" content="#0a0a0f">
-<title>Budget · Veenstra</title>
+<title>Budget ·</title>
 <style>
 :root {
   --bg:#0a0a0f;--surface:#13131a;--surface2:#1c1c26;--surface3:#242432;
@@ -137,10 +137,10 @@ input,select,textarea{font-size:16px!important;}</style>
       <div style="display:flex;align-items:center;gap:8px">
         <button class="edit-btn" id="edit-btn" onclick="toggleEdit()">Wijzig</button>
         <div style="display:flex;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:3px;gap:2px;display:none" id="month-filter">
-          <button onclick="setMonth('Alles',this)" style="font-size:11px;font-weight:600;padding:4px 9px;border-radius:16px;border:none;cursor:pointer;font-family:inherit;transition:all .15s;background:var(--accent);color:#fff">Alles</button>
-          <button onclick="setMonth('P1',this)" style="font-size:11px;font-weight:600;padding:4px 9px;border-radius:16px;border:none;cursor:pointer;font-family:inherit;transition:all .15s;background:transparent;color:var(--muted)">25 dec–jan</button>
-          <button onclick="setMonth('P2',this)" style="font-size:11px;font-weight:600;padding:4px 9px;border-radius:16px;border:none;cursor:pointer;font-family:inherit;transition:all .15s;background:transparent;color:var(--muted)">25 jan–feb</button>
-          <button onclick="setMonth('P3',this)" style="font-size:11px;font-weight:600;padding:4px 9px;border-radius:16px;border:none;cursor:pointer;font-family:inherit;transition:all .15s;background:transparent;color:var(--muted)">25 feb–mrt</button>
+          <button onclick="setMonth('Alles',this)" style="font-size:10px;font-weight:700;padding:4px 8px;border-radius:16px;border:none;cursor:pointer;font-family:inherit;transition:all .2s;background:var(--accent);color:#fff">Alles</button>
+          <button onclick="setMonth('P1',this)" style="font-size:10px;font-weight:700;padding:4px 8px;border-radius:16px;border:none;cursor:pointer;font-family:inherit;transition:all .2s;background:transparent;color:var(--muted)">dec–jan</button>
+          <button onclick="setMonth('P2',this)" style="font-size:10px;font-weight:700;padding:4px 8px;border-radius:16px;border:none;cursor:pointer;font-family:inherit;transition:all .2s;background:transparent;color:var(--muted)">jan–feb</button>
+          <button onclick="setMonth('P3',this)" style="font-size:10px;font-weight:700;padding:4px 8px;border-radius:16px;border:none;cursor:pointer;font-family:inherit;transition:all .2s;background:transparent;color:var(--muted)">feb–mrt</button>
         </div>
       </div>
     </div>
@@ -275,9 +275,10 @@ let activeMonth='Alles';
 function setMonth(m, btn){
   activeMonth=m;
   document.querySelectorAll('#month-filter button').forEach(b=>{
-    const isActive = b.textContent.trim()===m || (m==='Alles' && b.textContent.trim()==='Alles');
-    b.style.background = isActive ? 'var(--accent)' : 'transparent';
-    b.style.color = isActive ? '#fff' : 'var(--muted)';
+    const active = b.textContent.trim()===m;
+    b.style.background = active ? 'var(--accent)' : 'transparent';
+    b.style.color      = active ? '#fff' : 'var(--muted)';
+    b.style.fontWeight = active ? '800' : '700';
   });
   const activeView=document.querySelector('.view.active');
   if(activeView){
@@ -775,24 +776,17 @@ async function saveToSheets(){
     variabel: varToRows(),
   });
 
-  try {
-    // no-cors POST — schrijft naar Sheets zonder CORS blokkade
-    // We kunnen de response niet lezen, maar het schrijven werkt
-    await fetch(sheetsUrl, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'text/plain' },
-      body: payload,
-    });
-    if(btn){ btn.textContent='☁️ Opslaan in Sheets'; btn.disabled=false; }
-    if(status) status.textContent = 'Opgeslagen op '+new Date().toLocaleTimeString('nl')+' ✓';
-    showToast('Opgeslagen in Sheets ✓');
-  } catch(e) {
-    if(btn){ btn.textContent='☁️ Opslaan in Sheets'; btn.disabled=false; }
-    const err = e.message || 'onbekend';
-    if(status) status.textContent = 'Mislukt: '+err.slice(0,50);
-    showToast('Opslaan mislukt: '+err.slice(0,30));
-  }
+  // Fire-and-forget — toon succes direct, wacht niet op response
+  fetch(sheetsUrl, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain' },
+    body: payload,
+  }).catch(e => console.error('Sheets POST fout:', e));
+
+  if(btn){ btn.textContent='☁️ Opslaan in Sheets'; btn.disabled=false; }
+  if(status) status.textContent = 'Opgeslagen op '+new Date().toLocaleTimeString('nl')+' ✓';
+  showToast('Opgeslagen ✓');
 }
 
 async function loadFromSheets(){
