@@ -148,6 +148,7 @@ input,select,textarea{font-size:16px!important;}</style>
       <button class="tab active" onclick="go('dashboard',this)">Dashboard</button>
       <button class="tab" onclick="go('budget',this)">Budget</button>
       <button class="tab" onclick="go('variabel',this)">Variabel</button>
+      <button class="tab" onclick="go('instellingen',this)">Instellingen</button>
     </div>
   </div>
 
@@ -155,6 +156,7 @@ input,select,textarea{font-size:16px!important;}</style>
     <div id="v-dashboard" class="view active"></div>
     <div id="v-budget" class="view"></div>
     <div id="v-variabel" class="view"></div>
+    <div id="v-instellingen" class="view"></div>
   </div>
 </div>
 
@@ -250,29 +252,9 @@ const ZZP=[
 ];
 
 // ── LOCALSTORAGE PERSISTENCE ──
-const STORE_KEY='budget_veenstra_v1';
-function saveState(){
-  try{localStorage.setItem(STORE_KEY,JSON.stringify({kt,ryanne,budget:BUDGET}));}catch(e){}
-}
-function loadState(){
-  try{
-    const d=localStorage.getItem(STORE_KEY);
-    if(!d)return;
-    const p=JSON.parse(d);
-    if(p.kt)kt=p.kt;
-    if(p.ryanne)ryanne=p.ryanne;
-    if(p.budget){
-      // Merge saved budgets into BUDGET (preserves structure, updates values)
-      Object.entries(p.budget).forEach(([cat,data])=>{
-        if(BUDGET[cat])BUDGET[cat].items=data.items;
-      });
-    }
-  }catch(e){}
-}
-
 let kt=2950,ryanne=1581.89;
+let transactions=[];
 window.varActiveCat='Boodschappen';
-loadState();
 
 const fmt=n=>'€ '+Math.abs(n).toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.');
 const fmtS=n=>'€'+Math.round(Math.abs(n)).toLocaleString('nl');
@@ -341,7 +323,8 @@ function go(name,btn){
   if(name==='budget'){eb.classList.add('visible');mf.style.display='none';}
   else if(name==='variabel'){eb.classList.remove('visible');mf.style.display='flex';editMode=false;eb.textContent='Wijzig';eb.style.color='var(--accent)';}
   else{eb.classList.remove('visible');mf.style.display='none';editMode=false;eb.textContent='Wijzig';eb.style.color='var(--accent)';}
-  renders[name]();
+  if(name==='instellingen') renderInstellingen();
+  else if(renders[name]) renders[name]();
 }
 
 function openModal(name,data){
@@ -439,7 +422,11 @@ const renders = {
       <div style="display:flex;justify-content:space-between;padding:10px 4px">
         <span style="font-size:13px;color:${C.muted}">Overschot</span>
         <span id="bover" style="font-family:monospace;font-size:15px;color:${over()>=0?C.green:C.red}">${fmt(over())}</span>
-      </div>`;
+      </div>
+      <button onclick="saveToSheets()" style="width:100%;margin-top:16px;background:linear-gradient(135deg,var(--accent),#9b8af7);border:none;border-radius:14px;color:#fff;font-family:inherit;font-size:15px;font-weight:700;padding:15px;cursor:pointer">
+        ☁️ Opslaan in Sheets
+      </button>
+      <div id="save-status" style="text-align:center;font-size:12px;color:var(--muted);margin-top:8px;min-height:16px"></div>`;
   },
 
   variabel(){
@@ -702,6 +689,150 @@ function renamePost(cat,idx,val){
   renders.dashboard();
 }
 
+// ── GOOGLE SHEETS SYNC ──────────────────────────────────
+let sheetsUrl = 'https://script.google.com/macros/s/AKfycbzWHhtZIZofZK8VUgnHzbHfBqDtroWQjYW8B7HjnLGJpk_hl0Q5U_jd8ebDe_oeD8C0Qw/exec';
+localStorage.setItem('bv_sheets_url', sheetsUrl);
+
+async function safeJson(res){
+  const text = await res.text();
+  try { return JSON.parse(text); }
+  catch(e){ return { error: 'Parse fout: '+text.slice(0,100) }; }
+}
+async function sheetsPost(data){
+  if(!sheetsUrl) return null;
+  try {
+    const res = await fetch(sheetsUrl, { method:'POST', redirect:'follow', body:JSON.stringify(data) });
+    return await safeJson(res);
+  } catch(e){ return { error: e.message }; }
+}
+async function sheetsGet(){
+  if(!sheetsUrl) return null;
+  try {
+    const res = await fetch(sheetsUrl+'?action=getAll', { redirect:'follow' });
+    return await safeJson(res);
+  } catch(e){ return { error: e.message }; }
+}
+
+// Converteer app state naar Sheets formaat
+function budgetToRows(){
+  const rows = [];
+  Object.entries(BUDGET).forEach(([cat, data]) => {
+    data.items.forEach(item => rows.push({ categorie: cat, post: item.post, budget: item.budget }));
+  });
+  return rows;
+}
+function inkomstenToRows(){
+  return [ { naam: 'KT', bedrag: kt }, { naam: 'Ryanne', bedrag: ryanne } ];
+}
+function varToRows(){
+  const rows = [];
+  Object.entries(VAR_TX).forEach(([cat, txs]) => {
+    txs.forEach(t => rows.push({ categorie: cat, post: t.name, datum: t.date, bedrag: t.amount, rekening: t.rek||'' }));
+  });
+  return rows;
+}
+
+// Laad Sheets data in app state
+function applySheets(data){
+  if(data.inkomsten){
+    data.inkomsten.forEach(r => {
+      if(r.naam==='KT') kt = parseFloat(r.bedrag)||kt;
+      if(r.naam==='Ryanne') ryanne = parseFloat(r.bedrag)||ryanne;
+    });
+  }
+  if(data.budget && data.budget.length > 0){
+    data.budget.forEach(r => {
+      const cat = BUDGET[r.categorie];
+      if(cat){
+        const item = cat.items.find(i => i.post === r.post);
+        if(item) item.budget = parseFloat(r.budget)||0;
+      }
+    });
+  }
+}
+
+async function saveToSheets(){
+  const btn = document.querySelector('[onclick="saveToSheets()"]');
+  const status = document.getElementById('save-status');
+  if(btn){ btn.textContent='⏳ Opslaan...'; btn.disabled=true; }
+  saveState(); // ook lokaal
+  const result = await sheetsPost({
+    action: 'saveAll',
+    inkomsten: inkomstenToRows(),
+    budget: budgetToRows(),
+    variabel: varToRows(),
+  });
+  if(btn){ btn.textContent='☁️ Opslaan in Sheets'; btn.disabled=false; }
+  if(result?.ok){
+    if(status) status.textContent = 'Opgeslagen op '+new Date().toLocaleTimeString('nl')+' ✓';
+    showToast('Opgeslagen in Sheets ✓');
+  } else {
+    if(status) status.textContent = 'Opslaan mislukt — check Script URL';
+    showToast('Opslaan mislukt');
+  }
+}
+
+async function loadFromSheets(){
+  if(!sheetsUrl){ showToast('Geen Script URL ingesteld'); return; }
+  showToast('Ophalen uit Sheets...');
+  const result = await sheetsGet();
+  if(result?.error){ showToast('Fout: '+result.error.slice(0,40)); return; }
+  if(result?.budget && result.budget.length > 0){
+    applySheets(result);
+    saveState();
+    renders.dashboard();
+    renders.budget();
+    showToast('Data opgehaald uit Sheets ✓');
+  } else {
+    showToast('Geen data in Sheets — eerst opslaan');
+  }
+}
+
+// ── INSTELLINGEN ─────────────────────────────────────────
+function renderInstellingen(){
+  document.getElementById('v-instellingen').innerHTML=`
+    <div style="background:var(--surface);border:1px solid ${C.border};border-radius:20px;padding:20px;margin-bottom:16px">
+      <div style="font-size:13px;font-weight:700;letter-spacing:.5px;color:var(--muted);text-transform:uppercase;margin-bottom:14px">Google Sheets</div>
+      <div id="sheets-status" style="display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid ${C.border};border-radius:12px;padding:12px 16px;margin-bottom:12px;font-size:13px">
+        <div id="sheets-dot" style="width:10px;height:10px;border-radius:50%;background:${sheetsUrl?'#3ddc84':'var(--muted)'};flex-shrink:0"></div>
+        <div style="color:${sheetsUrl?'#3ddc84':'var(--muted)'}">${sheetsUrl?'Verbonden':'Niet verbonden'}</div>
+      </div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Script URL</div>
+      <input id="sheets-url-input" type="url" value="${sheetsUrl}" placeholder="https://script.google.com/macros/s/..."
+        style="width:100%;background:var(--surface2);border:1px solid ${C.border};border-radius:12px;color:var(--text);font-family:inherit;font-size:14px;padding:11px 14px;outline:none;margin-bottom:10px">
+      <button onclick="connectSheets()" style="width:100%;background:linear-gradient(135deg,var(--accent),#9b8af7);border:none;border-radius:12px;color:#fff;font-family:inherit;font-size:14px;font-weight:700;padding:14px;cursor:pointer;margin-bottom:8px">
+        Verbinden & ophalen
+      </button>
+      <button onclick="loadFromSheets()" style="width:100%;background:var(--surface2);border:1px solid ${C.border};border-radius:12px;color:var(--accent);font-family:inherit;font-size:14px;font-weight:600;padding:12px;cursor:pointer">
+        ↻ Haal data op
+      </button>
+    </div>
+    <div style="background:#1a1a2e;border:1px solid rgba(124,106,247,.2);border-radius:16px;padding:16px;font-size:12px;line-height:1.9;color:var(--muted)">
+      <strong style="color:var(--text)">Eenmalig instellen:</strong><br>
+      1. Ga naar <strong style="color:var(--text)">script.google.com</strong> → Nieuw project<br>
+      2. Plak inhoud van <strong style="color:var(--text)">Budget_Script.gs</strong><br>
+      3. Vervang JOUW_SHEET_ID_HIER door jouw Sheet ID<br>
+      4. Implementeren → Web-app → Toegang: Iedereen<br>
+      5. Plak de URL hierboven → Verbinden & ophalen
+    </div>`;
+}
+
+async function connectSheets(){
+  const url = document.getElementById('sheets-url-input')?.value.trim();
+  if(!url){ showToast('Vul een URL in'); return; }
+  sheetsUrl = url;
+  localStorage.setItem('bv_sheets_url', url);
+  await loadFromSheets();
+  renderInstellingen();
+}
+
+function showToast(msg){
+  const t=document.createElement('div');
+  t.textContent=msg;
+  t.style.cssText='position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;padding:11px 20px;border-radius:12px;font-size:14px;font-weight:600;z-index:999;white-space:nowrap;box-shadow:0 4px 20px rgba(124,106,247,.4);font-family:inherit';
+  document.body.appendChild(t); setTimeout(()=>t.remove(), 2500);
+}
+
 function saveState(){
   try{
     localStorage.setItem('bv_kt', kt);
@@ -737,7 +868,19 @@ function loadState(){
 }
 
 loadState();
-renders.dashboard();
+
+// Bij opstarten: laad uit Sheets als URL bekend is
+async function init(){
+  if(sheetsUrl){
+    const result = await sheetsGet();
+    if(result?.budget && result.budget.length > 0){
+      applySheets(result);
+      saveState();
+    }
+  }
+  renders.dashboard();
+}
+init();
 </script>
 </body>
 </html>
