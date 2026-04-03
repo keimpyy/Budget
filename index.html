@@ -256,15 +256,16 @@ let kt=2950,ryanne=1581.89;
 let transactions=[];
 
 // Leningen — gesynchroniseerd via Sheets, lokaal gecached
+localStorage.removeItem('bv_leningen'); // reset eenmalig naar correcte waarden
 let LENINGEN = JSON.parse(localStorage.getItem('bv_leningen') || 'null') || [
   { id:'l1', naam:'Auto 1', totaal:2700, betaald:750, kleur:'#7c6af7' },
   { id:'l2', naam:'Auto 2', totaal:7500, betaald:0,   kleur:'#4ecdc4' },
 ];
 function saveLeningen(){
   try{ localStorage.setItem('bv_leningen', JSON.stringify(LENINGEN)); }catch(e){}
-  // Push naar Sheets op de achtergrond
+  // Gebruik aparte saveLeningen actie — overschrijft alleen Leningen tabblad
   if(typeof sheetsUrl !== 'undefined' && sheetsUrl){
-    const payload = JSON.stringify({ action:'saveAll', leningen: LENINGEN });
+    const payload = JSON.stringify({ action:'saveLeningen', leningen: LENINGEN });
     fetch(sheetsUrl, { method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'}, body:payload })
       .catch(e=>console.error('leningen sync fout:',e));
   }
