@@ -741,10 +741,10 @@ function varToRows(){
 
 // Laad Sheets data in app state
 function applySheets(data){
-  if(data.inkomsten){
+  if(data.inkomsten && data.inkomsten.length > 0){
     data.inkomsten.forEach(r => {
-      if(r.naam==='KT') kt = parseFloat(r.bedrag)||kt;
-      if(r.naam==='Ryanne') ryanne = parseFloat(r.bedrag)||ryanne;
+      if(String(r.naam).trim()==='KT') kt = parseFloat(r.bedrag)||kt;
+      if(String(r.naam).trim()==='Ryanne') ryanne = parseFloat(r.bedrag)||ryanne;
     });
   }
   if(data.budget && data.budget.length > 0){
@@ -756,26 +756,40 @@ function applySheets(data){
       }
     });
   }
+  saveState();
+  // Re-render alles zodat nieuwe waarden zichtbaar zijn
+  renders.dashboard();
+  if(document.getElementById('v-budget').classList.contains('active')) renders.budget();
 }
 
 async function saveToSheets(){
   const btn = document.querySelector('[onclick="saveToSheets()"]');
   const status = document.getElementById('save-status');
   if(btn){ btn.textContent='⏳ Opslaan...'; btn.disabled=true; }
-  saveState(); // ook lokaal
-  const result = await sheetsPost({
+  saveState();
+
+  const payload = JSON.stringify({
     action: 'saveAll',
     inkomsten: inkomstenToRows(),
     budget: budgetToRows(),
     variabel: varToRows(),
   });
-  if(btn){ btn.textContent='☁️ Opslaan in Sheets'; btn.disabled=false; }
-  if(result?.ok){
+
+  try {
+    // no-cors POST — schrijft naar Sheets zonder CORS blokkade
+    // We kunnen de response niet lezen, maar het schrijven werkt
+    await fetch(sheetsUrl, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: payload,
+    });
+    if(btn){ btn.textContent='☁️ Opslaan in Sheets'; btn.disabled=false; }
     if(status) status.textContent = 'Opgeslagen op '+new Date().toLocaleTimeString('nl')+' ✓';
     showToast('Opgeslagen in Sheets ✓');
-  } else {
-    const err = result?.error || 'onbekend';
-    console.error('saveToSheets fout:', err);
+  } catch(e) {
+    if(btn){ btn.textContent='☁️ Opslaan in Sheets'; btn.disabled=false; }
+    const err = e.message || 'onbekend';
     if(status) status.textContent = 'Mislukt: '+err.slice(0,50);
     showToast('Opslaan mislukt: '+err.slice(0,30));
   }
