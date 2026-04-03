@@ -701,16 +701,18 @@ async function safeJson(res){
 async function sheetsPost(data){
   if(!sheetsUrl) return null;
   try {
-    const res = await fetch(sheetsUrl, { method:'POST', redirect:'follow', body:JSON.stringify(data) });
+    // Apps Script: gebruik GET met data als query param (CORS-safe)
+    const params = encodeURIComponent(JSON.stringify(data));
+    const res = await fetch(sheetsUrl+'?payload='+params, { redirect:'follow' });
     return await safeJson(res);
-  } catch(e){ return { error: e.message }; }
+  } catch(e){ console.error('sheetsPost:', e); return { error: e.message }; }
 }
 async function sheetsGet(){
   if(!sheetsUrl) return null;
   try {
     const res = await fetch(sheetsUrl+'?action=getAll', { redirect:'follow' });
     return await safeJson(res);
-  } catch(e){ return { error: e.message }; }
+  } catch(e){ console.error('sheetsGet:', e); return { error: e.message }; }
 }
 
 // Converteer app state naar Sheets formaat
