@@ -137,8 +137,11 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 .loan-addpay{background:linear-gradient(135deg,#ff3cac,#2b86ff);color:#fff;border:none;border-radius:14px;padding:13px 14px;font-weight:800;cursor:pointer;width:100%}
 .loan-save{background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:14px;padding:13px 14px;font-weight:800;cursor:pointer;width:100%}
 .loan-inputs{display:flex;flex-direction:column;gap:12px}
+.loan-metric{width:100%;min-width:0}
+.loan-metric .input{width:100%;min-width:0;max-width:100%}
 .loan-metric .inline{display:flex;flex-direction:column;align-items:stretch;gap:10px}
 .loan-metric .inline .input{width:100%}
+.loan-fullwidth{width:100%}
 .budget-toolbar-actions .pill-btn.order-btn{display:none}
 #confetti-layer{position:fixed;inset:0;pointer-events:none;z-index:2000}
 
@@ -202,7 +205,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 </style>
 </head>
 <body>
-<div class="shell">
+<div class="shell" id="app-shell" ontouchstart="appSwipeStart(event)" ontouchmove="appSwipeMove(event)" ontouchend="appSwipeEnd(event)">
   <div class="header">
     <div class="header-top">
       <div class="title">Budget <span>·</span> Veenstra</div>
@@ -360,6 +363,44 @@ function rerenderAll(){
   renderLeningen();
   renderInstellingen();
 }
+const VIEW_ORDER = ['dashboard','budget','leningen','instellingen'];
+const appSwipe = {startX:0, startY:0, dx:0, dy:0};
+function appSwipeStart(e){
+  const t = e.changedTouches[0];
+  appSwipe.startX = t.clientX;
+  appSwipe.startY = t.clientY;
+  appSwipe.dx = 0;
+  appSwipe.dy = 0;
+}
+function appSwipeMove(e){
+  const t = e.changedTouches[0];
+  appSwipe.dx = t.clientX - appSwipe.startX;
+  appSwipe.dy = t.clientY - appSwipe.startY;
+}
+function appSwipeEnd(e){
+  const absX = Math.abs(appSwipe.dx);
+  const absY = Math.abs(appSwipe.dy);
+  if(absX < 60 || absX < absY * 1.4) return;
+  const activeEl = document.querySelector('.view.active');
+  if(!activeEl) return;
+  const current = activeEl.id.replace('v-','');
+  const idx = VIEW_ORDER.indexOf(current);
+  if(idx < 0) return;
+  // ignore swipe if user is interacting with input/textarea/select/button inside budget cards
+  const target = e.target;
+  const tag = (target && target.tagName || '').toLowerCase();
+  if(['input','textarea','select','button'].includes(tag)) return;
+  if(appSwipe.dx < 0 && idx < VIEW_ORDER.length - 1){
+    const next = VIEW_ORDER[idx + 1];
+    const btn = [...document.querySelectorAll('.tab')].find(b => b.textContent.trim().toLowerCase() === next) || document.getElementById('settings-tab-btn');
+    if(btn) go(next, btn);
+  } else if(appSwipe.dx > 0 && idx > 0){
+    const prev = VIEW_ORDER[idx - 1];
+    const btn = [...document.querySelectorAll('.tab')].find(b => b.textContent.trim().toLowerCase() === prev) || document.querySelectorAll('.tab')[0];
+    if(btn) go(prev, btn);
+  }
+}
+
 function showToast(msg){
   const t=document.createElement('div');
   t.textContent=msg;
@@ -581,8 +622,8 @@ function renderLeningen(){
                 <div class="loan-metric-label">Al betaald</div>
                 <input class="input" type="number" value="${Number(l.betaald||0)}" onchange="updateLoanPaid(${idx}, this.value)">
               </div>
-              <div class="loan-metric">
-                <div class="loan-metric-label">Snelle actie</div>
+              <div class="loan-metric loan-fullwidth">
+                <div class="loan-metric-label">Snelle aflossing</div>
                 <button class="loan-addpay" onclick="addLoanPayment(${idx})">+ Aflossing toevoegen</button>
               </div>
             </div>
