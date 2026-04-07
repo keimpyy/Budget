@@ -65,7 +65,6 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 .post-row{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:8px}
 .loan-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
 .loan-row:last-child{border-bottom:none}
-.chip{display:inline-flex;padding:5px 10px;border-radius:999px;background:var(--surface2);border:1px solid var(--border);font-size:11px;color:var(--muted)}
 .note{font-size:12px;color:var(--muted);line-height:1.6}
 #startup-overlay{position:fixed;inset:0;background:rgba(10,10,15,.96);z-index:1000;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px}
 #startup-overlay .spinner{width:42px;height:42px;border:4px solid var(--surface3);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite}
@@ -77,7 +76,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
   <div class="header">
     <div class="header-top">
       <div class="title">Budget <span>·</span> Veenstra</div>
-      <div class="badge" id="sync-badge">Lokaal</div>
+      <div class="badge" id="sync-badge">Verbinden...</div>
     </div>
     <div class="tabs">
       <button class="tab active" onclick="go('dashboard',this)">Dashboard</button>
@@ -108,49 +107,8 @@ const state = {
     { naam:'KT', bedrag:2950 },
     { naam:'Ryanne', bedrag:1581.89 },
   ],
-  categorieen: [
-    { id:'cat_woning', naam:'Woning', volgorde:1 },
-    { id:'cat_auto', naam:'Auto', volgorde:2 },
-    { id:'cat_streaming', naam:'Streaming', volgorde:3 },
-    { id:'cat_leningen', naam:'Leningen', volgorde:4 },
-    { id:'cat_zorg', naam:'Zorgverzekering', volgorde:5 },
-    { id:'cat_telefoon', naam:'Telefoon', volgorde:6 },
-    { id:'cat_overig', naam:'Overig / ING', volgorde:7 },
-  ],
-  budget: [
-    { id:'bud_1', categorieId:'cat_woning', post:'Hypotheek', budget:1250, volgorde:1 },
-    { id:'bud_2', categorieId:'cat_woning', post:'Gas/Elektra', budget:250, volgorde:2 },
-    { id:'bud_3', categorieId:'cat_woning', post:'Vitens', budget:20, volgorde:3 },
-    { id:'bud_4', categorieId:'cat_woning', post:'Assudeuren', budget:55, volgorde:4 },
-    { id:'bud_5', categorieId:'cat_woning', post:'TAF', budget:10, volgorde:5 },
-
-    { id:'bud_6', categorieId:'cat_auto', post:'Allianz Auto 1', budget:46, volgorde:1 },
-    { id:'bud_7', categorieId:'cat_auto', post:'Allianz Auto 2', budget:46, volgorde:2 },
-    { id:'bud_8', categorieId:'cat_auto', post:'Benzine', budget:350, volgorde:3 },
-    { id:'bud_9', categorieId:'cat_auto', post:'Wegenbelasting 1', budget:31, volgorde:4 },
-    { id:'bud_10', categorieId:'cat_auto', post:'Wegenbelasting 2', budget:31, volgorde:5 },
-
-    { id:'bud_11', categorieId:'cat_streaming', post:'HBO', budget:5, volgorde:1 },
-    { id:'bud_12', categorieId:'cat_streaming', post:'Prime', budget:5, volgorde:2 },
-    { id:'bud_13', categorieId:'cat_streaming', post:'Videoland', budget:6, volgorde:3 },
-    { id:'bud_14', categorieId:'cat_streaming', post:'Podimo', budget:10, volgorde:4 },
-    { id:'bud_15', categorieId:'cat_streaming', post:'Sky', budget:5, volgorde:5 },
-
-    { id:'bud_16', categorieId:'cat_leningen', post:'Anko/Emmy', budget:150, volgorde:1 },
-    { id:'bud_17', categorieId:'cat_leningen', post:'Auto leningen', budget:500, volgorde:2 },
-
-    { id:'bud_18', categorieId:'cat_zorg', post:'KT', budget:125, volgorde:1 },
-    { id:'bud_19', categorieId:'cat_zorg', post:'Ryanne', budget:125, volgorde:2 },
-
-    { id:'bud_20', categorieId:'cat_telefoon', post:'KT (Youfone)', budget:7.5, volgorde:1 },
-    { id:'bud_21', categorieId:'cat_telefoon', post:'Ryanne (Ben)', budget:35, volgorde:2 },
-
-    { id:'bud_22', categorieId:'cat_overig', post:'ING kosten', budget:11, volgorde:1 },
-    { id:'bud_23', categorieId:'cat_overig', post:'Boodschappen', budget:500, volgorde:2 },
-    { id:'bud_24', categorieId:'cat_overig', post:'Gemeente', budget:120, volgorde:3 },
-    { id:'bud_25', categorieId:'cat_overig', post:'Xbox', budget:15, volgorde:4 },
-    { id:'bud_26', categorieId:'cat_overig', post:'Was spul', budget:50, volgorde:5 },
-  ],
+  categorieen: [],
+  budget: [],
   leningen: [
     { id:'l1', naam:'Auto 1', totaal:2700, betaald:750, kleur:'#7c6af7' },
     { id:'l2', naam:'Auto 2', totaal:7500, betaald:0, kleur:'#4ecdc4' },
@@ -158,44 +116,17 @@ const state = {
   openCats:{},
 };
 
-function uid(prefix){
-  return `${prefix}_${Date.now()}_${Math.floor(Math.random()*100000)}`;
-}
-function fmt(n){
-  const v = Number(n || 0);
-  return '€ ' + v.toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.');
-}
-function fmtShort(n){
-  return '€' + Math.round(Number(n || 0)).toLocaleString('nl');
-}
-function inkomstenTotaal(){
-  return state.inkomsten.reduce((s,r)=>s + Number(r.bedrag || 0), 0);
-}
-function budgetTotaal(){
-  return state.budget.reduce((s,r)=>s + Number(r.budget || 0), 0);
-}
-function overschot(){
-  return inkomstenTotaal() - budgetTotaal();
-}
-function spaarquote(){
-  const inc = inkomstenTotaal();
-  if(!inc) return 0;
-  return (overschot() / inc) * 100;
-}
-function orderedCats(){
-  return [...state.categorieen].sort((a,b)=>(a.volgorde||0)-(b.volgorde||0));
-}
-function itemsForCategory(catId){
-  return state.budget
-    .filter(r=>String(r.categorieId) === String(catId))
-    .sort((a,b)=>(a.volgorde||0)-(b.volgorde||0));
-}
-function totalForCategory(catId){
-  return itemsForCategory(catId).reduce((s,r)=>s + Number(r.budget || 0), 0);
-}
-function categoryNameById(id){
-  return (state.categorieen.find(c=>String(c.id)===String(id)) || {}).naam || 'Onbekend';
-}
+function uid(prefix){ return `${prefix}_${Date.now()}_${Math.floor(Math.random()*100000)}`; }
+function fmt(n){ const v = Number(n || 0); return '€ ' + v.toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.'); }
+function fmtShort(n){ return '€' + Math.round(Number(n || 0)).toLocaleString('nl'); }
+function inkomstenTotaal(){ return state.inkomsten.reduce((s,r)=>s + Number(r.bedrag || 0), 0); }
+function budgetTotaal(){ return state.budget.reduce((s,r)=>s + Number(r.budget || 0), 0); }
+function overschot(){ return inkomstenTotaal() - budgetTotaal(); }
+function spaarquote(){ const inc = inkomstenTotaal(); return inc ? (overschot() / inc) * 100 : 0; }
+function orderedCats(){ return [...state.categorieen].sort((a,b)=>(a.volgorde||0)-(b.volgorde||0)); }
+function itemsForCategory(catId){ return state.budget.filter(r=>String(r.categorieId) === String(catId)).sort((a,b)=>(a.volgorde||0)-(b.volgorde||0)); }
+function totalForCategory(catId){ return itemsForCategory(catId).reduce((s,r)=>s + Number(r.budget || 0), 0); }
+
 function persistLocal(){
   const cache = {
     inkomsten: state.inkomsten,
@@ -226,23 +157,38 @@ async function safeJson(res){
   catch(e){ return { ok:false, error:'Parse fout', raw:text.slice(0,200) }; }
 }
 async function sheetsGet(){
-  if(!state.sheetsUrl) return null;
   const res = await fetch(state.sheetsUrl + '?action=getAll', { redirect:'follow' });
   return safeJson(res);
 }
 async function sheetsPost(data){
-  if(!state.sheetsUrl) return null;
-  const res = await fetch(state.sheetsUrl, {
-    method:'POST',
-    redirect:'follow',
-    body: JSON.stringify(data)
-  });
+  const res = await fetch(state.sheetsUrl, { method:'POST', redirect:'follow', body: JSON.stringify(data) });
   return safeJson(res);
 }
+function normalizeData(){
+  state.categorieen = orderedCats().map((cat, idx)=>({
+    id: String(cat.id || uid('cat')),
+    naam: String(cat.naam || 'Nieuwe categorie'),
+    volgorde: idx + 1
+  }));
+  state.budget = state.budget.map(row=>({
+    id: String(row.id || uid('bud')),
+    categorieId: String(row.categorieId || ''),
+    post: String(row.post || 'Nieuwe post'),
+    budget: Number(row.budget || 0),
+    volgorde: Number(row.volgorde || 0)
+  }));
+  const validCatIds = new Set(state.categorieen.map(c=>c.id));
+  state.budget = state.budget.filter(r=>validCatIds.has(r.categorieId));
+  for (const cat of state.categorieen){
+    const rows = itemsForCategory(cat.id);
+    rows.forEach((row, idx)=>{ row.volgorde = idx + 1; });
+  }
+}
 function toRows(){
+  normalizeData();
   return {
     action:'saveAll',
-    inkomsten: state.inkomsten.map((r,i)=>({
+    inkomsten: state.inkomsten.map(r=>({
       naam: r.naam || '',
       bedrag: Number(r.bedrag || 0)
     })),
@@ -251,7 +197,7 @@ function toRows(){
       naam: c.naam || '',
       volgorde: i + 1
     })),
-    budget: orderedCats().flatMap((c, catIndex) =>
+    budget: orderedCats().flatMap(c =>
       itemsForCategory(c.id).map((r, rowIndex)=>({
         id: r.id,
         categorieId: c.id,
@@ -270,29 +216,11 @@ function toRows(){
   };
 }
 function applySheets(data){
-  if(data.inkomsten) state.inkomsten = data.inkomsten.map(r=>({
-    naam: String(r.naam || ''),
-    bedrag: Number(r.bedrag || 0)
-  }));
-  if(data.categorieen) state.categorieen = data.categorieen.map((r,i)=>({
-    id: String(r.id || uid('cat')),
-    naam: String(r.naam || ''),
-    volgorde: Number(r.volgorde || (i+1))
-  })).sort((a,b)=>a.volgorde-b.volgorde);
-  if(data.budget) state.budget = data.budget.map((r,i)=>({
-    id: String(r.id || uid('bud')),
-    categorieId: String(r.categorieId || ''),
-    post: String(r.post || ''),
-    budget: Number(r.budget || 0),
-    volgorde: Number(r.volgorde || (i+1))
-  }));
-  if(data.leningen) state.leningen = data.leningen.map(r=>({
-    id: String(r.id || uid('ln')),
-    naam: String(r.naam || ''),
-    totaal: Number(r.totaal || 0),
-    betaald: Number(r.betaald || 0),
-    kleur: String(r.kleur || '#7c6af7')
-  }));
+  if(data.inkomsten) state.inkomsten = data.inkomsten.map(r=>({ naam: String(r.naam || ''), bedrag: Number(r.bedrag || 0) }));
+  if(data.categorieen) state.categorieen = data.categorieen.map((r,i)=>({ id: String(r.id || uid('cat')), naam: String(r.naam || ''), volgorde: Number(r.volgorde || (i+1)) }));
+  if(data.budget) state.budget = data.budget.map((r,i)=>({ id: String(r.id || uid('bud')), categorieId: String(r.categorieId || ''), post: String(r.post || ''), budget: Number(r.budget || 0), volgorde: Number(r.volgorde || (i+1)) }));
+  if(data.leningen) state.leningen = data.leningen.map(r=>({ id: String(r.id || uid('ln')), naam: String(r.naam || ''), totaal: Number(r.totaal || 0), betaald: Number(r.betaald || 0), kleur: String(r.kleur || '#7c6af7') }));
+  normalizeData();
   persistLocal();
   rerenderAll();
 }
@@ -306,8 +234,7 @@ function showToast(msg){
   const t=document.createElement('div');
   t.textContent=msg;
   t.style.cssText='position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;padding:11px 20px;border-radius:12px;font-size:14px;font-weight:600;z-index:999;white-space:nowrap;box-shadow:0 4px 20px rgba(124,106,247,.4);font-family:inherit';
-  document.body.appendChild(t);
-  setTimeout(()=>t.remove(), 2200);
+  document.body.appendChild(t); setTimeout(()=>t.remove(), 2200);
 }
 function go(name,btn){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
@@ -319,17 +246,15 @@ function go(name,btn){
   if(name==='leningen') renderLeningen();
   if(name==='instellingen') renderInstellingen();
 }
-
 function renderDashboard(){
-  const o = overschot();
-  const s = spaarquote();
+  const o = overschot(), s = spaarquote(), total = budgetTotaal();
   document.getElementById('v-dashboard').innerHTML = `
     <div class="hero">
       <div class="hero-label">MAANDELIJKS OVERSCHOT</div>
       <div class="hero-amount ${o>=0?'pos':'neg'}">${fmtShort(o)}</div>
       <div class="hero-sub">
         <div><div class="hero-sub-label">INKOMSTEN</div><div class="hero-sub-val" style="color:var(--green)">${fmtShort(inkomstenTotaal())}</div></div>
-        <div><div class="hero-sub-label">BUDGET</div><div class="hero-sub-val" style="color:var(--accent)">${fmtShort(budgetTotaal())}</div></div>
+        <div><div class="hero-sub-label">BUDGET</div><div class="hero-sub-val" style="color:var(--accent)">${fmtShort(total)}</div></div>
       </div>
     </div>
     <div class="sq-bar">
@@ -341,17 +266,16 @@ function renderDashboard(){
     ${orderedCats().map(cat => `
       <div class="cat-card">
         <div class="cat-top">
-          <div class="cat-name">${cat.naam}</div>
+          <div class="cat-name">${escapeHtml(cat.naam)}</div>
           <div class="cat-b">${fmt(totalForCategory(cat.id))}</div>
         </div>
-        <div class="prog"><div class="prog-fill" style="width:${budgetTotaal()? (totalForCategory(cat.id)/budgetTotaal())*100 : 0}%"></div></div>
+        <div class="prog"><div class="prog-fill" style="width:${total ? (totalForCategory(cat.id)/total)*100 : 0}%"></div></div>
       </div>
     `).join('')}
   `;
 }
-
 function renderBudget(){
-  const html = `
+  document.getElementById('v-budget').innerHTML = `
     <div class="card">
       <div class="sec" style="margin-top:0">Inkomsten</div>
       <div class="stack">
@@ -415,9 +339,7 @@ function renderBudget(){
       <div id="save-status" class="note" style="margin-top:10px"></div>
     </div>
   `;
-  document.getElementById('v-budget').innerHTML = html;
 }
-
 function renderLeningen(){
   document.getElementById('v-leningen').innerHTML = `
     <div class="card">
@@ -446,13 +368,13 @@ function renderLeningen(){
     </div>
   `;
 }
-
 function renderInstellingen(){
   document.getElementById('v-instellingen').innerHTML = `
     <div class="card">
       <div class="sec" style="margin-top:0">Synchronisatie</div>
       <div class="stack">
         <div class="note">De app is gekoppeld aan Google Sheets.</div>
+        <div class="note mono">${escapeHtml(state.sheetsUrl)}</div>
         <div class="inline">
           <button class="btn secondary" onclick="loadFromSheets()" style="flex:1">Ophalen</button>
           <button class="btn secondary" onclick="saveToSheets()" style="flex:1">Opslaan</button>
@@ -461,101 +383,46 @@ function renderInstellingen(){
     </div>
   `;
 }
-
 function escapeHtml(v){
-  return String(v ?? '')
-    .replaceAll('&','&amp;')
-    .replaceAll('"','&quot;')
-    .replaceAll('<','&lt;')
-    .replaceAll('>','&gt;');
+  return String(v ?? '').replaceAll('&','&amp;').replaceAll('"','&quot;').replaceAll('<','&lt;').replaceAll('>','&gt;');
 }
-
 function updateIncomeName(idx, value){ state.inkomsten[idx].naam = value.trim(); persistLocal(); renderDashboard(); }
 function updateIncomeAmount(idx, value){ state.inkomsten[idx].bedrag = Number(value||0); persistLocal(); rerenderAll(); }
-
 function addCategory(){
   const name = prompt('Naam van de nieuwe categorie?');
   if(!name) return;
-  state.categorieen.push({
-    id: uid('cat'),
-    naam: name.trim(),
-    volgorde: state.categorieen.length + 1
-  });
-  persistLocal();
-  renderBudget();
+  state.categorieen.push({ id: uid('cat'), naam: name.trim(), volgorde: state.categorieen.length + 1 });
+  persistLocal(); renderBudget();
 }
 function renameCategory(catId, value){
-  const cat = state.categorieen.find(c=>c.id===catId);
-  if(!cat) return;
-  cat.naam = value.trim() || 'Nieuwe categorie';
-  persistLocal();
-  rerenderAll();
+  const cat = state.categorieen.find(c=>c.id===catId); if(!cat) return;
+  cat.naam = value.trim() || 'Nieuwe categorie'; persistLocal(); rerenderAll();
 }
 function removeCategory(catId){
   if(!confirm('Categorie verwijderen inclusief alle posten?')) return;
   state.categorieen = state.categorieen.filter(c=>c.id!==catId);
   state.budget = state.budget.filter(r=>r.categorieId!==catId);
-  persistLocal();
-  rerenderAll();
+  persistLocal(); rerenderAll();
 }
-function toggleCategory(catId){
-  state.openCats[catId] = !state.openCats[catId];
-  renderBudget();
-}
+function toggleCategory(catId){ state.openCats[catId] = !state.openCats[catId]; renderBudget(); }
 function addBudgetPost(catId){
-  state.budget.push({
-    id: uid('bud'),
-    categorieId: catId,
-    post: 'Nieuwe post',
-    budget: 0,
-    volgorde: itemsForCategory(catId).length + 1
-  });
-  state.openCats[catId] = true;
-  persistLocal();
-  renderBudget();
+  state.budget.push({ id: uid('bud'), categorieId: catId, post: 'Nieuwe post', budget: 0, volgorde: itemsForCategory(catId).length + 1 });
+  state.openCats[catId] = true; persistLocal(); renderBudget();
 }
 function renameBudgetPost(id, value){
-  const row = state.budget.find(r=>r.id===id);
-  if(!row) return;
-  row.post = value.trim() || 'Nieuwe post';
-  persistLocal();
-  rerenderAll();
+  const row = state.budget.find(r=>r.id===id); if(!row) return;
+  row.post = value.trim() || 'Nieuwe post'; persistLocal(); rerenderAll();
 }
 function updateBudgetAmount(id, value){
-  const row = state.budget.find(r=>r.id===id);
-  if(!row) return;
-  row.budget = Number(value||0);
-  persistLocal();
-  rerenderAll();
+  const row = state.budget.find(r=>r.id===id); if(!row) return;
+  row.budget = Number(value||0); persistLocal(); rerenderAll();
 }
-function removeBudgetPost(id){
-  state.budget = state.budget.filter(r=>r.id!==id);
-  persistLocal();
-  rerenderAll();
-}
+function removeBudgetPost(id){ state.budget = state.budget.filter(r=>r.id!==id); persistLocal(); rerenderAll(); }
 function updateLoanName(idx, value){ state.leningen[idx].naam = value.trim(); persistLocal(); renderLeningen(); }
 function updateLoanTotal(idx, value){ state.leningen[idx].totaal = Number(value||0); persistLocal(); renderLeningen(); }
 function updateLoanPaid(idx, value){ state.leningen[idx].betaald = Number(value||0); persistLocal(); renderLeningen(); }
-function addLoan(){
-  state.leningen.push({ id:uid('ln'), naam:'Nieuwe lening', totaal:0, betaald:0, kleur:'#7c6af7' });
-  persistLocal();
-  renderLeningen();
-}
-
-async function connectSheets(){
-  const url = document.getElementById('sheets-url-input')?.value.trim();
-  if(!url){ showToast('Vul een URL in'); return; }
-  state.sheetsUrl = url;
-  persistLocal();
-  await loadFromSheets();
-  renderInstellingen();
-}
-
+function addLoan(){ state.leningen.push({ id:uid('ln'), naam:'Nieuwe lening', totaal:0, betaald:0, kleur:'#7c6af7' }); persistLocal(); renderLeningen(); }
 async function loadFromSheets(){
-  if(!state.sheetsUrl){
-    showToast('Nog geen Sheets URL ingevuld');
-    return;
-  }
   updateSyncBadge('Ophalen...');
   try{
     const result = await sheetsGet();
@@ -572,18 +439,12 @@ async function loadFromSheets(){
     showToast('Ophalen mislukt');
   }
 }
-
 async function saveToSheets(){
-  if(!state.sheetsUrl){
-    showToast('Nog geen Sheets URL ingevuld');
-    return;
-  }
   const status = document.getElementById('save-status');
   if(status) status.textContent = 'Opslaan...';
   updateSyncBadge('Opslaan...');
   try{
-    const payload = toRows();
-    const result = await sheetsPost(payload);
+    const result = await sheetsPost(toRows());
     if(result?.ok){
       persistLocal();
       if(status) status.textContent = 'Opgeslagen in Sheets';
@@ -600,22 +461,20 @@ async function saveToSheets(){
     showToast('Opslaan mislukt');
   }
 }
-
 async function init(){
   restoreLocal();
+  normalizeData();
   rerenderAll();
-  if(state.sheetsUrl){
-    try{
-      const result = await sheetsGet();
-      if(result?.ok){
-        applySheets(result);
-        updateSyncBadge('Sheets');
-      }else{
-        updateSyncBadge('Lokaal');
-      }
-    }catch(e){
-      updateSyncBadge('Lokaal');
+  try{
+    const result = await sheetsGet();
+    if(result?.ok){
+      applySheets(result);
+      updateSyncBadge('Sheets');
+    }else{
+      updateSyncBadge('Cache');
     }
+  }catch(e){
+    updateSyncBadge('Cache');
   }
   document.getElementById('startup-overlay').style.display = 'none';
 }
