@@ -10,10 +10,10 @@
 <title>Budget · Veenstra</title>
 <style>
 :root{
-  --bg:#0a0a0f;--surface:#13131a;--surface2:#1c1c26;--surface3:#242432;
-  --border:rgba(255,255,255,0.07);--text:#f0f0f8;--muted:#6b6b88;
-  --accent:#7c6af7;--accent2:#4ecdc4;--green:#3ddc84;--red:#ff6b6b;--amber:#ffbe0b;
-  --shadow:0 10px 30px rgba(0,0,0,.22);
+  --bg:#0c0f12;--surface:#14181d;--surface2:#1b2128;--surface3:#252c35;
+  --border:rgba(255,255,255,0.08);--text:#eef2f5;--muted:#8b96a3;
+  --accent:#8fa3b8;--accent2:#6f879b;--green:#87a98a;--red:#c98787;--amber:#b89a6a;
+  --shadow:0 10px 30px rgba(0,0,0,.24);
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{scroll-behavior:smooth}
@@ -34,7 +34,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 .content{flex:1;padding:10px 20px calc(env(safe-area-inset-bottom,0px) + 40px)}
 .view{display:none;animation:fadeIn .22s ease}.view.active{display:block}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-.hero{background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);border:1px solid rgba(124,106,247,.25);border-radius:24px;padding:24px;margin-bottom:12px;position:relative;overflow:hidden;box-shadow:var(--shadow)}
+.hero{background:linear-gradient(135deg,#171d23,#1a232b,#202a34);border:1px solid rgba(143,163,184,.18);border-radius:24px;padding:24px;margin-bottom:12px;position:relative;overflow:hidden;box-shadow:var(--shadow)}
 .hero::before{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(124,106,247,.15) 0%,transparent 70%);pointer-events:none}
 .hero-label{font-size:11px;color:rgba(240,240,248,.65);letter-spacing:1px;font-family:monospace;margin-bottom:6px}
 .hero-amount{font-size:42px;font-weight:800;letter-spacing:-2px;line-height:1}
@@ -106,19 +106,16 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 .settings-list{display:flex;flex-direction:column;gap:10px}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-.hero-glow{position:absolute;inset:auto -40px -60px auto;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(78,205,196,.18),transparent 70%);filter:blur(8px);pointer-events:none}
-.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 14px}
-.stat-card{background:linear-gradient(180deg,var(--surface),var(--surface2));border:1px solid var(--border);border-radius:18px;padding:14px 16px;box-shadow:var(--shadow);position:relative;overflow:hidden}
-.stat-card::after{content:'';position:absolute;inset:auto -20px -30px auto;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle,rgba(124,106,247,.12),transparent 70%)}
-.stat-label{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
-.stat-value{font-size:22px;font-weight:800;letter-spacing:-.5px}
-.stat-sub{font-size:12px;color:var(--muted);margin-top:6px}
-.dashboard-highlight{background:linear-gradient(135deg,rgba(124,106,247,.16),rgba(78,205,196,.10));border:1px solid rgba(124,106,247,.2)}
-.float-in{animation:floatIn .5s ease both}
-.float-in:nth-child(2){animation-delay:.06s}
-.float-in:nth-child(3){animation-delay:.12s}
-.float-in:nth-child(4){animation-delay:.18s}
-@keyframes floatIn{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+.premium-cat-grid{display:grid;grid-template-columns:1fr;gap:10px}
+.premium-cat-card{background:linear-gradient(180deg,var(--surface),var(--surface2));border:1px solid var(--border);border-radius:20px;padding:16px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.premium-cat-card::after{content:'';position:absolute;right:-24px;top:-24px;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.05),transparent 70%)}
+.premium-cat-name{font-size:16px;font-weight:800;letter-spacing:-.2px}
+.premium-cat-sub{font-size:12px;color:var(--muted);margin-top:4px}
+.premium-cat-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px}
+.premium-cat-amount{font-family:monospace;font-size:16px;font-weight:700;color:var(--text)}
+
+
+
 .loan-card{display:flex;flex-direction:column;gap:12px;padding:14px 0;border-bottom:1px solid var(--border)}
 .loan-card:last-child{border-bottom:none}
 .loan-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
@@ -312,62 +309,38 @@ function setBudgetSubtab(tab){ state.budgetSubtab = tab; renderBudget(); }
 
 function renderDashboard(){
   const o = overschot(), s = spaarquote(), total = budgetTotaal();
-  const biggest = orderedCats().slice().sort((a,b)=>totalForCategory(b.id)-totalForCategory(a.id))[0];
-  const biggestVal = biggest ? totalForCategory(biggest.id) : 0;
   const cats = orderedCats();
   document.getElementById('v-dashboard').innerHTML = `
-    <div class="hero float-in">
-      <div class="hero-glow"></div>
+    <div class="hero">
       <div class="hero-label">MAANDELIJKS OVERSCHOT</div>
       <div class="hero-amount ${o>=0?'pos':'neg'}">${fmtShort(o)}</div>
       <div class="hero-sub">
-        <div><div class="hero-sub-label">INKOMSTEN</div><div class="hero-sub-val" style="color:var(--green)">${fmtShort(inkomstenTotaal())}</div></div>
-        <div><div class="hero-sub-label">BUDGET</div><div class="hero-sub-val" style="color:var(--accent)">${fmtShort(total)}</div></div>
+        <div><div class="hero-sub-label">INKOMSTEN</div><div class="hero-sub-val" style="color:var(--text)">${fmtShort(inkomstenTotaal())}</div></div>
+        <div><div class="hero-sub-label">BUDGET</div><div class="hero-sub-val" style="color:var(--text)">${fmtShort(total)}</div></div>
       </div>
     </div>
 
-    <div class="stats-grid">
-      <div class="stat-card float-in">
-        <div class="stat-label">Spaarquote</div>
-        <div class="stat-value">${s.toFixed(1)}%</div>
-        <div class="stat-sub">Op basis van budget</div>
-      </div>
-      <div class="stat-card float-in">
-        <div class="stat-label">Categorieën</div>
-        <div class="stat-value">${cats.length}</div>
-        <div class="stat-sub">${state.budget.length} posten</div>
-      </div>
-      <div class="stat-card dashboard-highlight float-in">
-        <div class="stat-label">Grootste categorie</div>
-        <div class="stat-value" style="font-size:18px">${biggest ? escapeHtml(biggest.naam) : '—'}</div>
-        <div class="stat-sub">${fmt(biggestVal)}</div>
-      </div>
-      <div class="stat-card float-in">
-        <div class="stat-label">Gem. per categorie</div>
-        <div class="stat-value">${fmtShort(cats.length ? total / cats.length : 0)}</div>
-        <div class="stat-sub">Gebudgetteerd</div>
-      </div>
-    </div>
-
-    <div class="sq-bar float-in">
-      <div class="sq-top"><span class="sq-label">Verdeling budget</span><span class="sq-val">${fmtShort(total)}</span></div>
-      <div class="track"><div class="fill" style="width:100%"></div></div>
-      <div class="sq-note">${cats.length ? cats.length + ' categorieën actief' : 'Nog geen categorieën'}</div>
+    <div class="sq-bar">
+      <div class="sq-top"><span class="sq-label">Spaarquote</span><span class="sq-val">${s.toFixed(1)}%</span></div>
+      <div class="track"><div class="fill" style="width:${Math.min(100, Math.max(0, s))}%"></div></div>
+      <div class="sq-note">Op basis van budget</div>
     </div>
 
     <div class="sec">Categorieën</div>
-    ${cats.map(cat => `
-      <div class="card float-in">
-        <div class="cat-top">
-          <div style="min-width:0">
-            <div class="cat-name">${escapeHtml(cat.naam)}</div>
-            <div class="cat-meta">${postsCount(cat.id)} posten</div>
+    <div class="premium-cat-grid">
+      ${cats.map(cat => `
+        <div class="premium-cat-card">
+          <div class="premium-cat-top">
+            <div>
+              <div class="premium-cat-name">${escapeHtml(cat.naam)}</div>
+              <div class="premium-cat-sub">${postsCount(cat.id)} posten</div>
+            </div>
+            <div class="premium-cat-amount">${fmt(totalForCategory(cat.id))}</div>
           </div>
-          <div class="cat-b">${fmt(totalForCategory(cat.id))}</div>
+          <div class="prog"><div class="prog-fill" style="width:${total ? (totalForCategory(cat.id)/total)*100 : 0}%"></div></div>
         </div>
-        <div class="prog"><div class="prog-fill" style="width:${total ? (totalForCategory(cat.id)/total)*100 : 0}%"></div></div>
-      </div>
-    `).join('')}
+      `).join('')}
+    </div>
   `;
 }
 function renderBudget(){
