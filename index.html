@@ -85,12 +85,14 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 .icon-btn{width:38px;height:38px;border-radius:12px;border:1px solid var(--border);background:var(--surface2);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer}
 .pill-btn{height:38px;padding:0 12px;border-radius:12px;border:1px solid var(--border);background:var(--surface2);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:700;font-size:12px}
 .category-card{position:relative;overflow:hidden}
-.category-card-content{position:relative;z-index:2;transition:transform .2s ease}
-.swipe-edit-bg{position:absolute;inset:0;border-radius:18px;background:linear-gradient(135deg,rgba(124,106,247,.18),rgba(78,205,196,.12));display:flex;align-items:center;justify-content:flex-end;gap:8px;padding-right:14px;opacity:0;transition:opacity .15s ease;z-index:1}
-.category-card.reveal-edit .swipe-edit-bg{opacity:1}
-.swipe-mini-btn{width:40px;height:40px;border-radius:12px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-weight:800;cursor:pointer}
+.category-card-content{position:relative;z-index:2}
+.category-actions-strip{display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);gap:8px;flex-wrap:wrap}
+.category-card.reveal-edit .category-actions-strip{display:flex}
+.swipe-mini-btn{height:40px;padding:0 12px;border-radius:12px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-weight:800;cursor:pointer}
 .swipe-mini-btn.danger{background:rgba(255,107,107,.14);color:var(--red);border-color:rgba(255,107,107,.25)}
 .category-name-input{min-width:0}
+.category-swipe-hint{font-size:11px;color:var(--muted);margin-top:3px}
+.category-ghost-btn{width:36px;height:36px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
 #startup-overlay{position:fixed;inset:0;background:rgba(10,10,15,.96);z-index:1000;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px}
 #startup-overlay .spinner{width:42px;height:42px;border:4px solid var(--surface3);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite}
 #menu-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(8px);z-index:1100;display:none;align-items:flex-end}
@@ -345,12 +347,6 @@ function renderBudget(){
       const isOpen = !!state.openCats[cat.id];
       return `
         <div class="card category-card" id="cat-card-${cat.id}" data-id="${cat.id}" ontouchstart="catSwipeStart(event, '${cat.id}')" ontouchmove="catSwipeMove(event, '${cat.id}')" ontouchend="catSwipeEnd(event, '${cat.id}')">
-          <div class="swipe-edit-bg">
-            <button class="swipe-mini-btn" onclick="moveCategoryUp('${cat.id}')">↑</button>
-            <button class="swipe-mini-btn" onclick="moveCategoryDown('${cat.id}')">↓</button>
-            <button class="swipe-mini-btn" onclick="toggleCategory('${cat.id}')">${isOpen ? '−' : '+'}</button>
-            <button class="swipe-mini-btn danger" onclick="removeCategory('${cat.id}')">✕</button>
-          </div>
           <div class="category-card-content">
             <div class="cat-head">
               <div style="min-width:0;flex:1">
@@ -358,8 +354,16 @@ function renderBudget(){
                   <input class="input category-name-input" style="font-weight:700" value="${escapeHtml(cat.naam)}" onchange="renameCategory('${cat.id}', this.value)">
                   <span class="mono" style="min-width:88px;text-align:right">${fmt(totalForCategory(cat.id))}</span>
                 </div>
-                <div class="cat-meta">${postsCount(cat.id)} posten · swipe naar links voor acties</div>
+                <div class="cat-meta">${postsCount(cat.id)} posten</div>
+                <div class="category-swipe-hint">Swipe naar links voor acties</div>
               </div>
+              <button class="category-ghost-btn" onclick="toggleCategoryActions('${cat.id}')" title="Acties">⋯</button>
+            </div>
+            <div class="category-actions-strip">
+              <button class="swipe-mini-btn" onclick="moveCategoryUp('${cat.id}')">Omhoog</button>
+              <button class="swipe-mini-btn" onclick="moveCategoryDown('${cat.id}')">Omlaag</button>
+              <button class="swipe-mini-btn" onclick="toggleCategory('${cat.id}')">${isOpen ? 'Sluit' : 'Open'}</button>
+              <button class="swipe-mini-btn danger" onclick="removeCategory('${cat.id}')">Verwijder</button>
             </div>
           </div>
           ${isOpen ? `
@@ -530,27 +534,25 @@ function catSwipeStart(e, id){
 function catSwipeMove(e, id){
   const card = document.querySelector(`.category-card[data-id="${id}"]`);
   if(!card || !catSwipeState[id]) return;
-  const content = card.querySelector('.category-card-content');
   const touch = e.changedTouches[0];
   const dx = touch.clientX - catSwipeState[id].startX;
-  if(dx > 0) return;
-  catSwipeState[id].x = Math.max(-170, dx);
-  content.style.transform = `translateX(${catSwipeState[id].x}px)`;
-  card.classList.toggle('reveal-edit', Math.abs(catSwipeState[id].x) > 28);
+  catSwipeState[id].x = dx;
 }
 function catSwipeEnd(e, id){
   const card = document.querySelector(`.category-card[data-id="${id}"]`);
   if(!card || !catSwipeState[id]) return;
-  const content = card.querySelector('.category-card-content');
   const dx = catSwipeState[id].x || 0;
-  if(dx < -72){
-    content.style.transform = 'translateX(-162px)';
+  if(dx < -50){
     card.classList.add('reveal-edit');
-  } else {
-    content.style.transform = '';
+  } else if(dx > 30){
     card.classList.remove('reveal-edit');
   }
   delete catSwipeState[id];
+}
+function toggleCategoryActions(id){
+  const card = document.querySelector(`.category-card[data-id="${id}"]`);
+  if(!card) return;
+  card.classList.toggle('reveal-edit');
 }
 
 
