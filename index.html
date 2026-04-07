@@ -422,7 +422,7 @@ const renders = {
     document.getElementById('v-budget').innerHTML=`
       <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px">
         <button onclick="addCategory()" style="background:linear-gradient(135deg,var(--accent),#9b8af7);border:none;border-radius:12px;color:#fff;font-family:inherit;font-size:13px;font-weight:700;padding:11px 14px;cursor:pointer">+ Categorie</button>
-        <div style="font-size:11px;color:var(--muted);font-family:monospace">Alleen budgettering · geen actuals</div>
+        
       </div>
       <div class="inc-grid">
         <div class="inc-card"><div class="inc-label">KT Salaris</div><div style="display:flex;align-items:center;gap:4px"><span style="color:${C.muted};font-family:monospace;font-size:14px">€</span><input class="inc-input" type="number" value="${kt}" oninput="kt=parseFloat(this.value)||0;saveState();recalcBudget()"></div></div>
@@ -934,7 +934,12 @@ async function sheetsGet(){
 function budgetToRows(){
   const rows = [];
   Object.entries(BUDGET).forEach(([cat, data]) => {
-    (data.items || []).forEach(item => rows.push({ categorie: cat, post: item.post, budget: Number(item.budget)||0 }));
+    const items = Array.isArray(data?.items) ? data.items : [];
+    if(!items.length){
+      rows.push({ categorie: cat, post: '__EMPTY__', budget: '' });
+      return;
+    }
+    items.forEach(item => rows.push({ categorie: cat, post: item.post, budget: Number(item.budget)||0 }));
   });
   return rows;
 }
@@ -959,6 +964,7 @@ function applySheets(data){
       const budget = parseFloat(r.budget)||0;
       if(!cat) return;
       if(!rebuilt[cat]) rebuilt[cat] = { items: [] };
+      if(post === '__EMPTY__' || post === '__LEEG__') return;
       rebuilt[cat].items.push({ post: post || 'Nieuwe post', budget });
     });
     if(Object.keys(rebuilt).length) BUDGET = rebuilt;
@@ -1035,9 +1041,6 @@ function renderInstellingen(){
           <span style="font-family:monospace;font-size:12px;color:${C.muted}">${data.items.length} posten</span>
         </div>`).join('')}
       <button onclick="addCategory()" style="width:100%;margin-top:12px;background:var(--surface2);border:1px solid ${C.border};border-radius:12px;color:var(--accent);font-family:inherit;font-size:14px;font-weight:700;padding:12px;cursor:pointer">+ Categorie toevoegen</button>
-    </div>
-    <div style="background:#1a1a2e;border:1px solid rgba(124,106,247,.2);border-radius:16px;padding:16px;font-size:12px;line-height:1.9;color:var(--muted)">
-      <strong style="color:var(--text)">Bron:</strong> Inkomsten, Budget en Leningen komen uit je Google Sheet. Actuals zijn verwijderd uit de app, zodat je puur je budgettering ziet.
     </div>`;
 }
 
