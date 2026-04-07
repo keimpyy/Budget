@@ -270,6 +270,104 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
   display:block;
 }
 
+
+/* Budget refactor */
+.subtabs{gap:10px;margin-bottom:14px}
+.subtab{border-radius:12px;padding:10px 14px;background:#0f0f10;border:1px solid rgba(255,255,255,0.06)}
+.subtab.active{background:#17181b;border-color:rgba(255,255,255,0.08);box-shadow:inset 0 1px 0 rgba(255,255,255,0.03)}
+.budget-toolbar{margin:12px 0 12px}
+.budget-toolbar-actions .btn.sm{height:38px;padding:0 14px;border-radius:10px}
+.card{
+  background:#0f0f10;
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:14px;
+  padding:16px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.025),0 12px 30px rgba(0,0,0,.28);
+}
+.category-card{padding:14px 14px 12px}
+.category-card-content{position:relative;z-index:2}
+.category-head-main{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.category-text{min-width:0;flex:1}
+.category-title-row{display:flex;align-items:center;gap:10px;min-width:0}
+.category-name-input{
+  background:transparent;
+  border:none;
+  padding:0;
+  height:auto;
+  font-size:16px!important;
+  font-weight:750;
+  color:var(--text);
+  border-radius:0;
+}
+.category-name-input:focus{outline:none;box-shadow:none}
+.category-total{
+  font-family:monospace;
+  font-size:15px;
+  font-weight:700;
+  color:var(--text);
+  white-space:nowrap;
+}
+.category-meta{
+  font-size:11px;
+  color:var(--muted);
+  margin-top:4px;
+  letter-spacing:.02em;
+}
+.collapse-btn{
+  width:34px;height:34px;border-radius:10px;
+  background:#16171a;
+  border:1px solid rgba(255,255,255,0.06);
+  color:#cfd5db;
+  font-size:15px;
+}
+.category-inner{
+  margin-top:12px;
+  padding:12px;
+  border-radius:12px;
+  background:#141416;
+  border:1px solid rgba(255,255,255,0.04);
+}
+.post-row{
+  background:#111214;
+  border:1px solid rgba(255,255,255,0.05);
+  border-radius:10px;
+  padding:10px;
+  margin-top:8px;
+}
+.post-row-content{gap:8px}
+.post-row .input{
+  background:#17181b;
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:10px;
+}
+.post-row .btn.sm.danger{
+  min-width:38px;
+  height:38px;
+  padding:0;
+  border-radius:10px;
+}
+.category-actions-footer{
+  display:flex;
+  gap:8px;
+  margin-top:10px;
+}
+.category-actions-footer .btn{
+  height:38px;
+  padding:0 12px;
+  border-radius:10px;
+  font-size:13px;
+  font-weight:650;
+}
+.category-actions-footer .btn.secondary{
+  background:#17181b;
+}
+.category-actions-footer .btn.danger{
+  background:rgba(255,77,79,.08);
+}
+.budget-summary-card .row:first-child{
+  margin-bottom:2px;
+}
+
 </style>
 </head>
 <body>
@@ -611,9 +709,11 @@ function renderBudget(){
     </div>
   ` : `
     <div class="budget-toolbar">
-      <div class="sec" style="margin:0">Categorieën</div>
-      <div class="budget-toolbar-actions">
-        <button class="btn sm" onclick="addCategory()">+ Categorie</button>
+      <div class="row" style="justify-content:space-between">
+        <div class="sec" style="margin:0">Categorieën</div>
+        <div class="budget-toolbar-actions">
+          <button class="btn sm" onclick="addCategory()">+ Categorie</button>
+        </div>
       </div>
     </div>
 
@@ -622,35 +722,36 @@ function renderBudget(){
       return `
         <div class="card category-card" id="cat-card-${cat.id}" data-id="${cat.id}">
           <div class="category-card-content">
-            <div class="cat-head">
-              <div style="min-width:0;flex:1">
-                <div class="row" style="gap:10px">
-                  <input class="input category-name-input" style="font-weight:700" value="${escapeHtml(cat.naam)}" onchange="renameCategory('${cat.id}', this.value)">
-                  <span class="mono" style="min-width:88px;text-align:right">${fmt(totalForCategory(cat.id))}</span>
+            <div class="category-head-main">
+              <div class="category-text">
+                <div class="category-title-row">
+                  <input class="input category-name-input" value="${escapeHtml(cat.naam)}" onchange="renameCategory('${cat.id}', this.value)">
+                  <span class="category-total">${fmt(totalForCategory(cat.id))}</span>
                 </div>
-                <div class="cat-meta">${postsCount(cat.id)} posten</div>
+                <div class="category-meta">${postsCount(cat.id)} posten</div>
               </div>
               <button class="collapse-btn" onclick="toggleCategory('${cat.id}')" title="${isOpen ? 'Sluit' : 'Open'}">${isOpen ? '⌃' : '⌄'}</button>
             </div>
-          </div>
-          ${isOpen ? `
-            <div class="stack" style="margin-top:10px">
-              ${itemsForCategory(cat.id).map(item => `
-                <div class="post-row" data-id="${item.id}" ontouchstart="swipeStart(event, '${item.id}')" ontouchmove="swipeMove(event, '${item.id}')" ontouchend="swipeEnd(event, '${item.id}')">
-                  <div class="swipe-delete-bg">Verwijder</div>
-                  <div class="post-row-content">
-                    <input class="input" value="${escapeHtml(item.post)}" onchange="renameBudgetPost('${item.id}', this.value)">
-                    <input class="input small" type="number" value="${Number(item.budget||0)}" onchange="updateBudgetAmount('${item.id}', this.value)">
-                    <button class="btn sm danger" onclick="removeBudgetPost('${item.id}')">✕</button>
+
+            ${isOpen ? `
+              <div class="category-inner">
+                ${itemsForCategory(cat.id).map(item => `
+                  <div class="post-row" data-id="${item.id}" ontouchstart="swipeStart(event, '${item.id}')" ontouchmove="swipeMove(event, '${item.id}')" ontouchend="swipeEnd(event, '${item.id}')">
+                    <div class="swipe-delete-bg">Verwijder</div>
+                    <div class="post-row-content">
+                      <input class="input" value="${escapeHtml(item.post)}" onchange="renameBudgetPost('${item.id}', this.value)">
+                      <input class="input small" type="number" value="${Number(item.budget||0)}" onchange="updateBudgetAmount('${item.id}', this.value)">
+                      <button class="btn sm danger" onclick="removeBudgetPost('${item.id}')">✕</button>
+                    </div>
                   </div>
+                `).join('')}
+                <div class="category-actions-footer">
+                  <button class="btn secondary" onclick="addBudgetPost('${cat.id}')" style="flex:1">+ Post toevoegen</button>
+                  <button class="btn danger" onclick="removeCategory('${cat.id}')">Verwijder</button>
                 </div>
-              `).join('')}
-              <div class="inline" style="margin-top:8px">
-                <button class="btn secondary" onclick="addBudgetPost('${cat.id}')" style="flex:1">+ Post toevoegen</button>
-                <button class="btn danger sm" onclick="removeCategory('${cat.id}')">Verwijder categorie</button>
               </div>
-            </div>
-          ` : ''}
+            ` : ''}
+          </div>
         </div>
       `;
     }).join('')}
@@ -662,7 +763,7 @@ function renderBudget(){
       <button class="subtab ${state.budgetSubtab==='categorieen'?'active':''}" onclick="setBudgetSubtab('categorieen')">Categorieën / Uitgaven</button>
     </div>
     ${budgetHtml}
-    <div class="card">
+    <div class="card budget-summary-card">
       <div class="row">
         <div style="font-weight:700">Totaal budget</div>
         <div class="mono" style="color:var(--accent)">${fmt(total)}</div>
