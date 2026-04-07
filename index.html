@@ -100,9 +100,10 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 </div>
 
 <script>
-const DEFAULT_SHEETS_URL = '';
+const DEFAULT_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxa-f-tmhNbPXRDgMc9VSU7nAxKtoV8hCd2twIim1Ikq58uExIrXWgnyEF0DwbMJPpmVA/exec';
+
 const state = {
-  sheetsUrl: localStorage.getItem('bv_sheets_url') || DEFAULT_SHEETS_URL,
+  sheetsUrl: DEFAULT_SHEETS_URL,
   inkomsten: [
     { naam:'KT', bedrag:2950 },
     { naam:'Ryanne', bedrag:1581.89 },
@@ -203,7 +204,6 @@ function persistLocal(){
     leningen: state.leningen
   };
   localStorage.setItem('bv_budget_state_v3', JSON.stringify(cache));
-  localStorage.setItem('bv_sheets_url', state.sheetsUrl || '');
 }
 function restoreLocal(){
   try{
@@ -450,14 +450,11 @@ function renderLeningen(){
 function renderInstellingen(){
   document.getElementById('v-instellingen').innerHTML = `
     <div class="card">
-      <div class="sec" style="margin-top:0">Google Sheets</div>
+      <div class="sec" style="margin-top:0">Synchronisatie</div>
       <div class="stack">
-        <input id="sheets-url-input" class="input" type="url" placeholder="https://script.google.com/macros/s/..." value="${escapeHtml(state.sheetsUrl || '')}">
+        <div class="note">De app is gekoppeld aan Google Sheets.</div>
         <div class="inline">
-          <button class="btn" onclick="connectSheets()" style="flex:1">Verbinden</button>
           <button class="btn secondary" onclick="loadFromSheets()" style="flex:1">Ophalen</button>
-        </div>
-        <div class="inline">
           <button class="btn secondary" onclick="saveToSheets()" style="flex:1">Opslaan</button>
         </div>
       </div>
