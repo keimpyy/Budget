@@ -105,6 +105,28 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 .menu-btn.danger{color:var(--red);background:rgba(255,107,107,.1);border-color:rgba(255,107,107,.2)}
 .settings-list{display:flex;flex-direction:column;gap:10px}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+.hero-glow{position:absolute;inset:auto -40px -60px auto;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(78,205,196,.18),transparent 70%);filter:blur(8px);pointer-events:none}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 14px}
+.stat-card{background:linear-gradient(180deg,var(--surface),var(--surface2));border:1px solid var(--border);border-radius:18px;padding:14px 16px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.stat-card::after{content:'';position:absolute;inset:auto -20px -30px auto;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle,rgba(124,106,247,.12),transparent 70%)}
+.stat-label{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.stat-value{font-size:22px;font-weight:800;letter-spacing:-.5px}
+.stat-sub{font-size:12px;color:var(--muted);margin-top:6px}
+.dashboard-highlight{background:linear-gradient(135deg,rgba(124,106,247,.16),rgba(78,205,196,.10));border:1px solid rgba(124,106,247,.2)}
+.float-in{animation:floatIn .5s ease both}
+.float-in:nth-child(2){animation-delay:.06s}
+.float-in:nth-child(3){animation-delay:.12s}
+.float-in:nth-child(4){animation-delay:.18s}
+@keyframes floatIn{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+.loan-card{display:flex;flex-direction:column;gap:12px;padding:14px 0;border-bottom:1px solid var(--border)}
+.loan-card:last-child{border-bottom:none}
+.loan-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.loan-inputs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.loan-metric{background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:10px 12px}
+.loan-metric-label{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.loan-progress-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+
 </style>
 </head>
 <body>
@@ -290,8 +312,12 @@ function setBudgetSubtab(tab){ state.budgetSubtab = tab; renderBudget(); }
 
 function renderDashboard(){
   const o = overschot(), s = spaarquote(), total = budgetTotaal();
+  const biggest = orderedCats().slice().sort((a,b)=>totalForCategory(b.id)-totalForCategory(a.id))[0];
+  const biggestVal = biggest ? totalForCategory(biggest.id) : 0;
+  const cats = orderedCats();
   document.getElementById('v-dashboard').innerHTML = `
-    <div class="hero">
+    <div class="hero float-in">
+      <div class="hero-glow"></div>
       <div class="hero-label">MAANDELIJKS OVERSCHOT</div>
       <div class="hero-amount ${o>=0?'pos':'neg'}">${fmtShort(o)}</div>
       <div class="hero-sub">
@@ -299,14 +325,39 @@ function renderDashboard(){
         <div><div class="hero-sub-label">BUDGET</div><div class="hero-sub-val" style="color:var(--accent)">${fmtShort(total)}</div></div>
       </div>
     </div>
-    <div class="sq-bar">
-      <div class="sq-top"><span class="sq-label">Spaarquote</span><span class="sq-val">${s.toFixed(1)}%</span></div>
-      <div class="track"><div class="fill" style="width:${Math.min(100, Math.max(0, s))}%"></div></div>
-      <div class="sq-note">Op basis van budget</div>
+
+    <div class="stats-grid">
+      <div class="stat-card float-in">
+        <div class="stat-label">Spaarquote</div>
+        <div class="stat-value">${s.toFixed(1)}%</div>
+        <div class="stat-sub">Op basis van budget</div>
+      </div>
+      <div class="stat-card float-in">
+        <div class="stat-label">Categorieën</div>
+        <div class="stat-value">${cats.length}</div>
+        <div class="stat-sub">${state.budget.length} posten</div>
+      </div>
+      <div class="stat-card dashboard-highlight float-in">
+        <div class="stat-label">Grootste categorie</div>
+        <div class="stat-value" style="font-size:18px">${biggest ? escapeHtml(biggest.naam) : '—'}</div>
+        <div class="stat-sub">${fmt(biggestVal)}</div>
+      </div>
+      <div class="stat-card float-in">
+        <div class="stat-label">Gem. per categorie</div>
+        <div class="stat-value">${fmtShort(cats.length ? total / cats.length : 0)}</div>
+        <div class="stat-sub">Gebudgetteerd</div>
+      </div>
     </div>
+
+    <div class="sq-bar float-in">
+      <div class="sq-top"><span class="sq-label">Verdeling budget</span><span class="sq-val">${fmtShort(total)}</span></div>
+      <div class="track"><div class="fill" style="width:100%"></div></div>
+      <div class="sq-note">${cats.length ? cats.length + ' categorieën actief' : 'Nog geen categorieën'}</div>
+    </div>
+
     <div class="sec">Categorieën</div>
-    ${orderedCats().map(cat => `
-      <div class="card">
+    ${cats.map(cat => `
+      <div class="card float-in">
         <div class="cat-top">
           <div style="min-width:0">
             <div class="cat-name">${escapeHtml(cat.naam)}</div>
@@ -319,7 +370,6 @@ function renderDashboard(){
     `).join('')}
   `;
 }
-
 function renderBudget(){
   const total = budgetTotaal();
   const budgetHtml = state.budgetSubtab === 'inkomsten' ? `
@@ -346,7 +396,7 @@ function renderBudget(){
     ${orderedCats().map(cat => {
       const isOpen = !!state.openCats[cat.id];
       return `
-        <div class="card category-card" id="cat-card-${cat.id}" data-id="${cat.id}" ontouchstart="catSwipeStart(event, '${cat.id}')" ontouchmove="catSwipeMove(event, '${cat.id}')" ontouchend="catSwipeEnd(event, '${cat.id}')">
+        <div class="card category-card" id="cat-card-${cat.id}" data-id="${cat.id}">
           <div class="category-card-content">
             <div class="cat-head">
               <div style="min-width:0;flex:1">
@@ -355,7 +405,7 @@ function renderBudget(){
                   <span class="mono" style="min-width:88px;text-align:right">${fmt(totalForCategory(cat.id))}</span>
                 </div>
                 <div class="cat-meta">${postsCount(cat.id)} posten</div>
-                <div class="category-swipe-hint">Swipe naar links voor acties</div>
+                
               </div>
               <button class="category-ghost-btn" onclick="toggleCategoryActions('${cat.id}')" title="Acties">⋯</button>
             </div>
@@ -410,27 +460,39 @@ function renderBudget(){
   `;
 }
 function renderLeningen(){
+  const totaalRestant = state.leningen.reduce((s,l)=>s+(Number(l.totaal||0)-Number(l.betaald||0)),0);
   document.getElementById('v-leningen').innerHTML = `
     <div class="card">
       <div class="sec" style="margin-top:0">Leningen</div>
+      <div class="note" style="margin-bottom:12px">Totaal restant: <span class="mono">${fmt(totaalRestant)}</span></div>
       ${state.leningen.map((l, idx)=>{
         const restant = Number(l.totaal||0) - Number(l.betaald||0);
         const pct = Number(l.totaal||0) ? Math.min(100, (Number(l.betaald||0)/Number(l.totaal||0))*100) : 0;
         return `
-          <div class="loan-row">
-            <div style="flex:1">
+          <div class="loan-card">
+            <div class="loan-top">
               <input class="input" value="${escapeHtml(l.naam)}" onchange="updateLoanName(${idx}, this.value)">
-              <div class="track" style="margin-top:8px"><div class="fill" style="width:${pct}%;background:${l.kleur||'#7c6af7'}"></div></div>
-              <div class="note" style="margin-top:6px">Restant: ${fmt(restant)}</div>
+              <div class="mono" style="min-width:84px;text-align:right;color:var(--accent2)">${pct.toFixed(0)}%</div>
             </div>
-            <div class="stack" style="width:110px">
-              <input class="input small" type="number" value="${Number(l.totaal||0)}" onchange="updateLoanTotal(${idx}, this.value)">
-              <input class="input small" type="number" value="${Number(l.betaald||0)}" onchange="updateLoanPaid(${idx}, this.value)">
+            <div class="track"><div class="fill" style="width:${pct}%;background:${l.kleur||'#7c6af7'}"></div></div>
+            <div class="loan-progress-row">
+              <div class="note">Restant: ${fmt(restant)}</div>
+              <div class="note">Betaald: ${fmt(Number(l.betaald||0))}</div>
+            </div>
+            <div class="loan-inputs">
+              <div class="loan-metric">
+                <div class="loan-metric-label">Totaal</div>
+                <input class="input small" type="number" value="${Number(l.totaal||0)}" onchange="updateLoanTotal(${idx}, this.value)" style="width:100%">
+              </div>
+              <div class="loan-metric">
+                <div class="loan-metric-label">Betaald</div>
+                <input class="input small" type="number" value="${Number(l.betaald||0)}" onchange="updateLoanPaid(${idx}, this.value)" style="width:100%">
+              </div>
             </div>
           </div>
         `;
       }).join('')}
-      <div class="stack" style="margin-top:12px">
+      <div class="stack" style="margin-top:14px">
         <button class="btn secondary" onclick="addLoan()">+ Lening</button>
         <button class="btn" onclick="saveToSheets()">☁️ Opslaan in Sheets</button>
       </div>
@@ -525,29 +587,6 @@ function moveCategoryDown(catId){
   state.categorieen = cats.map((c, i) => ({...c, volgorde:i+1}));
   persistLocal();
   renderBudget();
-}
-const catSwipeState = {};
-function catSwipeStart(e, id){
-  const touch = e.changedTouches[0];
-  catSwipeState[id] = { startX: touch.clientX, x:0 };
-}
-function catSwipeMove(e, id){
-  const card = document.querySelector(`.category-card[data-id="${id}"]`);
-  if(!card || !catSwipeState[id]) return;
-  const touch = e.changedTouches[0];
-  const dx = touch.clientX - catSwipeState[id].startX;
-  catSwipeState[id].x = dx;
-}
-function catSwipeEnd(e, id){
-  const card = document.querySelector(`.category-card[data-id="${id}"]`);
-  if(!card || !catSwipeState[id]) return;
-  const dx = catSwipeState[id].x || 0;
-  if(dx < -50){
-    card.classList.add('reveal-edit');
-  } else if(dx > 30){
-    card.classList.remove('reveal-edit');
-  }
-  delete catSwipeState[id];
 }
 function toggleCategoryActions(id){
   const card = document.querySelector(`.category-card[data-id="${id}"]`);
