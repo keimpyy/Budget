@@ -16,19 +16,24 @@
   --shadow:0 10px 30px rgba(0,0,0,.22);
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;overflow-x:hidden}
 .shell{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
 .header{padding:calc(env(safe-area-inset-top,0px) + 18px) 20px 0;position:sticky;top:0;background:linear-gradient(180deg,var(--bg) 86%, rgba(10,10,15,0));backdrop-filter:blur(12px);z-index:100}
 .header-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
 .title{font-size:20px;font-weight:800;letter-spacing:-0.5px}
 .title span{color:var(--accent)}
-.badge{font-size:11px;color:var(--muted);background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:4px 10px;font-family:monospace}
+.badge-btn{font-size:11px;color:var(--muted);background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:6px 10px;font-family:monospace;cursor:pointer}
 .tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:12px;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
-.tab{flex-shrink:0;font-size:13px;font-weight:600;padding:8px 16px;border-radius:20px;cursor:pointer;border:1px solid transparent;background:transparent;color:var(--muted);transition:all .15s;font-family:inherit}
+.tab{flex-shrink:0;font-size:13px;font-weight:600;padding:8px 16px;border-radius:20px;cursor:pointer;border:1px solid transparent;background:transparent;color:var(--muted);transition:all .18s ease;font-family:inherit}
 .tab.active{background:var(--surface2);border-color:var(--border);color:var(--text);box-shadow:var(--shadow)}
+.subtabs{display:flex;gap:8px;margin-bottom:12px}
+.subtab{flex:1;font-size:12px;font-weight:700;padding:10px 14px;border-radius:14px;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--muted);transition:all .18s ease;font-family:inherit}
+.subtab.active{background:var(--surface2);color:var(--text);border-color:rgba(124,106,247,.3)}
 .content{flex:1;padding:10px 20px calc(env(safe-area-inset-bottom,0px) + 40px)}
-.view{display:none}.view.active{display:block}
+.view{display:none;animation:fadeIn .22s ease}.view.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 .hero{background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);border:1px solid rgba(124,106,247,.25);border-radius:24px;padding:24px;margin-bottom:12px;position:relative;overflow:hidden;box-shadow:var(--shadow)}
 .hero::before{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(124,106,247,.15) 0%,transparent 70%);pointer-events:none}
 .hero-label{font-size:11px;color:rgba(240,240,248,.65);letter-spacing:1px;font-family:monospace;margin-bottom:6px}
@@ -45,7 +50,8 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 .fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .35s ease}
 .sq-note{text-align:right;margin-top:5px;font-size:10px;color:var(--muted);font-family:monospace}
 .sec{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin:16px 0 10px}
-.cat-card,.card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:14px 16px;margin-bottom:10px;box-shadow:var(--shadow)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:14px 16px;margin-bottom:10px;box-shadow:var(--shadow);transition:transform .15s ease, opacity .15s ease}
+.card.dragging{opacity:.45;transform:scale(.985)}
 .cat-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px}
 .cat-name{font-size:15px;font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cat-b{font-family:monospace;font-size:14px;font-weight:600;color:var(--accent)}
@@ -64,31 +70,33 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 .inline{display:flex;gap:8px;align-items:center}
 .muted{color:var(--muted)}
 .mono{font-family:monospace}
-.post-row{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:8px}
+.post-row{position:relative;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:8px;transition:transform .2s ease}
+.post-row.swiping{transition:none}
+.post-row-content{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;z-index:2}
+.swipe-delete-bg{position:absolute;inset:0;border-radius:12px;background:linear-gradient(135deg,rgba(255,107,107,.16),rgba(255,107,107,.08));display:flex;align-items:center;justify-content:flex-end;padding-right:16px;color:var(--red);font-size:12px;font-weight:800;opacity:0;transition:opacity .15s ease;z-index:1}
+.post-row.reveal-delete .swipe-delete-bg{opacity:1}
 .loan-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
 .loan-row:last-child{border-bottom:none}
 .note{font-size:12px;color:var(--muted);line-height:1.6}
-.summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
-.summary-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:14px;box-shadow:var(--shadow)}
-.summary-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
-.summary-value{font-size:20px;font-weight:800;letter-spacing:-0.5px}
-.summary-sub{font-size:12px;color:var(--muted);margin-top:6px}
 .budget-toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:14px 0 10px}
-.budget-toolbar-left{min-width:0}
 .budget-toolbar-actions{display:flex;gap:8px;flex-shrink:0}
 .cat-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .cat-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
 .icon-btn{width:38px;height:38px;border-radius:12px;border:1px solid var(--border);background:var(--surface2);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer}
 .pill-btn{height:38px;padding:0 12px;border-radius:12px;border:1px solid var(--border);background:var(--surface2);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:700;font-size:12px}
+.drag-handle{width:38px;height:38px;border-radius:12px;border:1px dashed var(--border);background:var(--surface2);color:var(--muted);display:flex;align-items:center;justify-content:center;cursor:grab;font-size:14px;user-select:none}
+.drag-handle:active{cursor:grabbing}
 #startup-overlay{position:fixed;inset:0;background:rgba(10,10,15,.96);z-index:1000;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px}
 #startup-overlay .spinner{width:42px;height:42px;border:4px solid var(--surface3);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite}
 #menu-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(8px);z-index:1100;display:none;align-items:flex-end}
 #menu-overlay.open{display:flex}
-.menu-sheet{background:var(--surface);border-top-left-radius:24px;border-top-right-radius:24px;border:1px solid var(--border);width:100%;max-width:480px;margin:0 auto;padding:12px 16px calc(env(safe-area-inset-bottom,0px) + 20px);box-shadow:var(--shadow)}
+.menu-sheet{background:var(--surface);border-top-left-radius:24px;border-top-right-radius:24px;border:1px solid var(--border);width:100%;max-width:480px;margin:0 auto;padding:12px 16px calc(env(safe-area-inset-bottom,0px) + 20px);box-shadow:var(--shadow);animation:sheetUp .22s ease}
+@keyframes sheetUp{from{transform:translateY(16px);opacity:.4}to{transform:translateY(0);opacity:1}}
 .menu-handle{width:42px;height:5px;background:var(--surface3);border-radius:999px;margin:6px auto 16px}
 .menu-title{font-size:17px;font-weight:800;margin-bottom:14px}
 .menu-btn{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:14px;color:var(--text);font-family:inherit;font-size:15px;font-weight:700;padding:14px 16px;cursor:pointer;text-align:left;margin-bottom:8px}
 .menu-btn.danger{color:var(--red);background:rgba(255,107,107,.1);border-color:rgba(255,107,107,.2)}
+.settings-list{display:flex;flex-direction:column;gap:10px}
 @keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
@@ -97,13 +105,13 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
   <div class="header">
     <div class="header-top">
       <div class="title">Budget <span>·</span> Veenstra</div>
-      <div class="badge" id="sync-badge">Verbinden...</div>
+      <button class="badge-btn" onclick="openSettings()">⚙ Sheets</button>
     </div>
     <div class="tabs">
       <button class="tab active" onclick="go('dashboard',this)">Dashboard</button>
       <button class="tab" onclick="go('budget',this)">Budget</button>
       <button class="tab" onclick="go('leningen',this)">Leningen</button>
-      <button class="tab" onclick="go('instellingen',this)">Instellingen</button>
+      <button class="tab" style="display:none" id="settings-tab-btn" onclick="go('instellingen',this)">Instellingen</button>
     </div>
   </div>
   <div class="content">
@@ -145,7 +153,10 @@ const state = {
     { id:'l2', naam:'Auto 2', totaal:7500, betaald:0, kleur:'#4ecdc4' },
   ],
   openCats:{},
-  menuCatId:null
+  menuCatId:null,
+  budgetSubtab:'categorieen',
+  currentView:'dashboard',
+  dragCategoryId:null
 };
 
 function uid(prefix){ return `${prefix}_${Date.now()}_${Math.floor(Math.random()*100000)}`; }
@@ -179,10 +190,6 @@ function restoreLocal(){
     if(parsed.budget) state.budget = parsed.budget;
     if(parsed.leningen) state.leningen = parsed.leningen;
   }catch(e){}
-}
-function updateSyncBadge(text){
-  const el = document.getElementById('sync-badge');
-  if(el) el.textContent = text;
 }
 async function safeJson(res){
   const text = await res.text();
@@ -270,6 +277,7 @@ function showToast(msg){
   document.body.appendChild(t); setTimeout(()=>t.remove(), 2200);
 }
 function go(name,btn){
+  state.currentView = name;
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('v-'+name).classList.add('active');
@@ -279,6 +287,12 @@ function go(name,btn){
   if(name==='leningen') renderLeningen();
   if(name==='instellingen') renderInstellingen();
 }
+function openSettings(){
+  const btn = document.getElementById('settings-tab-btn');
+  go('instellingen', btn);
+}
+function setBudgetSubtab(tab){ state.budgetSubtab = tab; renderBudget(); }
+
 function renderDashboard(){
   const o = overschot(), s = spaarquote(), total = budgetTotaal();
   document.getElementById('v-dashboard').innerHTML = `
@@ -297,7 +311,7 @@ function renderDashboard(){
     </div>
     <div class="sec">Categorieën</div>
     ${orderedCats().map(cat => `
-      <div class="cat-card">
+      <div class="card">
         <div class="cat-top">
           <div style="min-width:0">
             <div class="cat-name">${escapeHtml(cat.naam)}</div>
@@ -310,29 +324,10 @@ function renderDashboard(){
     `).join('')}
   `;
 }
+
 function renderBudget(){
   const total = budgetTotaal();
-  const avgCat = orderedCats().length ? total / orderedCats().length : 0;
-  const biggest = orderedCats().slice().sort((a,b)=>totalForCategory(b.id)-totalForCategory(a.id))[0];
-  document.getElementById('v-budget').innerHTML = `
-    <div class="summary-grid">
-      <div class="summary-card">
-        <div class="summary-label">Categorieën</div>
-        <div class="summary-value">${orderedCats().length}</div>
-        <div class="summary-sub">${state.budget.length} budgetposten</div>
-      </div>
-      <div class="summary-card">
-        <div class="summary-label">Gemiddeld</div>
-        <div class="summary-value">${fmtShort(avgCat)}</div>
-        <div class="summary-sub">per categorie</div>
-      </div>
-      <div class="summary-card" style="grid-column:1 / -1">
-        <div class="summary-label">Grootste categorie</div>
-        <div class="summary-value" style="font-size:18px">${biggest ? escapeHtml(biggest.naam) : '—'}</div>
-        <div class="summary-sub">${biggest ? fmt(totalForCategory(biggest.id)) : 'Geen data'}</div>
-      </div>
-    </div>
-
+  const budgetHtml = state.budgetSubtab === 'inkomsten' ? `
     <div class="card">
       <div class="sec" style="margin-top:0">Inkomsten</div>
       <div class="stack">
@@ -344,11 +339,9 @@ function renderBudget(){
         `).join('')}
       </div>
     </div>
-
+  ` : `
     <div class="budget-toolbar">
-      <div class="budget-toolbar-left">
-        <div class="sec" style="margin:0">Categorieën</div>
-      </div>
+      <div class="sec" style="margin:0">Categorieën</div>
       <div class="budget-toolbar-actions">
         <button class="pill-btn" onclick="toggleAllCategories()">${allCategoriesOpen() ? 'Alles sluiten' : 'Alles openen'}</button>
         <button class="btn sm" onclick="addCategory()">+ Categorie</button>
@@ -358,7 +351,7 @@ function renderBudget(){
     ${orderedCats().map(cat => {
       const isOpen = !!state.openCats[cat.id];
       return `
-        <div class="card">
+        <div class="card" draggable="true" ondragstart="startCategoryDrag('${cat.id}')" ondragover="event.preventDefault()" ondrop="dropCategory('${cat.id}', event)" ondragend="endCategoryDrag(this)" id="cat-card-${cat.id}">
           <div class="cat-head">
             <div style="min-width:0;flex:1">
               <div class="row" style="gap:10px">
@@ -368,6 +361,7 @@ function renderBudget(){
               <div class="cat-meta">${postsCount(cat.id)} posten</div>
             </div>
             <div class="cat-actions">
+              <div class="drag-handle" title="Sleep om te sorteren">⋮⋮</div>
               <button class="icon-btn" onclick="toggleCategory('${cat.id}')" title="${isOpen ? 'Sluit' : 'Open'}">${isOpen ? '−' : '+'}</button>
               <button class="pill-btn" onclick="showCategoryMenu('${cat.id}')">Wijzig</button>
             </div>
@@ -375,10 +369,13 @@ function renderBudget(){
           ${isOpen ? `
             <div class="stack" style="margin-top:10px">
               ${itemsForCategory(cat.id).map(item => `
-                <div class="post-row">
-                  <input class="input" value="${escapeHtml(item.post)}" onchange="renameBudgetPost('${item.id}', this.value)">
-                  <input class="input small" type="number" value="${Number(item.budget||0)}" onchange="updateBudgetAmount('${item.id}', this.value)">
-                  <button class="btn sm danger" onclick="removeBudgetPost('${item.id}')">✕</button>
+                <div class="post-row" data-id="${item.id}" ontouchstart="swipeStart(event, '${item.id}')" ontouchmove="swipeMove(event, '${item.id}')" ontouchend="swipeEnd(event, '${item.id}')">
+                  <div class="swipe-delete-bg">Verwijder</div>
+                  <div class="post-row-content">
+                    <input class="input" value="${escapeHtml(item.post)}" onchange="renameBudgetPost('${item.id}', this.value)">
+                    <input class="input small" type="number" value="${Number(item.budget||0)}" onchange="updateBudgetAmount('${item.id}', this.value)">
+                    <button class="btn sm danger" onclick="removeBudgetPost('${item.id}')">✕</button>
+                  </div>
                 </div>
               `).join('')}
               <button class="btn secondary" onclick="addBudgetPost('${cat.id}')">+ Post toevoegen</button>
@@ -387,7 +384,14 @@ function renderBudget(){
         </div>
       `;
     }).join('')}
+  `;
 
+  document.getElementById('v-budget').innerHTML = `
+    <div class="subtabs">
+      <button class="subtab ${state.budgetSubtab==='inkomsten'?'active':''}" onclick="setBudgetSubtab('inkomsten')">Inkomsten</button>
+      <button class="subtab ${state.budgetSubtab==='categorieen'?'active':''}" onclick="setBudgetSubtab('categorieen')">Categorieën / Uitgaven</button>
+    </div>
+    ${budgetHtml}
     <div class="card">
       <div class="row">
         <div style="font-weight:700">Totaal budget</div>
@@ -407,18 +411,6 @@ function renderBudget(){
 }
 function renderLeningen(){
   document.getElementById('v-leningen').innerHTML = `
-    <div class="summary-grid">
-      <div class="summary-card">
-        <div class="summary-label">Leningen</div>
-        <div class="summary-value">${state.leningen.length}</div>
-        <div class="summary-sub">actieve posten</div>
-      </div>
-      <div class="summary-card">
-        <div class="summary-label">Totaal restant</div>
-        <div class="summary-value">${fmtShort(state.leningen.reduce((s,l)=>s+(Number(l.totaal||0)-Number(l.betaald||0)),0))}</div>
-        <div class="summary-sub">nog af te lossen</div>
-      </div>
-    </div>
     <div class="card">
       <div class="sec" style="margin-top:0">Leningen</div>
       ${state.leningen.map((l, idx)=>{
@@ -449,20 +441,27 @@ function renderInstellingen(){
   document.getElementById('v-instellingen').innerHTML = `
     <div class="card">
       <div class="sec" style="margin-top:0">Synchronisatie</div>
-      <div class="stack">
+      <div class="settings-list">
         <div class="note">De app is gekoppeld aan Google Sheets en gebruikt cache als fallback.</div>
         <div class="note mono">${escapeHtml(state.sheetsUrl)}</div>
         <div class="inline">
           <button class="btn secondary" onclick="loadFromSheets()" style="flex:1">Ophalen</button>
           <button class="btn secondary" onclick="saveToSheets()" style="flex:1">Opslaan</button>
         </div>
+        <button class="btn secondary" onclick="closeSettings()">Terug</button>
       </div>
     </div>
   `;
 }
-function escapeHtml(v){
-  return String(v ?? '').replaceAll('&','&amp;').replaceAll('"','&quot;').replaceAll('<','&lt;').replaceAll('>','&gt;');
+function closeSettings(){
+  const btn = document.querySelector('.tab.active') || document.querySelector('.tab');
+  const target = state.currentView === 'instellingen' ? 'dashboard' : state.currentView;
+  const tabBtn = [...document.querySelectorAll('.tab')].find(b => b.textContent.trim().toLowerCase() === target);
+  if(tabBtn) go(target, tabBtn);
+  else go('dashboard', document.querySelectorAll('.tab')[0]);
 }
+
+function escapeHtml(v){ return String(v ?? '').replaceAll('&','&amp;').replaceAll('"','&quot;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
 function updateIncomeName(idx, value){ state.inkomsten[idx].naam = value.trim(); persistLocal(); renderDashboard(); }
 function updateIncomeAmount(idx, value){ state.inkomsten[idx].bedrag = Number(value||0); persistLocal(); rerenderAll(); }
 function addCategory(){
@@ -490,6 +489,28 @@ function allCategoriesOpen(){
 function toggleAllCategories(){
   const shouldOpen = !allCategoriesOpen();
   orderedCats().forEach(c => state.openCats[c.id] = shouldOpen);
+  renderBudget();
+}
+function startCategoryDrag(catId){
+  state.dragCategoryId = catId;
+  const el = document.getElementById('cat-card-'+catId);
+  if(el) el.classList.add('dragging');
+}
+function endCategoryDrag(el){
+  state.dragCategoryId = null;
+  document.querySelectorAll('.card.dragging').forEach(c => c.classList.remove('dragging'));
+}
+function dropCategory(targetCatId, event){
+  event.preventDefault();
+  if(!state.dragCategoryId || state.dragCategoryId === targetCatId) return;
+  const cats = orderedCats();
+  const from = cats.findIndex(c => c.id === state.dragCategoryId);
+  const to = cats.findIndex(c => c.id === targetCatId);
+  if(from < 0 || to < 0) return;
+  const moved = cats.splice(from, 1)[0];
+  cats.splice(to, 0, moved);
+  state.categorieen = cats.map((c, idx) => ({...c, volgorde: idx + 1}));
+  persistLocal();
   renderBudget();
 }
 function addBudgetPost(catId){
@@ -532,42 +553,78 @@ function menuRemoveCategory(){
   removeCategory(state.menuCatId);
 }
 
+// iPhone-style swipe to delete
+const swipeState = {};
+function swipeStart(e, id){
+  const touch = e.changedTouches[0];
+  swipeState[id] = { startX: touch.clientX, x:0 };
+}
+function swipeMove(e, id){
+  const row = document.querySelector(`.post-row[data-id="${id}"]`);
+  if(!row || !swipeState[id]) return;
+  const content = row.querySelector('.post-row-content');
+  const touch = e.changedTouches[0];
+  const dx = touch.clientX - swipeState[id].startX;
+  if(dx > 0) return;
+  swipeState[id].x = Math.max(-96, dx);
+  content.style.transform = `translateX(${swipeState[id].x}px)`;
+  row.classList.toggle('reveal-delete', Math.abs(swipeState[id].x) > 28);
+}
+function swipeEnd(e, id){
+  const row = document.querySelector(`.post-row[data-id="${id}"]`);
+  if(!row || !swipeState[id]) return;
+  const content = row.querySelector('.post-row-content');
+  const dx = swipeState[id].x || 0;
+  if(dx < -72){
+    content.style.transform = 'translateX(-84px)';
+    row.classList.add('reveal-delete');
+    setTimeout(() => {
+      if(confirm('Post verwijderen?')) removeBudgetPost(id);
+      else{
+        content.style.transform = '';
+        row.classList.remove('reveal-delete');
+      }
+    }, 80);
+  } else {
+    content.style.transform = '';
+    row.classList.remove('reveal-delete');
+  }
+  delete swipeState[id];
+}
+
 async function loadFromSheets(){
-  updateSyncBadge('Ophalen...');
+  const saveStatus = document.getElementById('save-status');
+  if(saveStatus) saveStatus.textContent = 'Ophalen...';
   try{
     const result = await sheetsGet();
     if(result?.ok){
       applySheets(result);
-      updateSyncBadge('Sheets');
       showToast('Data opgehaald');
+      if(saveStatus) saveStatus.textContent = 'Vers geladen uit Sheets';
     }else{
-      updateSyncBadge('Fout');
       showToast(result?.error || 'Ophalen mislukt');
+      if(saveStatus) saveStatus.textContent = 'Ophalen mislukt';
     }
   }catch(e){
-    updateSyncBadge('Fout');
     showToast('Ophalen mislukt');
+    if(saveStatus) saveStatus.textContent = 'Ophalen mislukt';
   }
 }
 async function saveToSheets(){
   const status = document.getElementById('save-status');
   if(status) status.textContent = 'Opslaan...';
-  updateSyncBadge('Opslaan...');
   try{
     const result = await sheetsPost(toRows());
     if(result?.ok){
       persistLocal();
       if(status) status.textContent = 'Opgeslagen in Sheets';
-      updateSyncBadge('Sheets');
       showToast('Opgeslagen');
     }else{
       if(status) status.textContent = result?.error || 'Opslaan mislukt';
-      updateSyncBadge('Fout');
       showToast(result?.error || 'Opslaan mislukt');
     }
   }catch(e){
     if(status) status.textContent = 'Opslaan mislukt';
-    updateSyncBadge('Fout');
     showToast('Opslaan mislukt');
   }
 }
@@ -579,13 +636,8 @@ async function init(){
     const result = await sheetsGet();
     if(result?.ok){
       applySheets(result);
-      updateSyncBadge('Sheets');
-    }else{
-      updateSyncBadge('Cache');
     }
-  }catch(e){
-    updateSyncBadge('Cache');
-  }
+  }catch(e){}
   document.getElementById('startup-overlay').style.display = 'none';
 }
 init();
