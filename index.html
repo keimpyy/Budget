@@ -7,6 +7,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Budget">
 <meta name="theme-color" content="#0a0a0f">
+<link rel="apple-touch-icon" sizes="180x180" href="budget-icon-180.png">
+<link rel="icon" type="image/png" sizes="512x512" href="budget-icon-512.png">
 <title>Budget · Veenstra</title>
 <style>
 :root{
@@ -27,6 +29,53 @@
 
   --shadow:0 10px 30px rgba(0,0,0,.5);
 }
+
+body[data-theme="sakura"]{
+  --bg:#0a0609;
+  --surface:#130d12;
+  --surface2:#1b1219;
+  --surface3:#281a24;
+  --border:rgba(255,210,230,0.10);
+  --text:#fff4f8;
+  --muted:#c6a8b7;
+  --accent:#ff7ab6;
+  --accent2:#ffb7d5;
+  --green:#ffd166;
+  --red:#ff8fa3;
+  --amber:#ffc6de;
+  --shadow:0 10px 30px rgba(0,0,0,.42);
+}
+body[data-theme="midnight"]{
+  --bg:#050505;
+  --surface:#0b0b0b;
+  --surface2:#121212;
+  --surface3:#1a1a1a;
+  --border:rgba(255,255,255,0.06);
+  --text:#f5f5f5;
+  --muted:#9aa0a6;
+  --accent:#ff3cac;
+  --accent2:#2b86ff;
+  --green:#00ffa3;
+  --red:#ff4d4f;
+  --amber:#ffc857;
+  --shadow:0 10px 30px rgba(0,0,0,.5);
+}
+body[data-theme="carbon"]{
+  --bg:#08090b;
+  --surface:#101214;
+  --surface2:#171b1f;
+  --surface3:#20262d;
+  --border:rgba(255,255,255,0.07);
+  --text:#eef2f5;
+  --muted:#9ba6b2;
+  --accent:#69a7ff;
+  --accent2:#8ef0d1;
+  --green:#8ef0d1;
+  --red:#ff7d7d;
+  --amber:#ffd479;
+  --shadow:0 10px 30px rgba(0,0,0,.38);
+}
+
   --bg:#0c0f12;--surface:#14181d;--surface2:#1b2128;--surface3:#252c35;
   --border:rgba(255,255,255,0.08);--text:#eef2f5;--muted:#8b96a3;
   --accent:#8fa3b8;--accent2:#6f879b;--green:#87a98a;--red:#c98787;--amber:#b89a6a;
@@ -869,8 +918,35 @@ function renderLeningen(){
     </div>
   `;
 }
+
+function applyTheme(theme){
+  document.body.setAttribute('data-theme', theme || 'midnight');
+  try{ localStorage.setItem('bv_theme', theme || 'midnight'); }catch(e){}
+}
+function loadTheme(){
+  try{
+    const theme = localStorage.getItem('bv_theme') || 'midnight';
+    applyTheme(theme);
+  }catch(e){
+    applyTheme('midnight');
+  }
+}
+
 function renderInstellingen(){
+  const currentTheme = document.body.getAttribute('data-theme') || 'midnight';
   document.getElementById('v-instellingen').innerHTML = `
+    <div class="card">
+      <div class="sec" style="margin-top:0">Weergave</div>
+      <div class="settings-list">
+        <div class="note">Kies een stijl voor je app.</div>
+        <select class="input" onchange="applyTheme(this.value)" style="appearance:none">
+          <option value="midnight" ${currentTheme==='midnight'?'selected':''}>Midnight RGB</option>
+          <option value="carbon" ${currentTheme==='carbon'?'selected':''}>Carbon</option>
+          <option value="sakura" ${currentTheme==='sakura'?'selected':''}>Sakura</option>
+        </select>
+      </div>
+    </div>
+
     <div class="card">
       <div class="sec" style="margin-top:0">Synchronisatie</div>
       <div class="settings-list">
@@ -885,74 +961,6 @@ function renderInstellingen(){
     </div>
   `;
 }
-function closeSettings(){
-  const btn = document.querySelector('.tab.active') || document.querySelector('.tab');
-  const target = state.currentView === 'instellingen' ? 'dashboard' : state.currentView;
-  const tabBtn = [...document.querySelectorAll('.tab')].find(b => b.textContent.trim().toLowerCase() === target);
-  if(tabBtn) go(target, tabBtn);
-  else go('dashboard', document.querySelectorAll('.tab')[0]);
-}
-
-function confettiBurst(){
-  const canvas = document.getElementById('confetti-layer');
-  if(!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const dpr = window.devicePixelRatio || 1;
-  canvas.width = innerWidth * dpr;
-  canvas.height = innerHeight * dpr;
-  canvas.style.width = innerWidth + 'px';
-  canvas.style.height = innerHeight + 'px';
-  ctx.scale(dpr, dpr);
-  const pieces = Array.from({length: 90}, () => ({
-    x: innerWidth * (0.25 + Math.random() * 0.5),
-    y: innerHeight * (0.18 + Math.random() * 0.12),
-    vx: -5 + Math.random() * 10,
-    vy: -9 - Math.random() * 7,
-    g: 0.22 + Math.random() * 0.08,
-    s: 4 + Math.random() * 6,
-    r: Math.random() * Math.PI,
-    vr: -0.15 + Math.random() * 0.3,
-    c: ['#ff3cac','#2b86ff','#00ffa3','#ffc857','#ffffff'][Math.floor(Math.random()*5)],
-    life: 0
-  }));
-  let frame = 0;
-  function tick(){
-    ctx.clearRect(0,0,innerWidth,innerHeight);
-    pieces.forEach(p => {
-      p.life++;
-      p.x += p.vx;
-      p.y += p.vy;
-      p.vy += p.g;
-      p.r += p.vr;
-      ctx.save();
-      ctx.translate(p.x, p.y);
-      ctx.rotate(p.r);
-      ctx.fillStyle = p.c;
-      ctx.fillRect(-p.s/2, -p.s/2, p.s, p.s * 0.7);
-      ctx.restore();
-    });
-    frame++;
-    if(frame < 70) requestAnimationFrame(tick);
-    else ctx.clearRect(0,0,innerWidth,innerHeight);
-  }
-  tick();
-}
-function addLoanPayment(idx){
-  const amount = prompt('Hoeveel wil je aflossen?');
-  if(!amount) return;
-  const val = Number(String(amount).replace(',','.'));
-  if(!isFinite(val) || val <= 0){
-    showToast('Geen geldig bedrag');
-    return;
-  }
-  const loan = state.leningen[idx];
-  loan.betaald = Math.min(Number(loan.totaal || 0), Number(loan.betaald || 0) + val);
-  persistLocal();
-  renderLeningen();
-  confettiBurst();
-  showToast('Aflossing toegevoegd');
-}
-
 function escapeHtml(v){ return String(v ?? '').replaceAll('&','&amp;').replaceAll('"','&quot;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
 function updateIncomeName(idx, value){ state.inkomsten[idx].naam = value.trim(); persistLocal(); renderDashboard(); }
 function updateIncomeAmount(idx, value){ state.inkomsten[idx].bedrag = Number(value||0); persistLocal(); rerenderAll(); }
@@ -1113,6 +1121,7 @@ async function init(){
   }catch(e){}
   document.getElementById('startup-overlay').style.display = 'none';
 }
+loadTheme();
 init();
 </script>
 </body>
