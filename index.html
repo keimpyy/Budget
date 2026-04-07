@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#0a0a0f">
 <title>Budget · Veenstra</title>
 <style>
-:root {
+:root{
   --bg:#0a0a0f;--surface:#13131a;--surface2:#1c1c26;--surface3:#242432;
   --border:rgba(255,255,255,0.07);--text:#f0f0f8;--muted:#6b6b88;
   --accent:#7c6af7;--accent2:#4ecdc4;--green:#3ddc84;--red:#ff6b6b;--amber:#ffbe0b;
@@ -28,7 +28,6 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 .tab.active{background:var(--surface2);border-color:var(--border);color:var(--text)}
 .content{flex:1;padding:10px 20px calc(env(safe-area-inset-bottom,0px) + 40px)}
 .view{display:none}.view.active{display:block}
-/* Hero */
 .hero{background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);border:1px solid rgba(124,106,247,.25);border-radius:20px;padding:24px;margin-bottom:12px;position:relative;overflow:hidden}
 .hero::before{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(124,106,247,.15) 0%,transparent 70%);pointer-events:none}
 .hero-label{font-size:11px;color:var(--muted);letter-spacing:1px;font-family:monospace;margin-bottom:6px}
@@ -37,7 +36,6 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 .hero-sub{display:flex;gap:20px;margin-top:16px}
 .hero-sub-label{font-size:10px;color:var(--muted);font-family:monospace;margin-bottom:3px}
 .hero-sub-val{font-size:15px;font-weight:600}
-/* Spaarquote */
 .sq-bar{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:14px 18px;margin-bottom:16px}
 .sq-top{display:flex;justify-content:space-between;margin-bottom:10px}
 .sq-label{font-size:13px;font-weight:600;color:var(--muted)}
@@ -45,104 +43,41 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 .track{background:var(--surface3);border-radius:99px;height:8px;overflow:hidden}
 .fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .6s ease}
 .sq-note{text-align:right;margin-top:5px;font-size:10px;color:var(--muted);font-family:monospace}
-/* Section title */
 .sec{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin:16px 0 10px}
-/* Cat cards */
-.cat-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:14px 16px;margin-bottom:8px;cursor:pointer}
+.cat-card,.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:14px 16px;margin-bottom:8px}
 .cat-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
 .cat-name{font-size:15px;font-weight:700}
-.cat-amounts{display:flex;gap:6px;align-items:baseline}
-.cat-b{font-family:monospace;font-size:12px;color:var(--muted)}
-.cat-w{font-family:monospace;font-size:14px;font-weight:500}
-.cat-w.over{color:var(--red)}.cat-w.ok{color:var(--green)}.cat-w.neu{color:var(--accent)}
+.cat-b{font-family:monospace;font-size:14px;font-weight:500;color:var(--accent)}
 .prog{background:var(--surface3);border-radius:99px;height:4px;overflow:hidden}
-.prog-fill{height:100%;border-radius:99px;transition:width .5s ease}
-.prog-fill.over{background:var(--red)}.prog-fill.ok{background:var(--green)}.prog-fill.neu{background:var(--accent)}
-/* Income inputs */
-.inc-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
-.inc-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px}
-.inc-label{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
-.inc-input{font-size:16px!important;background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--green);font-family:monospace;font-size:18px;font-weight:500;width:calc(100% - 16px);outline:none;padding:2px 0}
-/* Budget rows */
-.bud-section{margin-bottom:14px}
-.bud-hdr{background:var(--surface2);border-radius:16px 16px 0 0;padding:10px 16px;display:flex;justify-content:space-between;font-size:13px;font-weight:700;color:var(--muted)}
-.bud-hdr span:last-child{font-family:monospace;color:var(--accent)}
-.bud-row{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;justify-content:space-between;align-items:center}
-.bud-row.last{border-radius:0 0 16px 16px;border-bottom:none}
-.bud-post{font-size:13px;color:var(--muted);padding-left:12px}
-.bud-input-wrap{position:relative;display:flex;align-items:center}
-.bud-eur{position:absolute;left:9px;color:var(--muted);font-family:monospace;font-size:12px;pointer-events:none}
-.bud-input{font-size:16px!important;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:monospace;font-size:14px;padding:6px 10px 6px 24px;width:88px;text-align:right;outline:none}
-.bud-total{background:var(--surface2);border:1px solid var(--border);border-radius:16px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.bud-total-label{font-size:14px;font-weight:700}
-.bud-total-val{font-family:monospace;font-size:16px;color:var(--accent)}
-/* TX form */
-.tx-form{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:20px;margin-bottom:20px}
-.tx-form-title{font-size:15px;font-weight:700;margin-bottom:16px}
-.form-label{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
-.form-input,.form-select{font-size:16px!important;background:var(--surface2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:inherit;font-size:14px;padding:10px 14px;width:100%;outline:none;-webkit-appearance:none;margin-bottom:10px}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.form-btn{width:100%;background:linear-gradient(135deg,var(--accent),#9b8af7);border:none;border-radius:14px;color:#fff;font-family:inherit;font-size:15px;font-weight:700;padding:14px;cursor:pointer;margin-top:4px}
-/* Filter chips */
-.chips{display:flex;gap:6px;overflow-x:auto;margin-bottom:14px;scrollbar-width:none;padding-bottom:2px}
-.chips::-webkit-scrollbar{display:none}
-.chip{flex-shrink:0;background:var(--surface);border:1px solid var(--border);border-radius:20px;color:var(--muted);font-size:12px;font-weight:600;padding:5px 12px;cursor:pointer;font-family:inherit}
-.chip.active{background:var(--accent);border-color:var(--accent);color:#fff}
-/* TX items */
-.tx-item{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
-.tx-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.tx-dot.debit{background:var(--red)}.tx-dot.credit{background:var(--green)}
-.tx-info{flex:1;min-width:0}
-.tx-name{font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tx-meta{font-size:11px;color:var(--muted);font-family:monospace;margin-top:2px}
-.tx-amount{font-family:monospace;font-size:14px;font-weight:500;flex-shrink:0}
-.tx-amount.debit{color:var(--red)}.tx-amount.credit{color:var(--green)}
-.tx-del{background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:4px;line-height:1;border-radius:6px}
-/* Var cards */
-.var-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:14px 16px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
-.var-name{font-size:14px;font-weight:600}
-.var-sub{font-size:12px;color:var(--muted);font-family:monospace;margin-top:2px}
-.var-amount{font-family:monospace;font-size:16px;font-weight:500;color:var(--amber)}
-/* ZZP */
-.zzp-hero{background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);border:1px solid rgba(78,205,196,.2);border-radius:20px;padding:20px;margin-bottom:16px}
-.zzp-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05)}
-.zzp-row:last-child{border-bottom:none}
-.zzp-label{font-size:13px;color:var(--muted)}
-.zzp-val{font-family:monospace;font-size:13px;font-weight:500}
-/* Modal */
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:flex-end;backdrop-filter:blur(4px)}
-.overlay.open{display:flex}
-.modal{background:var(--surface);border:1px solid var(--border);border-radius:24px 24px 0 0;width:100%;max-height:80vh;overflow-y:auto;padding-bottom:32px}
-.modal-handle{width:36px;height:4px;background:var(--surface3);border-radius:99px;margin:12px auto}
-.modal-hdr{padding:0 20px 16px;border-bottom:1px solid var(--border);font-size:18px;font-weight:800}
-.modal-body{padding:8px 20px}
-.line{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)}
-.line:last-child{border-bottom:none}
-.line-name{font-size:14px;color:var(--muted)}
-.line-right{display:flex;gap:10px;align-items:baseline}
-/* Empty */
-.empty{text-align:center;padding:40px 0;color:var(--muted)}
-.empty-icon{font-size:36px;margin-bottom:10px}
-/* Edit button iOS style */
-.edit-btn{background:none;border:none;color:var(--accent);font-size:15px;font-weight:600;cursor:pointer;padding:4px 8px;font-family:inherit;display:none}
-.edit-btn.visible{display:block}
-.post-name-input{background:var(--surface2);border:1px solid var(--accent);border-radius:8px;color:var(--text);font-family:inherit;font-size:13px;padding:4px 8px;outline:none;width:130px}
-input,select,textarea{font-size:16px!important;}</style>
+.prog-fill{height:100%;border-radius:99px;background:var(--accent)}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.input{font-size:16px!important;background:var(--surface2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:inherit;padding:10px 14px;width:100%;outline:none}
+.input.small{width:110px;text-align:right;font-family:monospace}
+.btn{background:linear-gradient(135deg,var(--accent),#9b8af7);border:none;border-radius:14px;color:#fff;font-family:inherit;font-size:15px;font-weight:700;padding:14px 16px;cursor:pointer}
+.btn.secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.btn.ghost{background:transparent;color:var(--accent);border:1px solid rgba(124,106,247,.35)}
+.btn.danger{background:rgba(255,107,107,.14);color:var(--red);border:1px solid rgba(255,107,107,.25)}
+.btn.sm{padding:8px 10px;border-radius:10px;font-size:12px}
+.stack{display:flex;flex-direction:column;gap:8px}
+.inline{display:flex;gap:8px;align-items:center}
+.muted{color:var(--muted)}
+.mono{font-family:monospace}
+.post-row{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:8px}
+.loan-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
+.loan-row:last-child{border-bottom:none}
+.chip{display:inline-flex;padding:5px 10px;border-radius:999px;background:var(--surface2);border:1px solid var(--border);font-size:11px;color:var(--muted)}
+.note{font-size:12px;color:var(--muted);line-height:1.6}
+#startup-overlay{position:fixed;inset:0;background:rgba(10,10,15,.96);z-index:1000;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px}
+#startup-overlay .spinner{width:42px;height:42px;border:4px solid var(--surface3);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
 </head>
 <body>
 <div class="shell">
   <div class="header">
     <div class="header-top">
       <div class="title">Budget <span>·</span> Veenstra</div>
-      <div style="display:flex;align-items:center;gap:8px">
-        <button class="edit-btn" id="edit-btn" onclick="toggleEdit()">Wijzig</button>
-        <div style="display:flex;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:3px;gap:2px;display:none" id="month-filter">
-          <button onclick="setMonth('Alles',this)" style="font-size:10px;font-weight:700;padding:4px 8px;border-radius:16px;border:none;cursor:pointer;font-family:inherit;transition:all .2s;background:var(--accent);color:#fff">Alles</button>
-          <button onclick="setMonth('P1',this)" style="font-size:10px;font-weight:700;padding:4px 8px;border-radius:16px;border:none;cursor:pointer;font-family:inherit;transition:all .2s;background:transparent;color:var(--muted)">dec–jan</button>
-          <button onclick="setMonth('P2',this)" style="font-size:10px;font-weight:700;padding:4px 8px;border-radius:16px;border:none;cursor:pointer;font-family:inherit;transition:all .2s;background:transparent;color:var(--muted)">jan–feb</button>
-          <button onclick="setMonth('P3',this)" style="font-size:10px;font-weight:700;padding:4px 8px;border-radius:16px;border:none;cursor:pointer;font-family:inherit;transition:all .2s;background:transparent;color:var(--muted)">feb–mrt</button>
-        </div>
-      </div>
+      <div class="badge" id="sync-badge">Lokaal</div>
     </div>
     <div class="tabs">
       <button class="tab active" onclick="go('dashboard',this)">Dashboard</button>
@@ -151,7 +86,6 @@ input,select,textarea{font-size:16px!important;}</style>
       <button class="tab" onclick="go('instellingen',this)">Instellingen</button>
     </div>
   </div>
-
   <div class="content">
     <div id="v-dashboard" class="view active"></div>
     <div id="v-budget" class="view"></div>
@@ -160,953 +94,535 @@ input,select,textarea{font-size:16px!important;}</style>
   </div>
 </div>
 
-<div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <div class="modal-hdr" id="modal-title"></div>
-    <div class="modal-body" id="modal-body"></div>
-  </div>
+<div id="startup-overlay">
+  <div class="spinner"></div>
+  <div class="muted">Budget laden...</div>
 </div>
 
 <script>
-const C = {
-  bg:'#0a0a0f',surface:'#13131a',surface2:'#1c1c26',surface3:'#242432',
-  border:'rgba(255,255,255,0.07)',text:'#f0f0f8',muted:'#6b6b88',
-  accent:'#7c6af7',accent2:'#4ecdc4',green:'#3ddc84',red:'#ff6b6b',amber:'#ffbe0b'
+const DEFAULT_SHEETS_URL = '';
+const state = {
+  sheetsUrl: localStorage.getItem('bv_sheets_url') || DEFAULT_SHEETS_URL,
+  inkomsten: [
+    { naam:'KT', bedrag:2950 },
+    { naam:'Ryanne', bedrag:1581.89 },
+  ],
+  categorieen: [
+    { id:'cat_woning', naam:'Woning', volgorde:1 },
+    { id:'cat_auto', naam:'Auto', volgorde:2 },
+    { id:'cat_streaming', naam:'Streaming', volgorde:3 },
+    { id:'cat_leningen', naam:'Leningen', volgorde:4 },
+    { id:'cat_zorg', naam:'Zorgverzekering', volgorde:5 },
+    { id:'cat_telefoon', naam:'Telefoon', volgorde:6 },
+    { id:'cat_overig', naam:'Overig / ING', volgorde:7 },
+  ],
+  budget: [
+    { id:'bud_1', categorieId:'cat_woning', post:'Hypotheek', budget:1250, volgorde:1 },
+    { id:'bud_2', categorieId:'cat_woning', post:'Gas/Elektra', budget:250, volgorde:2 },
+    { id:'bud_3', categorieId:'cat_woning', post:'Vitens', budget:20, volgorde:3 },
+    { id:'bud_4', categorieId:'cat_woning', post:'Assudeuren', budget:55, volgorde:4 },
+    { id:'bud_5', categorieId:'cat_woning', post:'TAF', budget:10, volgorde:5 },
+
+    { id:'bud_6', categorieId:'cat_auto', post:'Allianz Auto 1', budget:46, volgorde:1 },
+    { id:'bud_7', categorieId:'cat_auto', post:'Allianz Auto 2', budget:46, volgorde:2 },
+    { id:'bud_8', categorieId:'cat_auto', post:'Benzine', budget:350, volgorde:3 },
+    { id:'bud_9', categorieId:'cat_auto', post:'Wegenbelasting 1', budget:31, volgorde:4 },
+    { id:'bud_10', categorieId:'cat_auto', post:'Wegenbelasting 2', budget:31, volgorde:5 },
+
+    { id:'bud_11', categorieId:'cat_streaming', post:'HBO', budget:5, volgorde:1 },
+    { id:'bud_12', categorieId:'cat_streaming', post:'Prime', budget:5, volgorde:2 },
+    { id:'bud_13', categorieId:'cat_streaming', post:'Videoland', budget:6, volgorde:3 },
+    { id:'bud_14', categorieId:'cat_streaming', post:'Podimo', budget:10, volgorde:4 },
+    { id:'bud_15', categorieId:'cat_streaming', post:'Sky', budget:5, volgorde:5 },
+
+    { id:'bud_16', categorieId:'cat_leningen', post:'Anko/Emmy', budget:150, volgorde:1 },
+    { id:'bud_17', categorieId:'cat_leningen', post:'Auto leningen', budget:500, volgorde:2 },
+
+    { id:'bud_18', categorieId:'cat_zorg', post:'KT', budget:125, volgorde:1 },
+    { id:'bud_19', categorieId:'cat_zorg', post:'Ryanne', budget:125, volgorde:2 },
+
+    { id:'bud_20', categorieId:'cat_telefoon', post:'KT (Youfone)', budget:7.5, volgorde:1 },
+    { id:'bud_21', categorieId:'cat_telefoon', post:'Ryanne (Ben)', budget:35, volgorde:2 },
+
+    { id:'bud_22', categorieId:'cat_overig', post:'ING kosten', budget:11, volgorde:1 },
+    { id:'bud_23', categorieId:'cat_overig', post:'Boodschappen', budget:500, volgorde:2 },
+    { id:'bud_24', categorieId:'cat_overig', post:'Gemeente', budget:120, volgorde:3 },
+    { id:'bud_25', categorieId:'cat_overig', post:'Xbox', budget:15, volgorde:4 },
+    { id:'bud_26', categorieId:'cat_overig', post:'Was spul', budget:50, volgorde:5 },
+  ],
+  leningen: [
+    { id:'l1', naam:'Auto 1', totaal:2700, betaald:750, kleur:'#7c6af7' },
+    { id:'l2', naam:'Auto 2', totaal:7500, betaald:0, kleur:'#4ecdc4' },
+  ],
+  openCats:{},
 };
 
-const ICONS={
-  'Woning':    {bg:'#3b5bdb',fg:'#fff',label:'W'},
-  'Auto':      {bg:'#e67700',fg:'#fff',label:'A'},
-  'Streaming': {bg:'#862e9c',fg:'#fff',label:'S'},
-  'Leningen':  {bg:'#c92a2a',fg:'#fff',label:'L'},
-  'Zorgverzekering':{bg:'#2f9e44',fg:'#fff',label:'Z'},
-  'Telefoon':  {bg:'#1971c2',fg:'#fff',label:'T'},
-  'Overig / ING':{bg:'#495057',fg:'#fff',label:'O'},
-};
-function icon(name){
-  const ic=ICONS[name]||{bg:'#495057',fg:'#fff',label:name[0]};
-  return `<span style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:7px;background:${ic.bg};color:${ic.fg};font-size:11px;font-weight:800;flex-shrink:0;letter-spacing:0">${ic.label}</span>`;
+function uid(prefix){
+  return `${prefix}_${Date.now()}_${Math.floor(Math.random()*100000)}`;
 }
-
-let BUDGET = {
-  'Woning':          { items: [
-    {post:'Hypotheek',budget:1250,werkelijk:1247.22},
-    {post:'Gas/Elektra',budget:250,werkelijk:250},
-    {post:'Vitens',budget:20,werkelijk:20},
-    {post:'Assudeuren',budget:55,werkelijk:53.71},
-    {post:'TAF',budget:10,werkelijk:7.61}
-  ]},
-  'Auto':{ items: [
-    {post:'Allianz Auto 1',budget:46,werkelijk:46.81},
-    {post:'Allianz Auto 2',budget:46,werkelijk:46.28},
-    {post:'Benzine',budget:350,werkelijk:242.04},
-    {post:'Wegenbelasting 1',budget:31,werkelijk:31.50},
-    {post:'Wegenbelasting 2',budget:31,werkelijk:31.33}
-  ]},
-  'Streaming':{ items: [
-    {post:'HBO',budget:5,werkelijk:5.99},
-    {post:'Prime',budget:5,werkelijk:4.99},
-    {post:'Videoland',budget:6,werkelijk:6.32},
-    {post:'Podimo',budget:10,werkelijk:6.99},
-    {post:'Sky',budget:5,werkelijk:0}
-  ]},
-  'Leningen':{ items: [
-    {post:'Anko/Emmy',budget:150,werkelijk:150},
-    {post:'Auto leningen',budget:500,werkelijk:500}
-  ]},
-  'Zorgverzekering':{ items: [
-    {post:'KT',budget:125,werkelijk:125.40},
-    {post:'Ryanne',budget:125,werkelijk:125.40}
-  ]},
-  'Telefoon':{ items: [
-    {post:'KT (Youfone)',budget:7.5,werkelijk:7.47},
-    {post:'Ryanne (Ben)',budget:35,werkelijk:35.50}
-  ]},
-  'Overig / ING':{ items: [
-    {post:'ING kosten',budget:11,werkelijk:20.62},
-    {post:'Boodschappen',budget:500,werkelijk:703.45},
-    {post:'Gemeente',budget:120,werkelijk:39.49},
-    {post:'Xbox',budget:15,werkelijk:0},
-    {post:'Was spul',budget:50,werkelijk:0}
-  ]}
-};
-
-function makeBudgetItem(item){
-  return { post: String(item?.post || 'Nieuwe post').trim() || 'Nieuwe post', budget: Number(item?.budget) || 0 };
+function fmt(n){
+  const v = Number(n || 0);
+  return '€ ' + v.toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.');
 }
-function normalizeBudgetObject(raw){
-  const out = {};
-  if(!raw || typeof raw !== 'object') return out;
-  Object.entries(raw).forEach(([cat,val])=>{
-    const name = String(cat || '').trim();
-    if(!name) return;
-    const items = Array.isArray(val?.items) ? val.items : (Array.isArray(val) ? val : []);
-    out[name] = { items: items.map(makeBudgetItem) };
+function fmtShort(n){
+  return '€' + Math.round(Number(n || 0)).toLocaleString('nl');
+}
+function inkomstenTotaal(){
+  return state.inkomsten.reduce((s,r)=>s + Number(r.bedrag || 0), 0);
+}
+function budgetTotaal(){
+  return state.budget.reduce((s,r)=>s + Number(r.budget || 0), 0);
+}
+function overschot(){
+  return inkomstenTotaal() - budgetTotaal();
+}
+function spaarquote(){
+  const inc = inkomstenTotaal();
+  if(!inc) return 0;
+  return (overschot() / inc) * 100;
+}
+function orderedCats(){
+  return [...state.categorieen].sort((a,b)=>(a.volgorde||0)-(b.volgorde||0));
+}
+function itemsForCategory(catId){
+  return state.budget
+    .filter(r=>String(r.categorieId) === String(catId))
+    .sort((a,b)=>(a.volgorde||0)-(b.volgorde||0));
+}
+function totalForCategory(catId){
+  return itemsForCategory(catId).reduce((s,r)=>s + Number(r.budget || 0), 0);
+}
+function categoryNameById(id){
+  return (state.categorieen.find(c=>String(c.id)===String(id)) || {}).naam || 'Onbekend';
+}
+function persistLocal(){
+  const cache = {
+    inkomsten: state.inkomsten,
+    categorieen: state.categorieen,
+    budget: state.budget,
+    leningen: state.leningen
+  };
+  localStorage.setItem('bv_budget_state_v3', JSON.stringify(cache));
+  localStorage.setItem('bv_sheets_url', state.sheetsUrl || '');
+}
+function restoreLocal(){
+  try{
+    const raw = localStorage.getItem('bv_budget_state_v3');
+    if(!raw) return;
+    const parsed = JSON.parse(raw);
+    if(parsed.inkomsten) state.inkomsten = parsed.inkomsten;
+    if(parsed.categorieen) state.categorieen = parsed.categorieen;
+    if(parsed.budget) state.budget = parsed.budget;
+    if(parsed.leningen) state.leningen = parsed.leningen;
+  }catch(e){}
+}
+function updateSyncBadge(text){
+  const el = document.getElementById('sync-badge');
+  if(el) el.textContent = text;
+}
+async function safeJson(res){
+  const text = await res.text();
+  try { return JSON.parse(text); }
+  catch(e){ return { ok:false, error:'Parse fout', raw:text.slice(0,200) }; }
+}
+async function sheetsGet(){
+  if(!state.sheetsUrl) return null;
+  const res = await fetch(state.sheetsUrl + '?action=getAll', { redirect:'follow' });
+  return safeJson(res);
+}
+async function sheetsPost(data){
+  if(!state.sheetsUrl) return null;
+  const res = await fetch(state.sheetsUrl, {
+    method:'POST',
+    redirect:'follow',
+    body: JSON.stringify(data)
   });
-  return out;
+  return safeJson(res);
 }
-function ensureBudgetDefaults(){ BUDGET = normalizeBudgetObject(BUDGET); }
-ensureBudgetDefaults();
-
-const VARIABEL=[
-
-  {cat:'Klarna / Riverty',post:'Afbetalingen',w:326},
-  {cat:'Boodschappen',post:'Supermarkt (beide rek.)',w:724.89},
-  {cat:'Verzorging / Huishouden',post:'Drogist / Was',w:79.28},
-  {cat:'Uit eten',post:'Restaurants / Bezorging',w:158.56},
-  {cat:'Benzine',post:'Brandstof (beide rek.)',w:242.04},
-  {cat:'Online / Winkels',post:'Bol/Amazon/Klussen',w:309.26},
-  {cat:'PayPal / Overig',post:'PayPal (beide rek.)',w:123.32}
-];
-
-const ZZP=[
-  {post:'Privé betalingen',gem:214.90},{post:'Auto - Benzine',gem:142.71},
-  {post:'Winkels / Klussen',gem:138.44},{post:'PayPal / Online',gem:86.82},
-  {post:'Boodschappen',gem:64.72},{post:'Uit eten',gem:55.09},
-  {post:'Leningen - Klarna',gem:44.67},{post:'Belasting',gem:31.33},
-  {post:'Administratie',gem:25},{post:'Drogist',gem:20.40},
-  {post:'Gaming',gem:8.33},{post:'Verzekering Lifetri',gem:8.07},{post:'Overig',gem:27.81}
-];
-
-// ── LOCALSTORAGE PERSISTENCE ──
-let kt=2950,ryanne=1581.89;
-let transactions=[];
-
-// Leningen — gesynchroniseerd via Sheets, lokaal gecached
-localStorage.removeItem('bv_leningen'); // reset eenmalig naar correcte waarden
-let LENINGEN = JSON.parse(localStorage.getItem('bv_leningen') || 'null') || [
-  { id:'l1', naam:'Auto 1', totaal:2700, betaald:750, kleur:'#7c6af7' },
-  { id:'l2', naam:'Auto 2', totaal:7500, betaald:0,   kleur:'#4ecdc4' },
-];
-function saveLeningen(){
-  try{ localStorage.setItem('bv_leningen', JSON.stringify(LENINGEN)); }catch(e){}
-  // Gebruik aparte saveLeningen actie — overschrijft alleen Leningen tabblad
-  if(typeof sheetsUrl !== 'undefined' && sheetsUrl){
-    const payload = JSON.stringify({ action:'saveLeningen', leningen: LENINGEN });
-    fetch(sheetsUrl, { method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'}, body:payload })
-      .catch(e=>console.error('leningen sync fout:',e));
-  }
+function toRows(){
+  return {
+    action:'saveAll',
+    inkomsten: state.inkomsten.map((r,i)=>({
+      naam: r.naam || '',
+      bedrag: Number(r.bedrag || 0)
+    })),
+    categorieen: orderedCats().map((c,i)=>({
+      id: c.id,
+      naam: c.naam || '',
+      volgorde: i + 1
+    })),
+    budget: orderedCats().flatMap((c, catIndex) =>
+      itemsForCategory(c.id).map((r, rowIndex)=>({
+        id: r.id,
+        categorieId: c.id,
+        post: r.post || '',
+        budget: Number(r.budget || 0),
+        volgorde: rowIndex + 1
+      }))
+    ),
+    leningen: state.leningen.map(r=>({
+      id: r.id,
+      naam: r.naam || '',
+      totaal: Number(r.totaal || 0),
+      betaald: Number(r.betaald || 0),
+      kleur: r.kleur || '#7c6af7'
+    }))
+  };
 }
-window.varActiveCat='Boodschappen';
-
-const fmt=n=>'€ '+Math.abs(n).toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.');
-const fmtS=n=>'€'+Math.round(Math.abs(n)).toLocaleString('nl');
-const totalB=()=>Object.values(BUDGET).reduce((s,c)=>s+c.items.reduce((ss,i)=>ss+i.budget,0),0);
-const inc=()=>kt+ryanne;
-const over=()=>inc()-totalB();
-const sq=()=>over()/inc()*100;
-
-// Periodes lopen van de 25e t/m de 24e van de volgende maand
-const PERIODS = {
-  'P1': { start:'2025-12-25', end:'2026-01-24', label:'25 dec – 24 jan' },
-  'P2': { start:'2026-01-25', end:'2026-02-24', label:'25 jan – 24 feb' },
-  'P3': { start:'2026-02-25', end:'2026-03-24', label:'25 feb – 24 mrt' },
-};
-
-let activeMonth='Alles';
-
-function setMonth(m, btn){
-  activeMonth=m;
-  document.querySelectorAll('#month-filter button').forEach(b=>{
-    const active = b.textContent.trim()===m;
-    b.style.background = active ? 'var(--accent)' : 'transparent';
-    b.style.color      = active ? '#fff' : 'var(--muted)';
-    b.style.fontWeight = active ? '800' : '700';
-  });
-  const activeView=document.querySelector('.view.active');
-  if(activeView){
-    const id=activeView.id.replace('v-','');
-    if(renders[id]) renders[id]();
-  }
+function applySheets(data){
+  if(data.inkomsten) state.inkomsten = data.inkomsten.map(r=>({
+    naam: String(r.naam || ''),
+    bedrag: Number(r.bedrag || 0)
+  }));
+  if(data.categorieen) state.categorieen = data.categorieen.map((r,i)=>({
+    id: String(r.id || uid('cat')),
+    naam: String(r.naam || ''),
+    volgorde: Number(r.volgorde || (i+1))
+  })).sort((a,b)=>a.volgorde-b.volgorde);
+  if(data.budget) state.budget = data.budget.map((r,i)=>({
+    id: String(r.id || uid('bud')),
+    categorieId: String(r.categorieId || ''),
+    post: String(r.post || ''),
+    budget: Number(r.budget || 0),
+    volgorde: Number(r.volgorde || (i+1))
+  }));
+  if(data.leningen) state.leningen = data.leningen.map(r=>({
+    id: String(r.id || uid('ln')),
+    naam: String(r.naam || ''),
+    totaal: Number(r.totaal || 0),
+    betaald: Number(r.betaald || 0),
+    kleur: String(r.kleur || '#7c6af7')
+  }));
+  persistLocal();
+  rerenderAll();
 }
-
-function monthFilter(txs){
-  if(activeMonth==='Alles') return txs;
-  const p=PERIODS[activeMonth];
-  if(!p) return txs;
-  return txs.filter(t=>t.date>=p.start && t.date<=p.end);
+function rerenderAll(){
+  renderDashboard();
+  renderBudget();
+  renderLeningen();
+  renderInstellingen();
 }
-
-function periodLabel(){
-  if(activeMonth==='Alles') return 'Alle periodes — beide rekeningen';
-  const p=PERIODS[activeMonth];
-  return p ? p.label+' — beide rekeningen' : activeMonth;
+function showToast(msg){
+  const t=document.createElement('div');
+  t.textContent=msg;
+  t.style.cssText='position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;padding:11px 20px;border-radius:12px;font-size:14px;font-weight:600;z-index:999;white-space:nowrap;box-shadow:0 4px 20px rgba(124,106,247,.4);font-family:inherit';
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), 2200);
 }
-
-function numPeriods(){
-  if(activeMonth==='Alles') return 3;
-  return 1;
-}
-
-let editMode=false;
-
-function toggleEdit(){
-  editMode=!editMode;
-  document.getElementById('edit-btn').textContent=editMode?'Klaar':'Wijzig';
-  document.getElementById('edit-btn').style.color=editMode?'var(--green)':'var(--accent)';
-  renders.budget();
-}
-
 function go(name,btn){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('v-'+name).classList.add('active');
   btn.classList.add('active');
-  const eb=document.getElementById('edit-btn');
-  const mf=document.getElementById('month-filter');
-  if(name==='budget'){eb.classList.add('visible');mf.style.display='none';}
-  else{eb.classList.remove('visible');mf.style.display='none';editMode=false;eb.textContent='Wijzig';eb.style.color='var(--accent)';}
+  if(name==='dashboard') renderDashboard();
+  if(name==='budget') renderBudget();
+  if(name==='leningen') renderLeningen();
   if(name==='instellingen') renderInstellingen();
-  else if(name==='leningen') renderLeningen();
-  else if(renders[name]) renders[name]();
-  // Haal op de achtergrond verse data op bij tabwisseling
-  if(sheetsUrl){
-    sheetsGet().then(result=>{
-      if(result?.budget && result.budget.length > 0){
-        applySheets(result);
-      }
-    }).catch(()=>{});
-  }
 }
 
-function openModal(name,data){
-  document.getElementById('modal-title').innerHTML=`<div style="display:flex;align-items:center;gap:10px">${icon(name)}<span>${name}</span></div>`;
-  document.getElementById('modal-body').innerHTML=(data.items||[]).map(item=>`
-    <div class="line">
-      <span class="line-name">${item.post}</span>
-      <div class="line-right">
-        <span style="font-family:monospace;font-size:14px;font-weight:500;color:${C.accent}">${fmt(item.budget)}</span>
+function renderDashboard(){
+  const o = overschot();
+  const s = spaarquote();
+  document.getElementById('v-dashboard').innerHTML = `
+    <div class="hero">
+      <div class="hero-label">MAANDELIJKS OVERSCHOT</div>
+      <div class="hero-amount ${o>=0?'pos':'neg'}">${fmtShort(o)}</div>
+      <div class="hero-sub">
+        <div><div class="hero-sub-label">INKOMSTEN</div><div class="hero-sub-val" style="color:var(--green)">${fmtShort(inkomstenTotaal())}</div></div>
+        <div><div class="hero-sub-label">BUDGET</div><div class="hero-sub-val" style="color:var(--accent)">${fmtShort(budgetTotaal())}</div></div>
       </div>
-    </div>`).join('') || `<div class="empty"><div class="empty-icon">🗂️</div><div>Geen budgetposten</div></div>`;
-  document.getElementById('overlay').classList.add('open');
-}
-function closeModal(){document.getElementById('overlay').classList.remove('open');}
-
-const renders = {
-  dashboard(){
-    ensureBudgetDefaults();
-    const o=over(),s=sq(),i=inc(),b=totalB();
-    document.getElementById('v-dashboard').innerHTML=`
-      <div class="hero">
-        <div style="position:absolute;top:-60px;right:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(124,106,247,.15) 0%,transparent 70%);pointer-events:none"></div>
-        <div class="hero-label">MAANDELIJKS OVERSCHOT</div>
-        <div class="hero-amount ${o>=0?'pos':'neg'}">${fmtS(o)}</div>
-        <div class="hero-sub">
-          <div><div class="hero-sub-label">INKOMSTEN</div><div class="hero-sub-val" style="color:${C.green}">${fmtS(i)}</div></div>
-          <div><div class="hero-sub-label">BUDGET</div><div class="hero-sub-val" style="color:${C.accent}">${fmtS(b)}</div></div>
+    </div>
+    <div class="sq-bar">
+      <div class="sq-top"><span class="sq-label">Spaarquote</span><span class="sq-val">${s.toFixed(1)}%</span></div>
+      <div class="track"><div class="fill" style="width:${Math.min(100, Math.max(0, s))}%"></div></div>
+      <div class="sq-note">Op basis van budget</div>
+    </div>
+    <div class="sec">Categorieën</div>
+    ${orderedCats().map(cat => `
+      <div class="cat-card">
+        <div class="cat-top">
+          <div class="cat-name">${cat.naam}</div>
+          <div class="cat-b">${fmt(totalForCategory(cat.id))}</div>
         </div>
+        <div class="prog"><div class="prog-fill" style="width:${budgetTotaal()? (totalForCategory(cat.id)/budgetTotaal())*100 : 0}%"></div></div>
       </div>
-      <div class="sq-bar">
-        <div class="sq-top"><span class="sq-label">Spaarquote</span><span class="sq-val">${s.toFixed(1)}%</span></div>
-        <div class="track"><div class="fill" style="width:${Math.min(100,Math.max(0,s))}%"></div></div>
-        <div class="sq-note">Gebaseerd op inkomsten minus budget</div>
-      </div>
-      <div class="sec">Budgetcategorieën</div>
-      ${Object.entries(BUDGET).map(([name,data])=>{
-        const cb=data.items.reduce((sum,i)=>sum+(Number(i.budget)||0),0);
-        const pct=Math.min(100, Math.max(8, cb / Math.max(totalB(),1) * 100));
-        return `<div class="cat-card" onclick="openModal('${name.replace(/'/g,"\\'")}',BUDGET['${name.replace(/'/g,"\\'")}'])">
-          <div class="cat-top">
-            <div class="cat-name" style="display:flex;align-items:center;gap:8px">${icon(name)}<span>${name}</span></div>
-            <div class="cat-amounts"><span class="cat-w neu">${fmtS(cb)}</span></div>
+    `).join('')}
+  `;
+}
+
+function renderBudget(){
+  const html = `
+    <div class="card">
+      <div class="sec" style="margin-top:0">Inkomsten</div>
+      <div class="stack">
+        ${state.inkomsten.map((r, idx)=>`
+          <div class="row">
+            <input class="input" value="${escapeHtml(r.naam)}" onchange="updateIncomeName(${idx}, this.value)">
+            <input class="input small" type="number" value="${Number(r.bedrag||0)}" onchange="updateIncomeAmount(${idx}, this.value)">
           </div>
-          <div class="prog"><div class="prog-fill neu" style="width:${pct}%"></div></div>
-        </div>`;
-      }).join('')}`;
-  },
-
-  budget(){
-    ensureBudgetDefaults();
-    if(!window.budgetOpen) window.budgetOpen={};
-    document.getElementById('v-budget').innerHTML=`
-      <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px">
-        <button onclick="addCategory()" style="background:linear-gradient(135deg,var(--accent),#9b8af7);border:none;border-radius:12px;color:#fff;font-family:inherit;font-size:13px;font-weight:700;padding:11px 14px;cursor:pointer">+ Categorie</button>
-        
-      </div>
-      <div class="inc-grid">
-        <div class="inc-card"><div class="inc-label">KT Salaris</div><div style="display:flex;align-items:center;gap:4px"><span style="color:${C.muted};font-family:monospace;font-size:14px">€</span><input class="inc-input" type="number" value="${kt}" oninput="kt=parseFloat(this.value)||0;saveState();recalcBudget()"></div></div>
-        <div class="inc-card"><div class="inc-label">Ryanne</div><div style="display:flex;align-items:center;gap:4px"><span style="color:${C.muted};font-family:monospace;font-size:14px">€</span><input class="inc-input" type="number" value="${ryanne}" oninput="ryanne=parseFloat(this.value)||0;saveState();recalcBudget()"></div></div>
-      </div>
-      ${Object.entries(BUDGET).map(([name,data],ci)=>{
-        const ct=data.items.reduce((s,i)=>s+(Number(i.budget)||0),0);
-        const safeName=name.replace(/'/g,"\\'");
-        const isOpen=window.budgetOpen[name]||false;
-        return `<div class="bud-section">
-          <div onclick="window.budgetOpen['${safeName}']=!window.budgetOpen['${safeName}'];renders.budget()"
-            style="background:var(--surface);border:1px solid ${isOpen?'rgba(124,106,247,0.4)':C.border};border-radius:${isOpen?'16px 16px 0 0':'16px'};padding:12px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:border-color .15s">
-            <div style="display:flex;align-items:center;gap:10px">
-              ${icon(name)}
-              ${editMode
-                ? `<input class="post-name-input" value="${name.replace(/"/g,'&quot;')}" onchange="renameCategory('${safeName}',this.value)" onclick="event.stopPropagation();this.select()">`
-                : `<span style="font-size:14px;font-weight:700">${name}</span>`
-              }
-            </div>
-            <div style="display:flex;align-items:center;gap:10px">
-              <span style="font-family:monospace;font-size:13px;color:${C.accent}" id="bct-${ci}">${fmt(ct)}</span>
-              ${editMode ? `<button onclick="event.stopPropagation();deleteCategory('${safeName}')" style="background:none;border:none;color:${C.red};font-size:15px;cursor:pointer">✕</button>` : ``}
-              <span style="color:${C.muted};font-size:14px;display:inline-block;transform:rotate(${isOpen?'90':'0'}deg);transition:transform .2s">›</span>
-            </div>
-          </div>
-          ${isOpen ? `<div style="border:1px solid rgba(124,106,247,0.4);border-top:none;border-radius:0 0 16px 16px;overflow:hidden">
-            ${data.items.map((item,idx)=>`
-              <div style="background:var(--surface);border-bottom:${idx<data.items.length-1?`1px solid ${C.border}`:'none'};padding:10px 16px;display:flex;justify-content:space-between;align-items:center">
-                <div style="display:flex;align-items:center;gap:8px;min-width:0">
-                  ${editMode ? `<button onclick="deleteBudgetItem('${safeName}',${idx})" style="background:none;border:none;color:${C.red};font-size:14px;cursor:pointer;flex-shrink:0">✕</button>` : ``}
-                  ${editMode
-                    ? `<input class="post-name-input" value="${String(item.post).replace(/"/g,'&quot;')}" onchange="renamePost('${safeName}',${idx},this.value)" onclick="this.select()">`
-                    : `<span style="font-size:13px;color:${C.muted};padding-left:8px">${item.post}</span>`
-                  }
-                </div>
-                <div class="bud-input-wrap"><span class="bud-eur">€</span>
-                  <input class="bud-input" type="number" value="${Number(item.budget)||0}" oninput="BUDGET['${safeName}'].items[${idx}].budget=parseFloat(this.value)||0;saveState();recalcBudget()">
-                </div>
-              </div>`).join('')}
-            ${editMode ? `<div style="background:var(--surface);padding:12px 16px;border-top:1px solid ${C.border}">
-              <button onclick="addBudgetItem('${safeName}')" style="width:100%;background:var(--surface2);border:1px dashed ${C.border};border-radius:10px;color:#7c6af7;font-family:inherit;font-size:13px;font-weight:700;padding:10px;cursor:pointer">+ Post toevoegen</button>
-            </div>` : ``}
-          </div>` : ''}
-        </div>`;
-      }).join('')}
-      <div class="bud-total">
-        <div class="bud-total-label">Totaal budget</div>
-        <div class="bud-total-val" id="btotal">${fmt(totalB())}</div>
-      </div>
-      <div class="bud-total">
-        <div class="bud-total-label">Overschot</div>
-        <div class="bud-total-val" id="bover" style="color:${over()>=0?C.green:C.red}">${fmt(over())}</div>
-      </div>
-    `;
-  },
-
-  variabel(){
-    const cats=Object.keys(VAR_TX);
-    const openCat=window.varOpenCat||null;
-    const grandTotal=Object.values(VAR_TX).reduce((s,arr)=>s+monthFilter(arr).reduce((ss,t)=>ss+t.amount,0),0);
-    const label=periodLabel();
-
-    document.getElementById('v-variabel').innerHTML=`
-      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px">
-        <div class="sec" style="margin:0">${label}</div>
-        <span style="font-family:monospace;font-size:12px;color:${C.amber}">${fmt(grandTotal)}</span>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:8px">
-        ${cats.map(cat=>{
-          const txs=monthFilter(VAR_TX[cat]);
-          if(txs.length===0) return '';
-          const tot=txs.reduce((s,t)=>s+t.amount,0);
-          const isOpen=cat===openCat;
-          return `
-            <div style="background:var(--surface);border:1px solid ${isOpen?'rgba(124,106,247,0.4)':C.border};border-radius:16px;overflow:hidden">
-              <div onclick="window.varOpenCat='${isOpen?'__none':cat}';renders.variabel()"
-                style="padding:14px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none">
-                <div>
-                  <div style="font-size:14px;font-weight:700">${cat}</div>
-                  <div style="font-size:11px;color:${C.muted};font-family:monospace;margin-top:2px">${txs.length}x · gem ${fmt(tot/numPeriods())}/mnd</div>
-                </div>
-                <div style="display:flex;align-items:center;gap:10px">
-                  <span style="font-family:monospace;font-size:15px;font-weight:500;color:${C.amber}">${fmt(tot)}</span>
-                  <span style="color:${C.muted};font-size:14px;display:inline-block;transform:rotate(${isOpen?'90':'0'}deg)">›</span>
-                </div>
-              </div>
-              ${isOpen ? `
-              <div style="border-top:1px solid ${C.border}">
-                ${txs.map((t,i)=>{
-                  const origIdx=VAR_TX[cat].indexOf(t);
-                  return `
-                  <div style="padding:11px 16px;display:flex;align-items:center;gap:10px;border-bottom:${i<txs.length-1?`1px solid ${C.border}`:'none'}">
-                    <div style="flex:1;min-width:0">
-                      <div style="font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.name}</div>
-                      <div style="font-size:11px;color:${C.muted};font-family:monospace;margin-top:1px">${t.date.substring(8)}-${t.date.substring(5,7)} · <span style="color:${t.rek==='ZZP'?C.accent2:C.muted}">${t.rek}</span></div>
-                    </div>
-                    <span style="font-family:monospace;font-size:13px;color:${C.red};flex-shrink:0">−${fmt(t.amount)}</span>
-                    <button onclick="showRecatPicker('${cat}',${origIdx})"
-                      style="background:var(--surface2);border:1px solid ${C.border};border-radius:8px;color:${C.muted};font-size:11px;padding:5px 9px;cursor:pointer;flex-shrink:0;font-family:inherit">
-                      ↕
-                    </button>
-                  </div>`;
-                }).join('')}
-              </div>` : ''}
-            </div>`;
-        }).join('')}
-      </div>
-
-      <div id="recat-picker" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:300;align-items:flex-end;backdrop-filter:blur(4px)"
-        onclick="if(event.target===this)document.getElementById('recat-picker').style.display='none'">
-        <div style="background:var(--surface);border:1px solid ${C.border};border-radius:24px 24px 0 0;width:100%;padding:0 0 32px">
-          <div style="width:36px;height:4px;background:var(--surface3);border-radius:99px;margin:12px auto"></div>
-          <div style="padding:0 20px 14px;border-bottom:1px solid ${C.border};font-size:16px;font-weight:700" id="recat-title">Verplaats naar...</div>
-          <div id="recat-options" style="padding:8px 20px"></div>
-        </div>
-      </div>
-    `;
-  }
-};
-
-const VAR_TX = {
-  'Boodschappen': [
-    {date:'2026-03-31',name:'ALDI GNG044 ZWAAGWESTE',amount:92.07,rek:'Gezamenlijk'},
-    {date:'2026-03-31',name:'Tuin Zwaagwesteinde',amount:5.98,rek:'Gezamenlijk'},
-    {date:'2026-03-28',name:'BCK*PLUS Wolters',amount:23.72,rek:'Gezamenlijk'},
-    {date:'2026-03-26',name:'ALDI GNG044 ZWAAGWESTE',amount:86.99,rek:'Gezamenlijk'},
-    {date:'2026-03-26',name:'PLUS De Westereen',amount:28.34,rek:'Gezamenlijk'},
-    {date:'2026-03-26',name:'Poiesz Supermarkt 09',amount:91.94,rek:'Gezamenlijk'},
-    {date:'2026-03-22',name:'Poiesz Supermarkt 09',amount:59.54,rek:'Gezamenlijk'},
-    {date:'2026-03-16',name:'ALDI GNG044 ZWAAGWESTE',amount:18.30,rek:'Gezamenlijk'},
-    {date:'2026-03-15',name:'ALDI GNG044 ZWAAGWESTE',amount:59.51,rek:'Gezamenlijk'},
-    {date:'2026-03-15',name:'PLUS De Westereen',amount:23.30,rek:'Gezamenlijk'},
-    {date:'2026-03-11',name:'ALDI GNG044 ZWAAGWESTE',amount:58.01,rek:'Gezamenlijk'},
-    {date:'2026-03-11',name:'Poiesz Supermarkt 09',amount:39.27,rek:'Gezamenlijk'},
-    {date:'2026-03-11',name:'Poiesz Supermarkt 09',amount:16.22,rek:'ZZP'},
-    {date:'2026-03-05',name:'ALDI GNG044 ZWAAGWESTE',amount:12.36,rek:'ZZP'},
-    {date:'2026-03-04',name:'Tuin Zwaagwesteinde',amount:73.93,rek:'Gezamenlijk'},
-    {date:'2026-03-02',name:'Poiesz Supermarkt 09',amount:28.96,rek:'Gezamenlijk'},
-    {date:'2026-03-01',name:'ALDI GNG005 LEEUWARDEN',amount:47.23,rek:'Gezamenlijk'},
-    {date:'2026-02-27',name:'ALDI GNG047 KOLLUM',amount:26.68,rek:'Gezamenlijk'},
-    {date:'2026-02-26',name:'Poiesz Supermarkt 09',amount:115.38,rek:'Gezamenlijk'},
-    {date:'2026-02-26',name:'PLUS De Westereen',amount:33.65,rek:'ZZP'},
-    {date:'2026-02-20',name:'Poiesz Supermarkt 21 Burgum',amount:73.02,rek:'Gezamenlijk'},
-    {date:'2026-02-16',name:'Poiesz Supermarkt 09',amount:7.79,rek:'Gezamenlijk'},
-    {date:'2026-02-15',name:'BCK*PLUS Wolters',amount:26.22,rek:'ZZP'},
-    {date:'2026-02-14',name:'Poiesz Supermarkt 21 Burgum',amount:56.21,rek:'Gezamenlijk'},
-    {date:'2026-02-09',name:'ALDI GNG044 ZWAAGWESTE',amount:26.56,rek:'Gezamenlijk'},
-    {date:'2026-02-08',name:'ALDI GNG052 BURGUM',amount:7.50,rek:'Gezamenlijk'},
-    {date:'2026-02-08',name:'Poiesz Supermarkt 07',amount:12.00,rek:'Gezamenlijk'},
-    {date:'2026-02-05',name:'Poiesz Supermarkt 09',amount:92.85,rek:'Gezamenlijk'},
-    {date:'2026-01-31',name:'ALDI GNG044 ZWAAGWESTE',amount:112.39,rek:'Gezamenlijk'},
-    {date:'2026-01-31',name:'Poiesz Supermarkt 21 Burgum',amount:145.57,rek:'Gezamenlijk'},
-    {date:'2026-01-26',name:'Jumbo Burgum',amount:31.34,rek:'Gezamenlijk'},
-    {date:'2026-01-23',name:'Lidl 415 Buitenpost',amount:137.70,rek:'Gezamenlijk'},
-    {date:'2026-01-23',name:'Poiesz Supermarkt 09',amount:70.40,rek:'Gezamenlijk'},
-    {date:'2026-01-16',name:'Lidl 415 Buitenpost',amount:102.81,rek:'Gezamenlijk'},
-    {date:'2026-01-16',name:'Poiesz Supermarkt 09',amount:25.60,rek:'Gezamenlijk'},
-    {date:'2026-01-11',name:'Jumbo Burgum',amount:16.80,rek:'ZZP'},
-    {date:'2026-01-09',name:'ALDI GNG044 ZWAAGWESTE',amount:57.89,rek:'ZZP'},
-    {date:'2026-01-09',name:'PLUS De Westereen',amount:15.07,rek:'ZZP'},
-    {date:'2026-01-09',name:'Poiesz Supermarkt 09',amount:15.96,rek:'ZZP'},
-    {date:'2026-01-07',name:'PLUS De Westereen',amount:12.91,rek:'Gezamenlijk'},
-    {date:'2026-01-07',name:'Lidl 415 Buitenpost',amount:96.44,rek:'Gezamenlijk'},
-    {date:'2026-01-03',name:'Poiesz Supermarkt 21 Burgum',amount:49.11,rek:'Gezamenlijk'},
-    {date:'2026-01-03',name:'Poiesz Supermarkt 09',amount:38.53,rek:'Gezamenlijk'},
-    {date:'2026-01-02',name:'Jumbo Kollum',amount:132.46,rek:'Gezamenlijk'},
-  ],
-  'Uit eten': [
-    {date:'2026-03-31',name:'Pizzeria Fryslan/Food',amount:29.64,rek:'Gezamenlijk'},
-    {date:'2026-03-28',name:'Wegrestaurant Twijzel',amount:32.75,rek:'Gezamenlijk'},
-    {date:'2026-03-26',name:'SUBWAY Leeuwarden',amount:8.25,rek:'ZZP'},
-    {date:'2026-03-20',name:'Wegrestaurant Twijzel',amount:19.25,rek:'Gezamenlijk'},
-    {date:'2026-03-15',name:'Wegrestaurant Twijzel',amount:21.25,rek:'Gezamenlijk'},
-    {date:'2026-03-11',name:'Pizzeria Fryslan',amount:22.39,rek:'ZZP'},
-    {date:'2026-03-06',name:'Wegrestaurant Twijzel',amount:19.75,rek:'Gezamenlijk'},
-    {date:'2026-02-27',name:'Wegrestaurant Twijzel',amount:31.25,rek:'Gezamenlijk'},
-    {date:'2026-02-12',name:'Pizzeria Fryslan',amount:30.99,rek:'ZZP'},
-    {date:'2026-02-08',name:'Markt 23 Drachten',amount:76.00,rek:'ZZP'},
-    {date:'2026-02-07',name:'Wegrestaurant Twijzel',amount:31.25,rek:'Gezamenlijk'},
-    {date:'2026-02-04',name:'Pizzeria Fryslan',amount:33.27,rek:'Gezamenlijk'},
-    {date:'2026-01-30',name:'Wegrestaurant Twijzel',amount:22.25,rek:'Gezamenlijk'},
-    {date:'2026-01-24',name:'Pizzeria Fryslan',amount:43.49,rek:'Gezamenlijk'},
-    {date:'2026-01-21',name:"Snackbar 't West",amount:26.25,rek:'Gezamenlijk'},
-    {date:'2026-01-11',name:'Pizzeria Fryslan',amount:27.64,rek:'ZZP'},
-  ],
-  'Benzine': [
-    {date:'2026-03-30',name:'Fieten Twijzelerheide',amount:82.58,rek:'ZZP'},
-    {date:'2026-03-27',name:'OK De Westereen',amount:30.24,rek:'Gezamenlijk'},
-    {date:'2026-03-18',name:'Fieten Twijzelerheide',amount:89.05,rek:'Gezamenlijk'},
-    {date:'2026-03-11',name:'Fieten Twijzelerheide',amount:64.48,rek:'ZZP'},
-    {date:'2026-03-01',name:'PPLeeuwarden',amount:9.98,rek:'Gezamenlijk'},
-    {date:'2026-02-26',name:'Fieten Twijzelerheide',amount:77.29,rek:'Gezamenlijk'},
-    {date:'2026-02-25',name:'Fieten Twijzelerheide',amount:75.09,rek:'ZZP'},
-    {date:'2026-02-14',name:'TanQyou Zwaagwesteinde',amount:50.06,rek:'ZZP'},
-    {date:'2026-02-08',name:'AVIA XPress Eestrum',amount:74.78,rek:'ZZP'},
-    {date:'2026-02-08',name:'OK De Westereen',amount:12.50,rek:'ZZP'},
-    {date:'2026-01-26',name:'Fieten Twijzelerheide',amount:68.65,rek:'ZZP'},
-    {date:'2026-01-19',name:'Fieten Twijzelerheide',amount:70.63,rek:'Gezamenlijk'},
-    {date:'2026-01-03',name:'OK De Westereen',amount:20.80,rek:'Gezamenlijk'},
-  ],
-  'Winkels / Klussen': [
-    {date:'2026-03-29',name:'KLUSWIJS BOUWMARKT',amount:83.62,rek:'ZZP'},
-    {date:'2026-03-28',name:'Action Burgum',amount:31.83,rek:'ZZP'},
-    {date:'2026-03-11',name:'Action Burgum',amount:11.98,rek:'ZZP'},
-    {date:'2026-03-05',name:'BCK*Shoppoint De Westereen',amount:7.00,rek:'Gezamenlijk'},
-    {date:'2026-03-04',name:'Action Burgum',amount:35.04,rek:'Gezamenlijk'},
-    {date:'2026-03-01',name:'Action Burgum',amount:12.82,rek:'Gezamenlijk'},
-    {date:'2026-03-01',name:'JYSK Leeuwarden',amount:15.00,rek:'ZZP'},
-    {date:'2026-02-28',name:'Xenos Leeuwarden',amount:31.50,rek:'Gezamenlijk'},
-    {date:'2026-02-15',name:'Mitra Burgum',amount:12.29,rek:'ZZP'},
-    {date:'2026-01-30',name:'Action Burgum',amount:57.08,rek:'ZZP'},
-    {date:'2026-01-26',name:'Action Burgum',amount:44.35,rek:'ZZP'},
-    {date:'2026-01-20',name:'Karwei Burgum',amount:72.83,rek:'ZZP'},
-    {date:'2026-01-11',name:'Action Kollum',amount:24.59,rek:'ZZP'},
-    {date:'2026-01-11',name:'Action Burgum',amount:61.74,rek:'ZZP'},
-  ],
-  'Verzorging / Huishouden': [
-    {date:'2026-03-15',name:'Kruidvat De Westereen',amount:11.77,rek:'ZZP'},
-    {date:'2026-03-13',name:'Kruidvat De Westereen',amount:36.14,rek:'ZZP'},
-    {date:'2026-03-04',name:'RitualsCosmetics',amount:15.80,rek:'Gezamenlijk'},
-    {date:'2026-02-27',name:'Kruidvat Kollum',amount:11.98,rek:'Gezamenlijk'},
-    {date:'2026-02-26',name:'Kruidvat De Westereen',amount:4.95,rek:'Gezamenlijk'},
-    {date:'2026-02-09',name:'Kruidvat De Westereen',amount:18.97,rek:'Gezamenlijk'},
-    {date:'2026-02-05',name:'Kruidvat De Westereen',amount:26.84,rek:'Gezamenlijk'},
-    {date:'2026-01-31',name:'Kruidvat De Westereen',amount:23.64,rek:'Gezamenlijk'},
-    {date:'2026-01-24',name:'Kruidvat Burgum',amount:29.98,rek:'Gezamenlijk'},
-    {date:'2026-01-24',name:'Kruidvat Burgum',amount:40.95,rek:'Gezamenlijk'},
-    {date:'2026-01-23',name:'Kruidvat De Westereen',amount:9.97,rek:'Gezamenlijk'},
-    {date:'2026-01-12',name:'Kruidvat Kollum',amount:13.29,rek:'ZZP'},
-    {date:'2026-01-07',name:'Kruidvat Buitenpost',amount:8.38,rek:'Gezamenlijk'},
-  ],
-  'Online / Winkels': [
-    {date:'2026-03-29',name:'Instant Gaming',amount:12.49,rek:'ZZP'},
-    {date:'2026-03-03',name:'Instant Gaming',amount:12.49,rek:'ZZP'},
-    {date:'2026-03-02',name:'bol.com',amount:26.96,rek:'Gezamenlijk'},
-    {date:'2026-03-01',name:'Toychamp Leeuwarden',amount:25.96,rek:'ZZP'},
-    {date:'2026-01-24',name:'VALVE CORPORATION',amount:12.74,rek:'Gezamenlijk'},
-    {date:'2026-01-24',name:'bol.com',amount:54.95,rek:'Gezamenlijk'},
-    {date:'2026-01-18',name:'bol.com',amount:62.17,rek:'Gezamenlijk'},
-    {date:'2026-01-09',name:'bol.com',amount:22.01,rek:'Gezamenlijk'},
-    {date:'2026-01-08',name:'Amazon Payments',amount:10.64,rek:'Gezamenlijk'},
-  ],
-  'Overig': [
-    {date:'2026-03-22',name:'TalmaWald Ova',amount:7.00,rek:'Gezamenlijk'},
-    {date:'2026-02-27',name:'TalmaWald Ova',amount:7.25,rek:'Gezamenlijk'},
-    {date:'2026-02-21',name:'TalmaWald Ova',amount:5.50,rek:'Gezamenlijk'},
-    {date:'2026-02-14',name:'Hondentrimsalon Luchano',amount:140.00,rek:'Gezamenlijk'},
-    {date:'2026-01-30',name:'TalmaWald Ova',amount:5.50,rek:'Gezamenlijk'},
-  ],
-};
-
-function showRecatPicker(fromCat, idx){
-  const tx=VAR_TX[fromCat][idx];
-  const picker=document.getElementById('recat-picker');
-  document.getElementById('recat-title').textContent=`"${tx.name}" — verplaats naar`;
-  const cats=Object.keys(VAR_TX);
-  document.getElementById('recat-options').innerHTML=
-    cats.filter(c=>c!==fromCat).map(c=>`
-      <div onclick="recatTx('${fromCat}',${idx},'${c}');document.getElementById('recat-picker').style.display='none'"
-        style="padding:14px 0;border-bottom:1px solid ${C.border};font-size:15px;cursor:pointer;display:flex;justify-content:space-between;align-items:center">
-        <span>${c}</span>
-        <span style="font-family:monospace;font-size:12px;color:${C.muted}">${fmt(VAR_TX[c].reduce((s,t)=>s+t.amount,0))}</span>
-      </div>`).join('')+
-    `<div onclick="recatTx('${fromCat}',${idx},'__remove');document.getElementById('recat-picker').style.display='none'"
-      style="padding:14px 0;font-size:15px;cursor:pointer;color:${C.red}">
-      🗑 Verwijder
-    </div>`;
-  picker.style.display='flex';
-}
-
-function recatTx(fromCat,idx,toCat){
-  if(!toCat)return;
-  const tx=VAR_TX[fromCat][idx];
-  VAR_TX[fromCat].splice(idx,1);
-  if(toCat!=='__remove') VAR_TX[toCat].unshift(tx);
-  window.varOpenCat=toCat!=='__remove'?toCat:fromCat;
-  renders.variabel();
-}
-
-function recalcBudget(){
-  saveState();
-  const bt=document.getElementById('btotal');
-  const bo=document.getElementById('bover');
-  if(bt) bt.textContent=fmt(totalB());
-  if(bo){
-    bo.textContent=fmt(over());
-    bo.style.color=over()>=0?C.green:C.red;
-  }
-  Object.entries(BUDGET).forEach(([,data],ci)=>{
-    const el=document.getElementById('bct-'+ci);
-    if(el) el.textContent=fmt(data.items.reduce((s,i)=>s+(Number(i.budget)||0),0));
-  });
-  renders.dashboard();
-  if(document.getElementById('v-budget')?.classList.contains('active')) renders.budget();
-}
-
-function renamePost(cat,idx,val){
-  if(!BUDGET[cat] || !BUDGET[cat].items[idx]) return;
-  const clean = String(val||'').trim();
-  if(clean) BUDGET[cat].items[idx].post = clean;
-  saveState();
-  renders.dashboard();
-  if(document.getElementById('v-budget')?.classList.contains('active')) renders.budget();
-}
-function renameCategory(oldName,newName){
-  const clean = String(newName||'').trim();
-  if(!clean || clean===oldName || !BUDGET[oldName]){ renders.budget(); return; }
-  if(BUDGET[clean]){ showToast('Categorie bestaat al'); renders.budget(); return; }
-  const entries = Object.entries(BUDGET).map(([k,v])=> k===oldName ? [clean,v] : [k,v]);
-  BUDGET = Object.fromEntries(entries);
-  if(window.budgetOpen[oldName]){ window.budgetOpen[clean]=true; delete window.budgetOpen[oldName]; }
-  saveState();
-  rerenderAll();
-}
-function addCategory(){
-  const clean = String(prompt('Nieuwe categorie naam?')||'').trim();
-  if(!clean) return;
-  if(BUDGET[clean]){ showToast('Categorie bestaat al'); return; }
-  BUDGET[clean] = { items: [] };
-  window.budgetOpen[clean] = true;
-  saveState();
-  rerenderAll();
-}
-function deleteCategory(name){
-  if(!BUDGET[name]) return;
-  if(!confirm(`Categorie "${name}" verwijderen?`)) return;
-  delete BUDGET[name];
-  delete window.budgetOpen[name];
-  saveState();
-  rerenderAll();
-}
-function addBudgetItem(cat){
-  if(!BUDGET[cat]) return;
-  BUDGET[cat].items.push({ post:'Nieuwe post', budget:0 });
-  window.budgetOpen[cat] = true;
-  saveState();
-  renders.budget();
-}
-function deleteBudgetItem(cat, idx){
-  if(!BUDGET[cat] || !BUDGET[cat].items[idx]) return;
-  BUDGET[cat].items.splice(idx,1);
-  saveState();
-  renders.dashboard();
-  renders.budget();
-}
-function rerenderAll(){
-  renders.dashboard();
-  renders.budget();
-  renderLeningen();
-  if(document.getElementById('v-instellingen')?.classList.contains('active')) renderInstellingen();
-}
-
-// ── LENINGEN ────────────────────────────────────────────
-function renderLeningen(){
-  const totaalBetaald = LENINGEN.reduce((s,l)=>s+l.betaald,0);
-  const totaalSchuld  = LENINGEN.reduce((s,l)=>s+l.totaal,0);
-  const totaalOpen    = totaalSchuld - totaalBetaald;
-  const maandBudget   = 500; // totaal p/mnd voor alle auto leningen
-
-  // Bereken verwachte maanden resterend op basis van openstaand
-  function maandenResterend(open, pmnd){
-    if(pmnd <= 0 || open <= 0) return null;
-    return Math.ceil(open / pmnd);
-  }
-
-  function einddatum(maanden){
-    if(!maanden) return '—';
-    const d = new Date();
-    d.setMonth(d.getMonth() + maanden);
-    return d.toLocaleDateString('nl-NL', { month:'long', year:'numeric' });
-  }
-
-  document.getElementById('v-leningen').innerHTML = `
-    <!-- Totaal overzicht -->
-    <div style="background:linear-gradient(135deg,#1a1a2e,#16213e);border:1px solid rgba(124,106,247,.25);border-radius:20px;padding:20px;margin-bottom:16px">
-      <div style="font-size:11px;color:var(--muted);letter-spacing:1px;font-family:monospace;margin-bottom:6px">TOTALE SCHULD</div>
-      <div style="font-size:36px;font-weight:800;letter-spacing:-1px;color:var(--red)">€ ${totaalOpen.toLocaleString('nl')}</div>
-      <div style="display:flex;gap:20px;margin-top:14px">
-        <div><div style="font-size:10px;color:var(--muted);font-family:monospace;margin-bottom:2px">TOTAAL</div><div style="font-size:14px;font-weight:600">€ ${totaalSchuld.toLocaleString('nl')}</div></div>
-        <div><div style="font-size:10px;color:var(--muted);font-family:monospace;margin-bottom:2px">BETAALD</div><div style="font-size:14px;font-weight:600;color:var(--green)">€ ${totaalBetaald.toLocaleString('nl')}</div></div>
-        <div><div style="font-size:10px;color:var(--muted);font-family:monospace;margin-bottom:2px">P/MND</div><div style="font-size:14px;font-weight:600;color:var(--accent)">€ ${maandBudget}</div></div>
-      </div>
-      <!-- Totale voortgangsbalk -->
-      <div style="margin-top:14px">
-        <div style="background:rgba(255,255,255,.1);border-radius:99px;height:8px;overflow:hidden">
-          <div style="height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent2));width:${Math.min(100,(totaalBetaald/totaalSchuld)*100).toFixed(1)}%;transition:width .6s ease"></div>
-        </div>
-        <div style="font-size:10px;color:var(--muted);font-family:monospace;margin-top:4px;text-align:right">${((totaalBetaald/totaalSchuld)*100).toFixed(1)}% afgelost</div>
+        `).join('')}
       </div>
     </div>
 
-    <!-- Extra aflossing -->
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:16px">
-      <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:12px">Extra aflossing</div>
-      <div style="display:flex;gap:10px;align-items:center">
-        <div style="flex:1">
-          <div style="font-size:11px;color:var(--muted);margin-bottom:4px">Verdeel over leningen</div>
-          <div style="display:flex;gap:8px">
-            ${LENINGEN.map(l=>`
-              <div style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:8px 10px">
-                <div style="font-size:10px;color:var(--muted);margin-bottom:4px">${l.naam}</div>
-                <div style="display:flex;align-items:center;gap:4px">
-                  <span style="color:var(--muted);font-size:11px;font-family:monospace">€</span>
-                  <input type="number" placeholder="0" min="0"
-                    style="background:transparent;border:none;color:var(--text);font-family:monospace;font-size:14px;font-weight:600;width:100%;outline:none"
-                    id="extra-${l.id}">
-                </div>
-              </div>`).join('')}
-          </div>
-        </div>
-        <button onclick="verwerkExtraAflossing()"
-          style="background:var(--green);border:none;border-radius:12px;color:#fff;font-family:inherit;font-size:13px;font-weight:700;padding:12px 16px;cursor:pointer;white-space:nowrap;align-self:flex-end">
-          Verwerk
-        </button>
-      </div>
+    <div class="row" style="margin:14px 0">
+      <div class="sec" style="margin:0">Categorieën</div>
+      <button class="btn sm" onclick="addCategory()">+ Categorie</button>
     </div>
 
-    <!-- Per lening -->
-    ${LENINGEN.map(l=>{
-      const open  = l.totaal - l.betaald;
-      const pct   = Math.min(100,(l.betaald/l.totaal)*100);
-      // Naar rato van openstaand saldo bepalen hoeveel van 500 naar deze lening gaat
-      const ratio = totaalOpen > 0 ? open/totaalOpen : 1/LENINGEN.length;
-      const pmnd  = Math.round(maandBudget * ratio);
-      const maanden = maandenResterend(open, pmnd);
+    ${orderedCats().map(cat => {
+      const isOpen = !!state.openCats[cat.id];
       return `
-        <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:10px">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
-            <div>
-              <div style="font-size:15px;font-weight:700">${l.naam}</div>
-              <div style="font-size:11px;color:var(--muted);font-family:monospace;margin-top:2px">€ ${l.betaald.toLocaleString('nl')} betaald van € ${l.totaal.toLocaleString('nl')}</div>
+        <div class="card">
+          <div class="row">
+            <div class="inline" style="flex:1">
+              <input class="input" style="font-weight:700" value="${escapeHtml(cat.naam)}" onchange="renameCategory('${cat.id}', this.value)">
+              <span class="mono" style="min-width:88px;text-align:right">${fmt(totalForCategory(cat.id))}</span>
             </div>
-            <div style="text-align:right">
-              <div style="font-size:18px;font-weight:800;color:var(--red)">€ ${open.toLocaleString('nl')}</div>
-              <div style="font-size:10px;color:var(--muted);font-family:monospace">nog open</div>
+            <div class="inline">
+              <button class="btn sm ghost" onclick="toggleCategory('${cat.id}')">${isOpen ? 'Sluit' : 'Open'}</button>
+              <button class="btn sm danger" onclick="removeCategory('${cat.id}')">Verwijder</button>
             </div>
           </div>
-          <!-- Voortgangsbalk -->
-          <div style="background:var(--surface3);border-radius:99px;height:10px;overflow:hidden;margin-bottom:8px">
-            <div style="height:100%;border-radius:99px;background:${l.kleur};width:${pct.toFixed(1)}%;transition:width .6s ease"></div>
+          ${isOpen ? `
+            <div class="stack" style="margin-top:10px">
+              ${itemsForCategory(cat.id).map(item => `
+                <div class="post-row">
+                  <input class="input" value="${escapeHtml(item.post)}" onchange="renameBudgetPost('${item.id}', this.value)">
+                  <input class="input small" type="number" value="${Number(item.budget||0)}" onchange="updateBudgetAmount('${item.id}', this.value)">
+                  <button class="btn sm danger" onclick="removeBudgetPost('${item.id}')">✕</button>
+                </div>
+              `).join('')}
+              <button class="btn secondary" onclick="addBudgetPost('${cat.id}')">+ Post toevoegen</button>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }).join('')}
+
+    <div class="card">
+      <div class="row">
+        <div style="font-weight:700">Totaal budget</div>
+        <div class="mono" style="color:var(--accent)">${fmt(budgetTotaal())}</div>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <div class="muted">Overschot</div>
+        <div class="mono" style="color:${overschot()>=0?'var(--green)':'var(--red)'}">${fmt(overschot())}</div>
+      </div>
+      <div class="stack" style="margin-top:14px">
+        <button class="btn" onclick="saveToSheets()">☁️ Opslaan in Sheets</button>
+        <button class="btn secondary" onclick="loadFromSheets()">↻ Opnieuw ophalen</button>
+      </div>
+      <div id="save-status" class="note" style="margin-top:10px"></div>
+    </div>
+  `;
+  document.getElementById('v-budget').innerHTML = html;
+}
+
+function renderLeningen(){
+  document.getElementById('v-leningen').innerHTML = `
+    <div class="card">
+      <div class="sec" style="margin-top:0">Leningen</div>
+      ${state.leningen.map((l, idx)=>{
+        const restant = Number(l.totaal||0) - Number(l.betaald||0);
+        const pct = Number(l.totaal||0) ? Math.min(100, (Number(l.betaald||0)/Number(l.totaal||0))*100) : 0;
+        return `
+          <div class="loan-row">
+            <div style="flex:1">
+              <input class="input" value="${escapeHtml(l.naam)}" onchange="updateLoanName(${idx}, this.value)">
+              <div class="track" style="margin-top:8px"><div class="fill" style="width:${pct}%;background:${l.kleur||'#7c6af7'}"></div></div>
+              <div class="note" style="margin-top:6px">Restant: ${fmt(restant)}</div>
+            </div>
+            <div class="stack" style="width:110px">
+              <input class="input small" type="number" value="${Number(l.totaal||0)}" onchange="updateLoanTotal(${idx}, this.value)">
+              <input class="input small" type="number" value="${Number(l.betaald||0)}" onchange="updateLoanPaid(${idx}, this.value)">
+            </div>
           </div>
-          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);font-family:monospace">
-            <span>${pct.toFixed(1)}% afgelost · ~€ ${pmnd}/mnd</span>
-            <span>${maanden ? `nog ~${maanden} mnd · ${einddatum(maanden)}` : 'afgelost!'}</span>
-          </div>
-        </div>`;
-    }).join('')}`;
+        `;
+      }).join('')}
+      <div class="stack" style="margin-top:12px">
+        <button class="btn secondary" onclick="addLoan()">+ Lening</button>
+        <button class="btn" onclick="saveToSheets()">☁️ Opslaan in Sheets</button>
+      </div>
+    </div>
+  `;
 }
 
-function verwerkExtraAflossing(){
-  let totaalExtra = 0;
-  LENINGEN.forEach(l=>{
-    const el = document.getElementById('extra-'+l.id);
-    const extra = parseFloat(el?.value)||0;
-    if(extra > 0){
-      l.betaald = Math.min(l.totaal, l.betaald + extra);
-      totaalExtra += extra;
-    }
-    if(el) el.value = '';
+function renderInstellingen(){
+  document.getElementById('v-instellingen').innerHTML = `
+    <div class="card">
+      <div class="sec" style="margin-top:0">Google Sheets</div>
+      <div class="stack">
+        <input id="sheets-url-input" class="input" type="url" placeholder="https://script.google.com/macros/s/..." value="${escapeHtml(state.sheetsUrl || '')}">
+        <div class="inline">
+          <button class="btn" onclick="connectSheets()" style="flex:1">Verbinden</button>
+          <button class="btn secondary" onclick="loadFromSheets()" style="flex:1">Ophalen</button>
+        </div>
+        <div class="inline">
+          <button class="btn secondary" onclick="saveToSheets()" style="flex:1">Opslaan</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function escapeHtml(v){
+  return String(v ?? '')
+    .replaceAll('&','&amp;')
+    .replaceAll('"','&quot;')
+    .replaceAll('<','&lt;')
+    .replaceAll('>','&gt;');
+}
+
+function updateIncomeName(idx, value){ state.inkomsten[idx].naam = value.trim(); persistLocal(); renderDashboard(); }
+function updateIncomeAmount(idx, value){ state.inkomsten[idx].bedrag = Number(value||0); persistLocal(); rerenderAll(); }
+
+function addCategory(){
+  const name = prompt('Naam van de nieuwe categorie?');
+  if(!name) return;
+  state.categorieen.push({
+    id: uid('cat'),
+    naam: name.trim(),
+    volgorde: state.categorieen.length + 1
   });
-  if(totaalExtra > 0){
-    saveLeningen();
-    renderLeningen();
-    showToast('€ '+totaalExtra+' extra afgelost ✓');
-  } else {
-    showToast('Vul een bedrag in');
-  }
+  persistLocal();
+  renderBudget();
 }
-
-// ── GOOGLE SHEETS SYNC ──────────────────────────────────
-const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxa-f-tmhNbPXRDgMc9VSU7nAxKtoV8hCd2twIim1Ikq58uExIrXWgnyEF0DwbMJPpmVA/exec';
-let sheetsUrl = SHEETS_URL;
-
-async function safeJson(res){
-  const text = await res.text();
-  try { return JSON.parse(text); }
-  catch(e){ return { error: 'Parse fout: '+text.slice(0,200) }; }
-}
-
-async function sheetsPost(data){
-  if(!sheetsUrl) return null;
-  try {
-    // Alles via GET — meest betrouwbaar met Apps Script CORS
-    const url = sheetsUrl + '?payload=' + encodeURIComponent(JSON.stringify(data));
-    const res = await fetch(url, { redirect:'follow' });
-    return await safeJson(res);
-  } catch(e){
-    console.error('sheetsPost:', e);
-    return { error: e.message };
-  }
-}
-
-async function sheetsGet(){
-  if(!sheetsUrl) return null;
-  try {
-    // Probeer eerst zonder redirect:follow (werkt beter op sommige mobiele browsers)
-    const res = await fetch(sheetsUrl+'?action=getAll');
-    const text = await res.text();
-    console.log('Sheets raw text:', text.slice(0,300));
-    try { return JSON.parse(text); }
-    catch(e){ return { error: 'Parse fout: '+text.slice(0,100) }; }
-  } catch(e){
-    console.error('sheetsGet fout:', e.message);
-    return { error: e.message };
-  }
-}
-
-// Converteer app state naar Sheets formaat
-function budgetToRows(){
-  const rows = [];
-  Object.entries(BUDGET).forEach(([cat, data]) => {
-    const items = Array.isArray(data?.items) ? data.items : [];
-    if(!items.length){
-      rows.push({ categorie: cat, post: '__EMPTY__', budget: '' });
-      return;
-    }
-    items.forEach(item => rows.push({ categorie: cat, post: item.post, budget: Number(item.budget)||0 }));
-  });
-  return rows;
-}
-function inkomstenToRows(){
-  return [ { naam: 'KT', bedrag: kt }, { naam: 'Ryanne', bedrag: ryanne } ];
-}
-
-function applySheets(data){
-  if(Array.isArray(data?.inkomsten)){
-    data.inkomsten.forEach(r => {
-      const naam = String(r.naam||'').trim();
-      const bedrag = parseFloat(r.bedrag);
-      if(naam === 'KT' && !isNaN(bedrag)) kt = bedrag;
-      if(naam === 'Ryanne' && !isNaN(bedrag)) ryanne = bedrag;
-    });
-  }
-  if(Array.isArray(data?.budget)){
-    const rebuilt = {};
-    data.budget.forEach(r => {
-      const cat = String(r.categorie||'').trim();
-      const post = String(r.post||'').trim();
-      const budget = parseFloat(r.budget)||0;
-      if(!cat) return;
-      if(!rebuilt[cat]) rebuilt[cat] = { items: [] };
-      if(post === '__EMPTY__' || post === '__LEEG__') return;
-      rebuilt[cat].items.push({ post: post || 'Nieuwe post', budget });
-    });
-    if(Object.keys(rebuilt).length) BUDGET = rebuilt;
-  }
-  if(Array.isArray(data?.leningen)){
-    LENINGEN = data.leningen.map(r=>({
-      id: String(r.id || Date.now()),
-      naam: String(r.naam || 'Lening'),
-      totaal: parseFloat(r.totaal)||0,
-      betaald: parseFloat(r.betaald)||0,
-      kleur: String(r.kleur||'#7c6af7')
-    }));
-    try{ localStorage.setItem('bv_leningen', JSON.stringify(LENINGEN)); }catch(e){}
-  }
-  saveState(false);
+function renameCategory(catId, value){
+  const cat = state.categorieen.find(c=>c.id===catId);
+  if(!cat) return;
+  cat.naam = value.trim() || 'Nieuwe categorie';
+  persistLocal();
   rerenderAll();
+}
+function removeCategory(catId){
+  if(!confirm('Categorie verwijderen inclusief alle posten?')) return;
+  state.categorieen = state.categorieen.filter(c=>c.id!==catId);
+  state.budget = state.budget.filter(r=>r.categorieId!==catId);
+  persistLocal();
+  rerenderAll();
+}
+function toggleCategory(catId){
+  state.openCats[catId] = !state.openCats[catId];
+  renderBudget();
+}
+function addBudgetPost(catId){
+  state.budget.push({
+    id: uid('bud'),
+    categorieId: catId,
+    post: 'Nieuwe post',
+    budget: 0,
+    volgorde: itemsForCategory(catId).length + 1
+  });
+  state.openCats[catId] = true;
+  persistLocal();
+  renderBudget();
+}
+function renameBudgetPost(id, value){
+  const row = state.budget.find(r=>r.id===id);
+  if(!row) return;
+  row.post = value.trim() || 'Nieuwe post';
+  persistLocal();
+  rerenderAll();
+}
+function updateBudgetAmount(id, value){
+  const row = state.budget.find(r=>r.id===id);
+  if(!row) return;
+  row.budget = Number(value||0);
+  persistLocal();
+  rerenderAll();
+}
+function removeBudgetPost(id){
+  state.budget = state.budget.filter(r=>r.id!==id);
+  persistLocal();
+  rerenderAll();
+}
+function updateLoanName(idx, value){ state.leningen[idx].naam = value.trim(); persistLocal(); renderLeningen(); }
+function updateLoanTotal(idx, value){ state.leningen[idx].totaal = Number(value||0); persistLocal(); renderLeningen(); }
+function updateLoanPaid(idx, value){ state.leningen[idx].betaald = Number(value||0); persistLocal(); renderLeningen(); }
+function addLoan(){
+  state.leningen.push({ id:uid('ln'), naam:'Nieuwe lening', totaal:0, betaald:0, kleur:'#7c6af7' });
+  persistLocal();
+  renderLeningen();
+}
+
+async function connectSheets(){
+  const url = document.getElementById('sheets-url-input')?.value.trim();
+  if(!url){ showToast('Vul een URL in'); return; }
+  state.sheetsUrl = url;
+  persistLocal();
+  await loadFromSheets();
+  renderInstellingen();
+}
+
+async function loadFromSheets(){
+  if(!state.sheetsUrl){
+    showToast('Nog geen Sheets URL ingevuld');
+    return;
+  }
+  updateSyncBadge('Ophalen...');
+  try{
+    const result = await sheetsGet();
+    if(result?.ok){
+      applySheets(result);
+      updateSyncBadge('Sheets');
+      showToast('Data opgehaald');
+    }else{
+      updateSyncBadge('Fout');
+      showToast(result?.error || 'Ophalen mislukt');
+    }
+  }catch(e){
+    updateSyncBadge('Fout');
+    showToast('Ophalen mislukt');
+  }
 }
 
 async function saveToSheets(){
-  const btn = document.querySelector('[onclick="saveToSheets()"]');
+  if(!state.sheetsUrl){
+    showToast('Nog geen Sheets URL ingevuld');
+    return;
+  }
   const status = document.getElementById('save-status');
-  if(btn){ btn.textContent='⏳ Opslaan...'; btn.disabled=true; }
-  const result = await sheetsPost({
-    action: 'saveAll',
-    inkomsten: inkomstenToRows(),
-    budget: budgetToRows(),
-    leningen: LENINGEN
-  });
-  if(btn){ btn.textContent='☁️ Opslaan in Sheets'; btn.disabled=false; }
-  if(result?.ok){
-    if(status) status.textContent = 'Opgeslagen op '+new Date().toLocaleTimeString('nl')+' ✓';
-    showToast('Opgeslagen ✓');
-  } else {
+  if(status) status.textContent = 'Opslaan...';
+  updateSyncBadge('Opslaan...');
+  try{
+    const payload = toRows();
+    const result = await sheetsPost(payload);
+    if(result?.ok){
+      persistLocal();
+      if(status) status.textContent = 'Opgeslagen in Sheets';
+      updateSyncBadge('Sheets');
+      showToast('Opgeslagen');
+    }else{
+      if(status) status.textContent = result?.error || 'Opslaan mislukt';
+      updateSyncBadge('Fout');
+      showToast(result?.error || 'Opslaan mislukt');
+    }
+  }catch(e){
     if(status) status.textContent = 'Opslaan mislukt';
+    updateSyncBadge('Fout');
     showToast('Opslaan mislukt');
   }
 }
 
-async function loadFromSheets(showMessage=true){
-  if(!sheetsUrl){ if(showMessage) showToast('Geen Script URL ingesteld'); return false; }
-  if(showMessage) showToast('Ophalen uit Sheets...');
-  const result = await sheetsGet();
-  if(result?.error){ if(showMessage) showToast('Fout: '+result.error.slice(0,60)); return false; }
-  applySheets(result || {});
-  if(showMessage) showToast('Data opgehaald uit Sheets ✓');
-  return true;
-}
-
-// ── INSTELLINGEN ─────────────────────────────────────────
-function renderInstellingen(){
-  document.getElementById('v-instellingen').innerHTML=`
-    <div style="background:var(--surface);border:1px solid ${C.border};border-radius:20px;padding:20px;margin-bottom:16px">
-      <div style="font-size:13px;font-weight:700;letter-spacing:.5px;color:var(--muted);text-transform:uppercase;margin-bottom:14px">Google Sheets</div>
-      <div id="sheets-status" style="display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid ${C.border};border-radius:12px;padding:12px 16px;margin-bottom:12px;font-size:13px">
-        <div id="sheets-dot" style="width:10px;height:10px;border-radius:50%;background:${sheetsUrl?'#3ddc84':'var(--muted)'};flex-shrink:0"></div>
-        <div style="color:${sheetsUrl?'#3ddc84':'var(--muted)'}">${sheetsUrl?'Verbonden':'Niet verbonden'}</div>
-      </div>
-      <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Script URL</div>
-      <input id="sheets-url-input" type="url" value="${sheetsUrl}" readonly
-        style="width:100%;background:var(--surface2);border:1px solid ${C.border};border-radius:12px;color:var(--text);font-family:inherit;font-size:14px;padding:11px 14px;outline:none;margin-bottom:10px;opacity:.8">
-      <button onclick="loadFromSheets()" style="width:100%;background:linear-gradient(135deg,var(--accent),#9b8af7);border:none;border-radius:12px;color:#fff;font-family:inherit;font-size:14px;font-weight:700;padding:14px;cursor:pointer;margin-bottom:8px">
-        ↻ Haal data op
-      </button>
-      <button onclick="saveToSheets()" style="width:100%;background:var(--surface2);border:1px solid ${C.border};border-radius:12px;color:var(--accent);font-family:inherit;font-size:14px;font-weight:600;padding:12px;cursor:pointer">
-        ☁️ Opslaan in Sheets
-      </button>
-      <div id="save-status" style="font-size:11px;color:var(--muted);font-family:monospace;margin-top:10px"></div>
-    </div>
-    <div style="background:var(--surface);border:1px solid ${C.border};border-radius:20px;padding:20px;margin-bottom:16px">
-      <div style="font-size:13px;font-weight:700;letter-spacing:.5px;color:var(--muted);text-transform:uppercase;margin-bottom:14px">Categorieën</div>
-      ${Object.entries(BUDGET).map(([cat,data])=>`
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid ${C.border}">
-          <div style="display:flex;align-items:center;gap:10px">${icon(cat)}<span style="font-size:14px">${cat}</span></div>
-          <span style="font-family:monospace;font-size:12px;color:${C.muted}">${data.items.length} posten</span>
-        </div>`).join('')}
-      <button onclick="addCategory()" style="width:100%;margin-top:12px;background:var(--surface2);border:1px solid ${C.border};border-radius:12px;color:var(--accent);font-family:inherit;font-size:14px;font-weight:700;padding:12px;cursor:pointer">+ Categorie toevoegen</button>
-    </div>`;
-}
-
-async function connectSheets(){
-  showToast('Sheets is al gekoppeld.');
-  return true;
-}
-
-function showToast(msg){
-  const t=document.createElement('div');
-  t.textContent=msg;
-  t.style.cssText='position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;padding:11px 20px;border-radius:12px;font-size:14px;font-weight:600;z-index:999;white-space:nowrap;box-shadow:0 4px 20px rgba(124,106,247,.4);font-family:inherit';
-  document.body.appendChild(t); setTimeout(()=>t.remove(), 2500);
-}
-
-function saveState(push=true){
-  try{
-    localStorage.setItem('bv_kt', kt);
-    localStorage.setItem('bv_ryanne', ryanne);
-    localStorage.setItem('bv_budget', JSON.stringify(Object.fromEntries(Object.entries(BUDGET).map(([k,v])=>[k,(v.items||[]).map(i=>({budget:Number(i.budget)||0,post:i.post}))]))));
-    localStorage.setItem('bv_leningen', JSON.stringify(LENINGEN));
-  }catch(e){}
-  if(push && sheetsUrl){
-    sheetsPost({
-      action:'saveAll',
-      inkomsten: inkomstenToRows(),
-      budget: budgetToRows(),
-      leningen: LENINGEN
-    }).catch(()=>{});
+async function init(){
+  restoreLocal();
+  rerenderAll();
+  if(state.sheetsUrl){
+    try{
+      const result = await sheetsGet();
+      if(result?.ok){
+        applySheets(result);
+        updateSyncBadge('Sheets');
+      }else{
+        updateSyncBadge('Lokaal');
+      }
+    }catch(e){
+      updateSyncBadge('Lokaal');
+    }
   }
+  document.getElementById('startup-overlay').style.display = 'none';
 }
-
-function loadState(){
-  try{
-    const sk=localStorage.getItem('bv_kt');
-    const sr=localStorage.getItem('bv_ryanne');
-    const sb=localStorage.getItem('bv_budget');
-    const sl=localStorage.getItem('bv_leningen');
-    if(sk) kt=parseFloat(sk);
-    if(sr) ryanne=parseFloat(sr);
-    if(sb){
-      const saved=JSON.parse(sb);
-      const normalized = normalizeBudgetObject(saved);
-      if(Object.keys(normalized).length) BUDGET = normalized;
-    }
-    if(sl){
-      const savedLeningen=JSON.parse(sl);
-      if(Array.isArray(savedLeningen) && savedLeningen.length) LENINGEN=savedLeningen;
-    }
-  }catch(e){}
-}
-
-loadState();
-
-document.getElementById('v-dashboard').innerHTML = `
-  <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px;gap:16px">
-    <div style="width:40px;height:40px;border:3px solid var(--surface3);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite"></div>
-    <div style="font-size:13px;color:var(--muted);font-family:monospace">Ophalen uit Sheets...</div>
-  </div>
-  <style>@keyframes spin{to{transform:rotate(360deg)}}</style>`;
-
-loadFromSheets(false).then(ok=>{
-  if(!ok) renders.dashboard();
-}).catch(()=>{
-  renders.dashboard();
-});
+init();
 </script>
 </body>
 </html>
