@@ -10,6 +10,23 @@
 <title>Budget · Veenstra</title>
 <style>
 :root{
+  --bg:#050505;
+  --surface:#0b0b0b;
+  --surface2:#121212;
+  --surface3:#1a1a1a;
+  --border:rgba(255,255,255,0.06);
+  --text:#f5f5f5;
+  --muted:#9aa0a6;
+
+  /* RGB accents */
+  --accent:#ff3cac;
+  --accent2:#2b86ff;
+  --green:#00ffa3;
+  --red:#ff4d4f;
+  --amber:#ffc857;
+
+  --shadow:0 10px 30px rgba(0,0,0,.5);
+}
   --bg:#0c0f12;--surface:#14181d;--surface2:#1b2128;--surface3:#252c35;
   --border:rgba(255,255,255,0.08);--text:#eef2f5;--muted:#8b96a3;
   --accent:#8fa3b8;--accent2:#6f879b;--green:#87a98a;--red:#c98787;--amber:#b89a6a;
@@ -34,7 +51,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 .content{flex:1;padding:10px 20px calc(env(safe-area-inset-bottom,0px) + 40px)}
 .view{display:none;animation:fadeIn .22s ease}.view.active{display:block}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-.hero{background:linear-gradient(135deg,#171d23,#1a232b,#202a34);border:1px solid rgba(143,163,184,.18);border-radius:24px;padding:24px;margin-bottom:12px;position:relative;overflow:hidden;box-shadow:var(--shadow)}
+.hero{background:linear-gradient(135deg,#0b0b0b,#111,#161616);border:1px solid rgba(143,163,184,.18);border-radius:24px;padding:24px;margin-bottom:12px;position:relative;overflow:hidden;box-shadow:var(--shadow)}
 .hero::before{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(124,106,247,.15) 0%,transparent 70%);pointer-events:none}
 .hero-label{font-size:11px;color:rgba(240,240,248,.65);letter-spacing:1px;font-family:monospace;margin-bottom:6px}
 .hero-amount{font-size:42px;font-weight:800;letter-spacing:-2px;line-height:1}
@@ -47,7 +64,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 .sq-label{font-size:13px;font-weight:600;color:var(--muted)}
 .sq-val{font-family:monospace;font-size:16px;font-weight:600;color:var(--accent2)}
 .track{background:var(--surface3);border-radius:99px;height:8px;overflow:hidden}
-.fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .35s ease}
+.fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#ff3cac,#2b86ff,#00ffa3);transition:width .35s ease}
 .sq-note{text-align:right;margin-top:5px;font-size:10px;color:var(--muted);font-family:monospace}
 .sec{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin:16px 0 10px}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:14px 16px;margin-bottom:10px;box-shadow:var(--shadow);transition:transform .15s ease, opacity .15s ease}
@@ -105,6 +122,43 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 .menu-btn.danger{color:var(--red);background:rgba(255,107,107,.1);border-color:rgba(255,107,107,.2)}
 .settings-list{display:flex;flex-direction:column;gap:10px}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+.glow{
+  box-shadow:0 0 0 rgba(0,0,0,0),
+             0 0 20px rgba(255,60,172,0.15),
+             0 0 40px rgba(43,134,255,0.1);
+}
+.prog-fill{
+  background:linear-gradient(90deg,#ff3cac,#2b86ff,#00ffa3);
+  box-shadow:0 0 10px rgba(255,60,172,0.4);
+}
+.hero-amount.pos{
+  color:#00ffa3;
+  text-shadow:0 0 12px rgba(0,255,163,.4);
+}
+.hero-amount.neg{
+  color:#ff4d4f;
+  text-shadow:0 0 12px rgba(255,77,79,.4);
+}
+
+
+
+.dashboard-top3{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.top3-row{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:14px 16px;box-shadow:var(--shadow)}
+.top3-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.top3-name{font-size:15px;font-weight:700}
+.top3-amount{font-family:monospace;font-size:15px;font-weight:700}
+.top3-sub{font-size:12px;color:var(--muted);margin-top:4px}
+.alloc-wrap{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:14px 16px;box-shadow:var(--shadow);margin-bottom:14px}
+.alloc-stack{display:flex;flex-direction:column;gap:10px}
+.alloc-row{display:flex;align-items:center;gap:12px}
+.alloc-label{width:110px;flex-shrink:0;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.alloc-bar{flex:1;height:10px;background:var(--surface3);border-radius:99px;overflow:hidden}
+.alloc-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#ff3cac,#2b86ff,#00ffa3)}
+.alloc-val{width:70px;flex-shrink:0;text-align:right;font-family:monospace;font-size:12px;color:var(--muted)}
+.insight-card{background:linear-gradient(180deg,var(--surface),var(--surface2));border:1px solid var(--border);border-radius:18px;padding:16px;box-shadow:var(--shadow)}
+.insight-line{font-size:14px;line-height:1.6}
+.insight-line strong{color:var(--text)}
 
 .premium-cat-grid{display:grid;grid-template-columns:1fr;gap:10px}
 .premium-cat-card{background:linear-gradient(180deg,var(--surface),var(--surface2));border:1px solid var(--border);border-radius:20px;padding:16px;box-shadow:var(--shadow);position:relative;overflow:hidden}
@@ -308,38 +362,76 @@ function openSettings(){
 function setBudgetSubtab(tab){ state.budgetSubtab = tab; renderBudget(); }
 
 function renderDashboard(){
-  const o = overschot(), s = spaarquote(), total = budgetTotaal();
+  const o = overschot();
+  const s = spaarquote();
+  const total = budgetTotaal();
   const cats = orderedCats();
+  const sorted = cats.slice().sort((a,b)=>totalForCategory(b.id)-totalForCategory(a.id));
+  const top3 = sorted.slice(0,3);
+  const grootste = sorted[0];
+  const vasteLastenCats = cats.filter(c => ['woning','zorgverzekering','telefoon','leningen','auto'].some(k => c.naam.toLowerCase().includes(k)));
+  const vasteLasten = vasteLastenCats.reduce((sum,c)=>sum + totalForCategory(c.id), 0);
+  const vastePct = total ? (vasteLasten / total) * 100 : 0;
+  const inkomenGebruik = inkomstenTotaal() ? (total / inkomstenTotaal()) * 100 : 0;
+
   document.getElementById('v-dashboard').innerHTML = `
     <div class="hero">
-      <div class="hero-label">MAANDELIJKS OVERSCHOT</div>
+      <div class="hero-label">MAANDELIJKS RESULTAAT</div>
       <div class="hero-amount ${o>=0?'pos':'neg'}">${fmtShort(o)}</div>
       <div class="hero-sub">
-        <div><div class="hero-sub-label">INKOMSTEN</div><div class="hero-sub-val" style="color:var(--text)">${fmtShort(inkomstenTotaal())}</div></div>
-        <div><div class="hero-sub-label">BUDGET</div><div class="hero-sub-val" style="color:var(--text)">${fmtShort(total)}</div></div>
+        <div>
+          <div class="hero-sub-label">INKOMSTEN</div>
+          <div class="hero-sub-val" style="color:var(--text)">${fmtShort(inkomstenTotaal())}</div>
+        </div>
+        <div>
+          <div class="hero-sub-label">BUDGET</div>
+          <div class="hero-sub-val" style="color:var(--text)">${fmtShort(total)}</div>
+        </div>
       </div>
     </div>
 
     <div class="sq-bar">
-      <div class="sq-top"><span class="sq-label">Spaarquote</span><span class="sq-val">${s.toFixed(1)}%</span></div>
+      <div class="sq-top">
+        <span class="sq-label">Spaarquote</span>
+        <span class="sq-val">${s.toFixed(1)}%</span>
+      </div>
       <div class="track"><div class="fill" style="width:${Math.min(100, Math.max(0, s))}%"></div></div>
-      <div class="sq-note">Op basis van budget</div>
+      <div class="sq-note">${o >= 0 ? 'Je houdt geld over' : 'Je budget is hoger dan je inkomen'}</div>
     </div>
 
-    <div class="sec">Categorieën</div>
-    <div class="premium-cat-grid">
-      ${cats.map(cat => `
-        <div class="premium-cat-card">
-          <div class="premium-cat-top">
-            <div>
-              <div class="premium-cat-name">${escapeHtml(cat.naam)}</div>
-              <div class="premium-cat-sub">${postsCount(cat.id)} posten</div>
-            </div>
-            <div class="premium-cat-amount">${fmt(totalForCategory(cat.id))}</div>
+    <div class="sec">Grootste uitgaven</div>
+    <div class="dashboard-top3">
+      ${top3.map((cat, idx) => `
+        <div class="top3-row">
+          <div class="top3-head">
+            <div class="top3-name">${idx+1}. ${escapeHtml(cat.naam)}</div>
+            <div class="top3-amount">${fmt(totalForCategory(cat.id))}</div>
           </div>
-          <div class="prog"><div class="prog-fill" style="width:${total ? (totalForCategory(cat.id)/total)*100 : 0}%"></div></div>
+          <div class="top3-sub">${postsCount(cat.id)} posten · ${total ? ((totalForCategory(cat.id)/total)*100).toFixed(0) : 0}% van je budget</div>
         </div>
       `).join('')}
+    </div>
+
+    <div class="sec">Verdeling budget</div>
+    <div class="alloc-wrap">
+      <div class="alloc-stack">
+        ${sorted.map(cat => `
+          <div class="alloc-row">
+            <div class="alloc-label">${escapeHtml(cat.naam)}</div>
+            <div class="alloc-bar">
+              <div class="alloc-fill" style="width:${total ? (totalForCategory(cat.id)/total)*100 : 0}%"></div>
+            </div>
+            <div class="alloc-val">${fmtShort(totalForCategory(cat.id))}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="sec">Inzicht</div>
+    <div class="insight-card">
+      <div class="insight-line"><strong>${grootste ? escapeHtml(grootste.naam) : 'Geen categorie'}</strong> is je grootste kostenpost met <strong>${grootste ? fmt(totalForCategory(grootste.id)) : fmt(0)}</strong>.</div>
+      <div class="insight-line">Je vaste lasten zijn ongeveer <strong>${vastePct.toFixed(0)}%</strong> van je totale budget.</div>
+      <div class="insight-line">Je gebruikt nu <strong>${inkomenGebruik.toFixed(0)}%</strong> van je inkomen voor je budgetten.</div>
     </div>
   `;
 }
