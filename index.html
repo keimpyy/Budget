@@ -189,7 +189,7 @@ function icon(name){
   return `<span style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:7px;background:${ic.bg};color:${ic.fg};font-size:11px;font-weight:800;flex-shrink:0;letter-spacing:0">${ic.label}</span>`;
 }
 
-const BUDGET = {
+let BUDGET = {
   'Woning':          { items: [
     {post:'Hypotheek',budget:1250,werkelijk:1247.22},
     {post:'Gas/Elektra',budget:250,werkelijk:250},
@@ -232,7 +232,25 @@ const BUDGET = {
   ]}
 };
 
+function makeBudgetItem(item){
+  return { post: String(item?.post || 'Nieuwe post').trim() || 'Nieuwe post', budget: Number(item?.budget) || 0 };
+}
+function normalizeBudgetObject(raw){
+  const out = {};
+  if(!raw || typeof raw !== 'object') return out;
+  Object.entries(raw).forEach(([cat,val])=>{
+    const name = String(cat || '').trim();
+    if(!name) return;
+    const items = Array.isArray(val?.items) ? val.items : (Array.isArray(val) ? val : []);
+    out[name] = { items: items.map(makeBudgetItem) };
+  });
+  return out;
+}
+function ensureBudgetDefaults(){ BUDGET = normalizeBudgetObject(BUDGET); }
+ensureBudgetDefaults();
+
 const VARIABEL=[
+
   {cat:'Klarna / Riverty',post:'Afbetalingen',w:326},
   {cat:'Boodschappen',post:'Supermarkt (beide rek.)',w:724.89},
   {cat:'Verzorging / Huishouden',post:'Drogist / Was',w:79.28},
@@ -354,23 +372,20 @@ function go(name,btn){
 
 function openModal(name,data){
   document.getElementById('modal-title').innerHTML=`<div style="display:flex;align-items:center;gap:10px">${icon(name)}<span>${name}</span></div>`;
-  document.getElementById('modal-body').innerHTML=data.items.map(item=>{
-    const diff=item.werkelijk-item.budget;
-    const dc=diff>0?C.red:diff<0?C.green:C.muted;
-    return `<div class="line">
+  document.getElementById('modal-body').innerHTML=(data.items||[]).map(item=>`
+    <div class="line">
       <span class="line-name">${item.post}</span>
       <div class="line-right">
-        <span style="font-family:monospace;font-size:12px;color:${C.muted}">${fmt(item.budget)}</span>
-        <span style="font-family:monospace;font-size:14px;font-weight:500">${fmt(item.werkelijk)}</span>
-        <span style="font-family:monospace;font-size:12px;color:${dc}">${diff>0?'+':''}${fmt(diff)}</span>
-      </div></div>`;
-  }).join('');
+        <span style="font-family:monospace;font-size:14px;font-weight:500;color:${C.accent}">${fmt(item.budget)}</span>
+      </div>
+    </div>`).join('') || `<div class="empty"><div class="empty-icon">🗂️</div><div>Geen budgetposten</div></div>`;
   document.getElementById('overlay').classList.add('open');
 }
 function closeModal(){document.getElementById('overlay').classList.remove('open');}
 
 const renders = {
   dashboard(){
+    ensureBudgetDefaults();
     const o=over(),s=sq(),i=inc(),b=totalB();
     document.getElementById('v-dashboard').innerHTML=`
       <div class="hero">
@@ -379,79 +394,89 @@ const renders = {
         <div class="hero-amount ${o>=0?'pos':'neg'}">${fmtS(o)}</div>
         <div class="hero-sub">
           <div><div class="hero-sub-label">INKOMSTEN</div><div class="hero-sub-val" style="color:${C.green}">${fmtS(i)}</div></div>
-          <div><div class="hero-sub-label">UITGAVEN</div><div class="hero-sub-val" style="color:${C.red}">${fmtS(b)}</div></div>
+          <div><div class="hero-sub-label">BUDGET</div><div class="hero-sub-val" style="color:${C.accent}">${fmtS(b)}</div></div>
         </div>
       </div>
       <div class="sq-bar">
         <div class="sq-top"><span class="sq-label">Spaarquote</span><span class="sq-val">${s.toFixed(1)}%</span></div>
         <div class="track"><div class="fill" style="width:${Math.min(100,Math.max(0,s))}%"></div></div>
-        <div class="sq-note">Doel: 15–20%</div>
+        <div class="sq-note">Gebaseerd op inkomsten minus budget</div>
       </div>
-      <div class="sec">Categorieën</div>
+      <div class="sec">Budgetcategorieën</div>
       ${Object.entries(BUDGET).map(([name,data])=>{
-        const cb=data.items.reduce((s,i)=>s+i.budget,0);
-        const cw=data.items.reduce((s,i)=>s+i.werkelijk,0);
-        const pct=cb>0?Math.min(110,(cw/cb)*100):0;
-        const cls=cw>cb?'over':cw<cb*.95?'ok':'neu';
-        return `<div class="cat-card" onclick="openModal('${name}',BUDGET['${name}'])">
+        const cb=data.items.reduce((sum,i)=>sum+(Number(i.budget)||0),0);
+        const pct=Math.min(100, Math.max(8, cb / Math.max(totalB(),1) * 100));
+        return `<div class="cat-card" onclick="openModal('${name.replace(/'/g,"\\'")}',BUDGET['${name.replace(/'/g,"\\'")}'])">
           <div class="cat-top">
             <div class="cat-name" style="display:flex;align-items:center;gap:8px">${icon(name)}<span>${name}</span></div>
-            <div class="cat-amounts">
-              <span class="cat-b">${fmtS(cb)}</span>
-              <span style="color:${C.muted};font-size:11px;margin:0 3px">·</span>
-              <span class="cat-w ${cls}">${fmtS(cw)}</span>
-            </div>
+            <div class="cat-amounts"><span class="cat-w neu">${fmtS(cb)}</span></div>
           </div>
-          <div class="prog"><div class="prog-fill ${cls}" style="width:${pct}%"></div></div>
+          <div class="prog"><div class="prog-fill neu" style="width:${pct}%"></div></div>
         </div>`;
       }).join('')}`;
   },
 
   budget(){
+    ensureBudgetDefaults();
     if(!window.budgetOpen) window.budgetOpen={};
     document.getElementById('v-budget').innerHTML=`
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px">
+        <button onclick="addCategory()" style="background:linear-gradient(135deg,var(--accent),#9b8af7);border:none;border-radius:12px;color:#fff;font-family:inherit;font-size:13px;font-weight:700;padding:11px 14px;cursor:pointer">+ Categorie</button>
+        <div style="font-size:11px;color:var(--muted);font-family:monospace">Alleen budgettering · geen actuals</div>
+      </div>
       <div class="inc-grid">
         <div class="inc-card"><div class="inc-label">KT Salaris</div><div style="display:flex;align-items:center;gap:4px"><span style="color:${C.muted};font-family:monospace;font-size:14px">€</span><input class="inc-input" type="number" value="${kt}" oninput="kt=parseFloat(this.value)||0;saveState();recalcBudget()"></div></div>
         <div class="inc-card"><div class="inc-label">Ryanne</div><div style="display:flex;align-items:center;gap:4px"><span style="color:${C.muted};font-family:monospace;font-size:14px">€</span><input class="inc-input" type="number" value="${ryanne}" oninput="ryanne=parseFloat(this.value)||0;saveState();recalcBudget()"></div></div>
       </div>
       ${Object.entries(BUDGET).map(([name,data],ci)=>{
-        const ct=data.items.reduce((s,i)=>s+i.budget,0);
+        const ct=data.items.reduce((s,i)=>s+(Number(i.budget)||0),0);
+        const safeName=name.replace(/'/g,"\\'");
         const isOpen=window.budgetOpen[name]||false;
         return `<div class="bud-section">
-          <div onclick="window.budgetOpen['${name}']=!window.budgetOpen['${name}'];renders.budget()"
-            style="background:var(--surface);border:1px solid ${isOpen?'rgba(124,106,247,0.4)':C.border};border-radius:${isOpen?'16px 16px 0 0':'16px'};padding:12px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:border-color .15s;margin-bottom:${isOpen?'0':'0'}">
+          <div onclick="window.budgetOpen['${safeName}']=!window.budgetOpen['${safeName}'];renders.budget()"
+            style="background:var(--surface);border:1px solid ${isOpen?'rgba(124,106,247,0.4)':C.border};border-radius:${isOpen?'16px 16px 0 0':'16px'};padding:12px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:border-color .15s">
             <div style="display:flex;align-items:center;gap:10px">
               ${icon(name)}
-              <span style="font-size:14px;font-weight:700">${name}</span>
+              ${editMode
+                ? `<input class="post-name-input" value="${name.replace(/"/g,'&quot;')}" onchange="renameCategory('${safeName}',this.value)" onclick="event.stopPropagation();this.select()">`
+                : `<span style="font-size:14px;font-weight:700">${name}</span>`
+              }
             </div>
             <div style="display:flex;align-items:center;gap:10px">
               <span style="font-family:monospace;font-size:13px;color:${C.accent}" id="bct-${ci}">${fmt(ct)}</span>
+              ${editMode ? `<button onclick="event.stopPropagation();deleteCategory('${safeName}')" style="background:none;border:none;color:${C.red};font-size:15px;cursor:pointer">✕</button>` : ``}
               <span style="color:${C.muted};font-size:14px;display:inline-block;transform:rotate(${isOpen?'90':'0'}deg);transition:transform .2s">›</span>
             </div>
           </div>
-          ${isOpen ? `<div style="border:1px solid rgba(124,106,247,0.4);border-top:none;border-radius:0 0 16px 16px;overflow:hidden;margin-bottom:0">
+          ${isOpen ? `<div style="border:1px solid rgba(124,106,247,0.4);border-top:none;border-radius:0 0 16px 16px;overflow:hidden">
             ${data.items.map((item,idx)=>`
-              <div style="background:var(--surface);border-bottom:${idx<data.items.length-1?`1px solid ${C.border}`:'none'};padding:10px 16px;display:flex;justify-content:space-between;align-items:center;${idx===data.items.length-1?'border-radius:0 0 16px 16px':''}">
-                ${editMode
-                  ? `<input class="post-name-input" value="${item.post}" onchange="renamePost('${name}',${idx},this.value)" onclick="this.select()">`
-                  : `<span style="font-size:13px;color:${C.muted};padding-left:8px">${item.post}</span>`
-                }
+              <div style="background:var(--surface);border-bottom:${idx<data.items.length-1?`1px solid ${C.border}`:'none'};padding:10px 16px;display:flex;justify-content:space-between;align-items:center">
+                <div style="display:flex;align-items:center;gap:8px;min-width:0">
+                  ${editMode ? `<button onclick="deleteBudgetItem('${safeName}',${idx})" style="background:none;border:none;color:${C.red};font-size:14px;cursor:pointer;flex-shrink:0">✕</button>` : ``}
+                  ${editMode
+                    ? `<input class="post-name-input" value="${String(item.post).replace(/"/g,'&quot;')}" onchange="renamePost('${safeName}',${idx},this.value)" onclick="this.select()">`
+                    : `<span style="font-size:13px;color:${C.muted};padding-left:8px">${item.post}</span>`
+                  }
+                </div>
                 <div class="bud-input-wrap"><span class="bud-eur">€</span>
-                  <input class="bud-input" type="number" value="${item.budget}" oninput="BUDGET['${name}'].items[${idx}].budget=parseFloat(this.value)||0;saveState();recalcBudget()">
+                  <input class="bud-input" type="number" value="${Number(item.budget)||0}" oninput="BUDGET['${safeName}'].items[${idx}].budget=parseFloat(this.value)||0;saveState();recalcBudget()">
                 </div>
               </div>`).join('')}
+            ${editMode ? `<div style="background:var(--surface);padding:12px 16px;border-top:1px solid ${C.border}">
+              <button onclick="addBudgetItem('${safeName}')" style="width:100%;background:var(--surface2);border:1px dashed ${C.border};border-radius:10px;color:#7c6af7;font-family:inherit;font-size:13px;font-weight:700;padding:10px;cursor:pointer">+ Post toevoegen</button>
+            </div>` : ``}
           </div>` : ''}
         </div>`;
       }).join('')}
-      <div class="bud-total" style="margin-top:8px"><span class="bud-total-label">Totaal uitgaven</span><span class="bud-total-val" id="btotal">${fmt(totalB())}</span></div>
-      <div style="display:flex;justify-content:space-between;padding:10px 4px">
-        <span style="font-size:13px;color:${C.muted}">Overschot</span>
-        <span id="bover" style="font-family:monospace;font-size:15px;color:${over()>=0?C.green:C.red}">${fmt(over())}</span>
+      <div class="bud-total">
+        <div class="bud-total-label">Totaal budget</div>
+        <div class="bud-total-val" id="btotal">${fmt(totalB())}</div>
       </div>
-      <button onclick="saveToSheets()" style="width:100%;margin-top:16px;background:linear-gradient(135deg,var(--accent),#9b8af7);border:none;border-radius:14px;color:#fff;font-family:inherit;font-size:15px;font-weight:700;padding:15px;cursor:pointer">
-        ☁️ Opslaan in Sheets
-      </button>
-      <div id="save-status" style="text-align:center;font-size:12px;color:var(--muted);margin-top:8px;min-height:16px"></div>`;
+      <div class="bud-total">
+        <div class="bud-total-label">Overschot</div>
+        <div class="bud-total-val" id="bover" style="color:${over()>=0?C.green:C.red}">${fmt(over())}</div>
+      </div>
+    `;
   },
 
   variabel(){
@@ -681,37 +706,73 @@ function recalcBudget(){
   saveState();
   const bt=document.getElementById('btotal');
   const bo=document.getElementById('bover');
-  if(bt)bt.textContent=fmt(totalB());
-  if(bo){bo.textContent=fmt(over());bo.style.color=over()>=0?C.green:C.red;}
+  if(bt) bt.textContent=fmt(totalB());
+  if(bo){
+    bo.textContent=fmt(over());
+    bo.style.color=over()>=0?C.green:C.red;
+  }
   Object.entries(BUDGET).forEach(([,data],ci)=>{
     const el=document.getElementById('bct-'+ci);
-    if(el)el.textContent=fmt(data.items.reduce((s,i)=>s+i.budget,0));
+    if(el) el.textContent=fmt(data.items.reduce((s,i)=>s+(Number(i.budget)||0),0));
   });
   renders.dashboard();
-}
-
-function addTx(){
-  const naam=document.getElementById('tn').value.trim();
-  const bedrag=parseFloat(document.getElementById('tb').value);
-  if(!naam||!bedrag)return;
-  transactions.unshift({id:Date.now(),naam,bedrag,type:document.getElementById('tt').value,datum:document.getElementById('td').value,cat:document.getElementById('tc').value});
-  document.getElementById('tn').value='';
-  document.getElementById('tb').value='';
-  saveState();
-  renders.transacties();
-}
-function delTx(id){transactions=transactions.filter(t=>t.id!==id);saveState();renders.transacties();}
-function setFilter(f,btn){
-  txFilter=f;
-  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
-  btn.classList.add('active');
-  renders.transacties();
+  if(document.getElementById('v-budget')?.classList.contains('active')) renders.budget();
 }
 
 function renamePost(cat,idx,val){
-  if(val.trim()) BUDGET[cat].items[idx].post=val.trim();
+  if(!BUDGET[cat] || !BUDGET[cat].items[idx]) return;
+  const clean = String(val||'').trim();
+  if(clean) BUDGET[cat].items[idx].post = clean;
   saveState();
   renders.dashboard();
+  if(document.getElementById('v-budget')?.classList.contains('active')) renders.budget();
+}
+function renameCategory(oldName,newName){
+  const clean = String(newName||'').trim();
+  if(!clean || clean===oldName || !BUDGET[oldName]){ renders.budget(); return; }
+  if(BUDGET[clean]){ showToast('Categorie bestaat al'); renders.budget(); return; }
+  const entries = Object.entries(BUDGET).map(([k,v])=> k===oldName ? [clean,v] : [k,v]);
+  BUDGET = Object.fromEntries(entries);
+  if(window.budgetOpen[oldName]){ window.budgetOpen[clean]=true; delete window.budgetOpen[oldName]; }
+  saveState();
+  rerenderAll();
+}
+function addCategory(){
+  const clean = String(prompt('Nieuwe categorie naam?')||'').trim();
+  if(!clean) return;
+  if(BUDGET[clean]){ showToast('Categorie bestaat al'); return; }
+  BUDGET[clean] = { items: [] };
+  window.budgetOpen[clean] = true;
+  saveState();
+  rerenderAll();
+}
+function deleteCategory(name){
+  if(!BUDGET[name]) return;
+  if(!confirm(`Categorie "${name}" verwijderen?`)) return;
+  delete BUDGET[name];
+  delete window.budgetOpen[name];
+  saveState();
+  rerenderAll();
+}
+function addBudgetItem(cat){
+  if(!BUDGET[cat]) return;
+  BUDGET[cat].items.push({ post:'Nieuwe post', budget:0 });
+  window.budgetOpen[cat] = true;
+  saveState();
+  renders.budget();
+}
+function deleteBudgetItem(cat, idx){
+  if(!BUDGET[cat] || !BUDGET[cat].items[idx]) return;
+  BUDGET[cat].items.splice(idx,1);
+  saveState();
+  renders.dashboard();
+  renders.budget();
+}
+function rerenderAll(){
+  renders.dashboard();
+  renders.budget();
+  renderLeningen();
+  if(document.getElementById('v-instellingen')?.classList.contains('active')) renderInstellingen();
 }
 
 // ── LENINGEN ────────────────────────────────────────────
@@ -832,8 +893,8 @@ function verwerkExtraAflossing(){
 }
 
 // ── GOOGLE SHEETS SYNC ──────────────────────────────────
-let sheetsUrl = 'https://script.google.com/macros/s/AKfycbxa-f-tmhNbPXRDgMc9VSU7nAxKtoV8hCd2twIim1Ikq58uExIrXWgnyEF0DwbMJPpmVA/exec';
-localStorage.setItem('bv_sheets_url', sheetsUrl);
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxa-f-tmhNbPXRDgMc9VSU7nAxKtoV8hCd2twIim1Ikq58uExIrXWgnyEF0DwbMJPpmVA/exec';
+let sheetsUrl = SHEETS_URL;
 
 async function safeJson(res){
   const text = await res.text();
@@ -873,24 +934,16 @@ async function sheetsGet(){
 function budgetToRows(){
   const rows = [];
   Object.entries(BUDGET).forEach(([cat, data]) => {
-    data.items.forEach(item => rows.push({ categorie: cat, post: item.post, budget: item.budget }));
+    (data.items || []).forEach(item => rows.push({ categorie: cat, post: item.post, budget: Number(item.budget)||0 }));
   });
   return rows;
 }
 function inkomstenToRows(){
   return [ { naam: 'KT', bedrag: kt }, { naam: 'Ryanne', bedrag: ryanne } ];
 }
-function varToRows(){
-  const rows = [];
-  Object.entries(VAR_TX).forEach(([cat, txs]) => {
-    txs.forEach(t => rows.push({ categorie: cat, post: t.name, datum: t.date, bedrag: t.amount, rekening: t.rek||'' }));
-  });
-  return rows;
-}
 
-// Laad Sheets data in app state
 function applySheets(data){
-  if(data.inkomsten && data.inkomsten.length > 0){
+  if(Array.isArray(data?.inkomsten)){
     data.inkomsten.forEach(r => {
       const naam = String(r.naam||'').trim();
       const bedrag = parseFloat(r.bedrag);
@@ -898,73 +951,60 @@ function applySheets(data){
       if(naam === 'Ryanne' && !isNaN(bedrag)) ryanne = bedrag;
     });
   }
-  if(data.budget && data.budget.length > 0){
+  if(Array.isArray(data?.budget)){
+    const rebuilt = {};
     data.budget.forEach(r => {
-      const cat = BUDGET[r.categorie];
-      if(cat){
-        const item = cat.items.find(i => i.post === r.post);
-        if(item) item.budget = parseFloat(r.budget)||0;
-      }
+      const cat = String(r.categorie||'').trim();
+      const post = String(r.post||'').trim();
+      const budget = parseFloat(r.budget)||0;
+      if(!cat) return;
+      if(!rebuilt[cat]) rebuilt[cat] = { items: [] };
+      rebuilt[cat].items.push({ post: post || 'Nieuwe post', budget });
     });
+    if(Object.keys(rebuilt).length) BUDGET = rebuilt;
   }
-  if(data.leningen && data.leningen.length > 0){
+  if(Array.isArray(data?.leningen)){
     LENINGEN = data.leningen.map(r=>({
-      id:     String(r.id),
-      naam:   String(r.naam),
+      id: String(r.id || Date.now()),
+      naam: String(r.naam || 'Lening'),
       totaal: parseFloat(r.totaal)||0,
-      betaald:parseFloat(r.betaald)||0,
-      kleur:  String(r.kleur||'#7c6af7'),
+      betaald: parseFloat(r.betaald)||0,
+      kleur: String(r.kleur||'#7c6af7')
     }));
     try{ localStorage.setItem('bv_leningen', JSON.stringify(LENINGEN)); }catch(e){}
   }
-  saveState();
-  // Altijd alles opnieuw renderen zodat nieuwe waarden zichtbaar zijn
-  renders.dashboard();
-  renders.budget();
-  if(document.getElementById('v-leningen')?.classList.contains('active')) renderLeningen();
+  saveState(false);
+  rerenderAll();
 }
 
 async function saveToSheets(){
   const btn = document.querySelector('[onclick="saveToSheets()"]');
   const status = document.getElementById('save-status');
   if(btn){ btn.textContent='⏳ Opslaan...'; btn.disabled=true; }
-  saveState();
-
-  const payload = JSON.stringify({
+  const result = await sheetsPost({
     action: 'saveAll',
     inkomsten: inkomstenToRows(),
     budget: budgetToRows(),
-    variabel: varToRows(),
-    leningen: LENINGEN,
+    leningen: LENINGEN
   });
-
-  // Fire-and-forget — toon succes direct, wacht niet op response
-  fetch(sheetsUrl, {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: { 'Content-Type': 'text/plain' },
-    body: payload,
-  }).catch(e => console.error('Sheets POST fout:', e));
-
   if(btn){ btn.textContent='☁️ Opslaan in Sheets'; btn.disabled=false; }
-  if(status) status.textContent = 'Opgeslagen op '+new Date().toLocaleTimeString('nl')+' ✓';
-  showToast('Opgeslagen ✓');
+  if(result?.ok){
+    if(status) status.textContent = 'Opgeslagen op '+new Date().toLocaleTimeString('nl')+' ✓';
+    showToast('Opgeslagen ✓');
+  } else {
+    if(status) status.textContent = 'Opslaan mislukt';
+    showToast('Opslaan mislukt');
+  }
 }
 
-async function loadFromSheets(){
-  if(!sheetsUrl){ showToast('Geen Script URL ingesteld'); return; }
-  showToast('Ophalen uit Sheets...');
+async function loadFromSheets(showMessage=true){
+  if(!sheetsUrl){ if(showMessage) showToast('Geen Script URL ingesteld'); return false; }
+  if(showMessage) showToast('Ophalen uit Sheets...');
   const result = await sheetsGet();
-  if(result?.error){ showToast('Fout: '+result.error.slice(0,40)); return; }
-  if(result?.budget && result.budget.length > 0){
-    applySheets(result);
-    saveState();
-    renders.dashboard();
-    renders.budget();
-    showToast('Data opgehaald uit Sheets ✓');
-  } else {
-    showToast('Geen data in Sheets — eerst opslaan');
-  }
+  if(result?.error){ if(showMessage) showToast('Fout: '+result.error.slice(0,60)); return false; }
+  applySheets(result || {});
+  if(showMessage) showToast('Data opgehaald uit Sheets ✓');
+  return true;
 }
 
 // ── INSTELLINGEN ─────────────────────────────────────────
@@ -977,32 +1017,33 @@ function renderInstellingen(){
         <div style="color:${sheetsUrl?'#3ddc84':'var(--muted)'}">${sheetsUrl?'Verbonden':'Niet verbonden'}</div>
       </div>
       <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Script URL</div>
-      <input id="sheets-url-input" type="url" value="${sheetsUrl}" placeholder="https://script.google.com/macros/s/..."
-        style="width:100%;background:var(--surface2);border:1px solid ${C.border};border-radius:12px;color:var(--text);font-family:inherit;font-size:14px;padding:11px 14px;outline:none;margin-bottom:10px">
-      <button onclick="connectSheets()" style="width:100%;background:linear-gradient(135deg,var(--accent),#9b8af7);border:none;border-radius:12px;color:#fff;font-family:inherit;font-size:14px;font-weight:700;padding:14px;cursor:pointer;margin-bottom:8px">
-        Verbinden & ophalen
-      </button>
-      <button onclick="loadFromSheets()" style="width:100%;background:var(--surface2);border:1px solid ${C.border};border-radius:12px;color:var(--accent);font-family:inherit;font-size:14px;font-weight:600;padding:12px;cursor:pointer">
+      <input id="sheets-url-input" type="url" value="${sheetsUrl}" readonly
+        style="width:100%;background:var(--surface2);border:1px solid ${C.border};border-radius:12px;color:var(--text);font-family:inherit;font-size:14px;padding:11px 14px;outline:none;margin-bottom:10px;opacity:.8">
+      <button onclick="loadFromSheets()" style="width:100%;background:linear-gradient(135deg,var(--accent),#9b8af7);border:none;border-radius:12px;color:#fff;font-family:inherit;font-size:14px;font-weight:700;padding:14px;cursor:pointer;margin-bottom:8px">
         ↻ Haal data op
       </button>
+      <button onclick="saveToSheets()" style="width:100%;background:var(--surface2);border:1px solid ${C.border};border-radius:12px;color:var(--accent);font-family:inherit;font-size:14px;font-weight:600;padding:12px;cursor:pointer">
+        ☁️ Opslaan in Sheets
+      </button>
+      <div id="save-status" style="font-size:11px;color:var(--muted);font-family:monospace;margin-top:10px"></div>
+    </div>
+    <div style="background:var(--surface);border:1px solid ${C.border};border-radius:20px;padding:20px;margin-bottom:16px">
+      <div style="font-size:13px;font-weight:700;letter-spacing:.5px;color:var(--muted);text-transform:uppercase;margin-bottom:14px">Categorieën</div>
+      ${Object.entries(BUDGET).map(([cat,data])=>`
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid ${C.border}">
+          <div style="display:flex;align-items:center;gap:10px">${icon(cat)}<span style="font-size:14px">${cat}</span></div>
+          <span style="font-family:monospace;font-size:12px;color:${C.muted}">${data.items.length} posten</span>
+        </div>`).join('')}
+      <button onclick="addCategory()" style="width:100%;margin-top:12px;background:var(--surface2);border:1px solid ${C.border};border-radius:12px;color:var(--accent);font-family:inherit;font-size:14px;font-weight:700;padding:12px;cursor:pointer">+ Categorie toevoegen</button>
     </div>
     <div style="background:#1a1a2e;border:1px solid rgba(124,106,247,.2);border-radius:16px;padding:16px;font-size:12px;line-height:1.9;color:var(--muted)">
-      <strong style="color:var(--text)">Eenmalig instellen:</strong><br>
-      1. Ga naar <strong style="color:var(--text)">script.google.com</strong> → Nieuw project<br>
-      2. Plak inhoud van <strong style="color:var(--text)">Budget_Script.gs</strong><br>
-      3. Vervang JOUW_SHEET_ID_HIER door jouw Sheet ID<br>
-      4. Implementeren → Web-app → Toegang: Iedereen<br>
-      5. Plak de URL hierboven → Verbinden & ophalen
+      <strong style="color:var(--text)">Bron:</strong> Inkomsten, Budget en Leningen komen uit je Google Sheet. Actuals zijn verwijderd uit de app, zodat je puur je budgettering ziet.
     </div>`;
 }
 
 async function connectSheets(){
-  const url = document.getElementById('sheets-url-input')?.value.trim();
-  if(!url){ showToast('Vul een URL in'); return; }
-  sheetsUrl = url;
-  localStorage.setItem('bv_sheets_url', url);
-  await loadFromSheets();
-  renderInstellingen();
+  showToast('Sheets is al gekoppeld.');
+  return true;
 }
 
 function showToast(msg){
@@ -1012,44 +1053,45 @@ function showToast(msg){
   document.body.appendChild(t); setTimeout(()=>t.remove(), 2500);
 }
 
-function saveState(){
+function saveState(push=true){
   try{
     localStorage.setItem('bv_kt', kt);
     localStorage.setItem('bv_ryanne', ryanne);
-    localStorage.setItem('bv_transactions', JSON.stringify(transactions));
-    localStorage.setItem('bv_budget', JSON.stringify(
-      Object.fromEntries(Object.entries(BUDGET).map(([k,v])=>[k,v.items.map(i=>({budget:i.budget,post:i.post}))]))
-    ));
+    localStorage.setItem('bv_budget', JSON.stringify(Object.fromEntries(Object.entries(BUDGET).map(([k,v])=>[k,(v.items||[]).map(i=>({budget:Number(i.budget)||0,post:i.post}))]))));
+    localStorage.setItem('bv_leningen', JSON.stringify(LENINGEN));
   }catch(e){}
+  if(push && sheetsUrl){
+    sheetsPost({
+      action:'saveAll',
+      inkomsten: inkomstenToRows(),
+      budget: budgetToRows(),
+      leningen: LENINGEN
+    }).catch(()=>{});
+  }
 }
 
 function loadState(){
   try{
     const sk=localStorage.getItem('bv_kt');
     const sr=localStorage.getItem('bv_ryanne');
-    const st=localStorage.getItem('bv_transactions');
     const sb=localStorage.getItem('bv_budget');
+    const sl=localStorage.getItem('bv_leningen');
     if(sk) kt=parseFloat(sk);
     if(sr) ryanne=parseFloat(sr);
-    if(st) transactions=JSON.parse(st);
     if(sb){
       const saved=JSON.parse(sb);
-      Object.entries(saved).forEach(([cat,items])=>{
-        if(BUDGET[cat]) items.forEach((item,i)=>{
-          if(BUDGET[cat].items[i]){
-            BUDGET[cat].items[i].budget = typeof item === 'object' ? item.budget : item;
-            if(typeof item === 'object' && item.post) BUDGET[cat].items[i].post = item.post;
-          }
-        });
-      });
+      const normalized = normalizeBudgetObject(saved);
+      if(Object.keys(normalized).length) BUDGET = normalized;
+    }
+    if(sl){
+      const savedLeningen=JSON.parse(sl);
+      if(Array.isArray(savedLeningen) && savedLeningen.length) LENINGEN=savedLeningen;
     }
   }catch(e){}
 }
 
-// Altijd starten met schone slate — alles komt uit Sheets
-localStorage.clear();
+loadState();
 
-// Toon laadscherm, wacht op Sheets, dan renderen
 document.getElementById('v-dashboard').innerHTML = `
   <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px;gap:16px">
     <div style="width:40px;height:40px;border:3px solid var(--surface3);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite"></div>
@@ -1057,21 +1099,9 @@ document.getElementById('v-dashboard').innerHTML = `
   </div>
   <style>@keyframes spin{to{transform:rotate(360deg)}}</style>`;
 
-sheetsGet().then(result=>{
-  console.log('Sheets response:', JSON.stringify(result)?.slice(0,500));
-  console.log('Inkomsten:', JSON.stringify(result?.inkomsten));
-  if(result && !result.error){
-    applySheets(result);
-  } else {
-    const msg = result?.error || 'Geen response';
-    document.getElementById('v-dashboard').innerHTML +=
-      `<div style="background:#ff6b6b22;border:1px solid #ff6b6b;border-radius:12px;padding:12px;margin:16px;font-size:12px;color:#ff6b6b;font-family:monospace">Sheets fout: ${msg}</div>`;
-    renders.dashboard();
-  }
-}).catch(e=>{
-  console.error('Sheets catch:', e);
-  document.getElementById('v-dashboard').innerHTML +=
-    `<div style="background:#ff6b6b22;border:1px solid #ff6b6b;border-radius:12px;padding:12px;margin:16px;font-size:12px;color:#ff6b6b;font-family:monospace">Fetch fout: ${e.message}</div>`;
+loadFromSheets(false).then(ok=>{
+  if(!ok) renders.dashboard();
+}).catch(()=>{
   renders.dashboard();
 });
 </script>
