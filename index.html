@@ -202,6 +202,26 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 .loan-metric-label{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
 .loan-progress-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
 
+
+.loan-metric{
+  width:100%;
+  min-width:0;
+  box-sizing:border-box;
+}
+.loan-metric .input{
+  width:100%;
+  max-width:100%;
+  box-sizing:border-box;
+  display:block;
+}
+.loan-inputs{
+  width:100%;
+}
+.loan-addpay{
+  width:100%;
+  display:block;
+}
+
 </style>
 </head>
 <body>
@@ -622,7 +642,7 @@ function renderLeningen(){
                 <div class="loan-metric-label">Al betaald</div>
                 <input class="input" type="number" value="${Number(l.betaald||0)}" onchange="updateLoanPaid(${idx}, this.value)">
               </div>
-              <div class="loan-metric loan-fullwidth">
+              <div class="loan-metric loan-fullwidth" style="width:100%">
                 <div class="loan-metric-label">Snelle aflossing</div>
                 <button class="loan-addpay" onclick="addLoanPayment(${idx})">+ Aflossing toevoegen</button>
               </div>
