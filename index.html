@@ -133,9 +133,13 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 .loan-stat{background:var(--surface2);border:1px solid var(--border);border-radius:16px;padding:12px}
 .loan-stat-label{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
 .loan-stat-val{font-size:15px;font-weight:800}
-.loan-actions{display:flex;gap:8px;margin-top:14px}
-.loan-addpay{background:linear-gradient(135deg,#ff3cac,#2b86ff);color:#fff;border:none;border-radius:14px;padding:12px 14px;font-weight:800;cursor:pointer;flex:1}
-.loan-save{background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:14px;padding:12px 14px;font-weight:800;cursor:pointer;flex:1}
+.loan-actions{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.loan-addpay{background:linear-gradient(135deg,#ff3cac,#2b86ff);color:#fff;border:none;border-radius:14px;padding:13px 14px;font-weight:800;cursor:pointer;width:100%}
+.loan-save{background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:14px;padding:13px 14px;font-weight:800;cursor:pointer;width:100%}
+.loan-inputs{display:flex;flex-direction:column;gap:12px}
+.loan-metric .inline{display:flex;flex-direction:column;align-items:stretch;gap:10px}
+.loan-metric .inline .input{width:100%}
+.budget-toolbar-actions .pill-btn.order-btn{display:none}
 #confetti-layer{position:fixed;inset:0;pointer-events:none;z-index:2000}
 
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -243,7 +247,6 @@ const state = {
   openCats:{},
   budgetSubtab:'categorieen',
   currentView:'dashboard',
-  orderMode:false
 };
 
 function uid(prefix){ return `${prefix}_${Date.now()}_${Math.floor(Math.random()*100000)}`; }
@@ -460,7 +463,6 @@ function renderBudget(){
     <div class="budget-toolbar">
       <div class="sec" style="margin:0">Categorieën</div>
       <div class="budget-toolbar-actions">
-        <button class="pill-btn" onclick="toggleOrderMode()">${state.orderMode ? 'Klaar' : 'Order'}</button>
         <button class="btn sm" onclick="addCategory()">+ Categorie</button>
       </div>
     </div>
@@ -477,12 +479,6 @@ function renderBudget(){
                   <span class="mono" style="min-width:88px;text-align:right">${fmt(totalForCategory(cat.id))}</span>
                 </div>
                 <div class="cat-meta">${postsCount(cat.id)} posten</div>
-                ${state.orderMode ? `
-                  <div class="order-row">
-                    <span class="muted">Volgorde</span>
-                    <input class="input small order-input" type="number" value="${Number(cat.volgorde||0)}" onchange="setCategoryOrder('${cat.id}', this.value)">
-                  </div>
-                ` : ``}
               </div>
               <button class="collapse-btn" onclick="toggleCategory('${cat.id}')" title="${isOpen ? 'Sluit' : 'Open'}">${isOpen ? '⌃' : '⌄'}</button>
             </div>
@@ -578,23 +574,24 @@ function renderLeningen(){
             </div>
             <div class="loan-inputs">
               <div class="loan-metric">
-                <div class="loan-metric-label">Totaal</div>
+                <div class="loan-metric-label">Totaal lening</div>
                 <input class="input" type="number" value="${Number(l.totaal||0)}" onchange="updateLoanTotal(${idx}, this.value)">
               </div>
               <div class="loan-metric">
-                <div class="loan-metric-label">Betaald</div>
-                <div class="inline">
-                  <input class="input" type="number" value="${Number(l.betaald||0)}" onchange="updateLoanPaid(${idx}, this.value)">
-                  <button class="loan-addpay" onclick="addLoanPayment(${idx})">+ Aflossing</button>
-                </div>
+                <div class="loan-metric-label">Al betaald</div>
+                <input class="input" type="number" value="${Number(l.betaald||0)}" onchange="updateLoanPaid(${idx}, this.value)">
+              </div>
+              <div class="loan-metric">
+                <div class="loan-metric-label">Snelle actie</div>
+                <button class="loan-addpay" onclick="addLoanPayment(${idx})">+ Aflossing toevoegen</button>
               </div>
             </div>
           </div>
         `;
       }).join('')}
       <div class="loan-actions">
-        <button class="loan-save" onclick="addLoan()">+ Lening</button>
-        <button class="loan-addpay" onclick="saveToSheets()">☁️ Opslaan</button>
+        <button class="loan-save" onclick="addLoan()">+ Lening toevoegen</button>
+        <button class="loan-addpay" onclick="saveToSheets()">☁️ Leningen opslaan</button>
       </div>
     </div>
   `;
@@ -623,21 +620,6 @@ function closeSettings(){
   else go('dashboard', document.querySelectorAll('.tab')[0]);
 }
 
-function toggleOrderMode(){
-  state.orderMode = !state.orderMode;
-  renderBudget();
-}
-function setCategoryOrder(catId, value){
-  const v = Math.max(1, parseInt(value || '1', 10));
-  const cats = orderedCats();
-  const idx = cats.findIndex(c => c.id === catId);
-  if(idx < 0) return;
-  const moved = cats.splice(idx, 1)[0];
-  cats.splice(Math.min(v - 1, cats.length), 0, moved);
-  state.categorieen = cats.map((c, i) => ({...c, volgorde:i+1}));
-  persistLocal();
-  renderBudget();
-}
 function confettiBurst(){
   const canvas = document.getElementById('confetti-layer');
   if(!canvas) return;
