@@ -121,6 +121,23 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 .menu-btn{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:14px;color:var(--text);font-family:inherit;font-size:15px;font-weight:700;padding:14px 16px;cursor:pointer;text-align:left;margin-bottom:8px}
 .menu-btn.danger{color:var(--red);background:rgba(255,107,107,.1);border-color:rgba(255,107,107,.2)}
 .settings-list{display:flex;flex-direction:column;gap:10px}
+
+.order-row{display:flex;gap:10px;align-items:center;margin-top:10px}
+.order-input{width:88px}
+.collapse-btn{width:40px;height:40px;border-radius:12px;border:1px solid var(--border);background:var(--surface2);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0}
+.loan-hero{background:linear-gradient(135deg,#0b0b0b,#101010,#171717);border:1px solid rgba(255,255,255,.06);border-radius:22px;padding:18px 18px 16px;margin-bottom:12px;box-shadow:var(--shadow)}
+.loan-hero-top{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
+.loan-hero-title{font-size:18px;font-weight:800;letter-spacing:-.3px}
+.loan-hero-pct{font-size:28px;font-weight:900;line-height:1;background:linear-gradient(90deg,#ff3cac,#2b86ff,#00ffa3);-webkit-background-clip:text;background-clip:text;color:transparent}
+.loan-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:14px}
+.loan-stat{background:var(--surface2);border:1px solid var(--border);border-radius:16px;padding:12px}
+.loan-stat-label{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.loan-stat-val{font-size:15px;font-weight:800}
+.loan-actions{display:flex;gap:8px;margin-top:14px}
+.loan-addpay{background:linear-gradient(135deg,#ff3cac,#2b86ff);color:#fff;border:none;border-radius:14px;padding:12px 14px;font-weight:800;cursor:pointer;flex:1}
+.loan-save{background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:14px;padding:12px 14px;font-weight:800;cursor:pointer;flex:1}
+#confetti-layer{position:fixed;inset:0;pointer-events:none;z-index:2000}
+
 @keyframes spin{to{transform:rotate(360deg)}}
 
 .glow{
@@ -207,6 +224,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
   <div class="muted">Budget laden...</div>
 </div>
 
+<canvas id="confetti-layer"></canvas>
 <script>
 const DEFAULT_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxa-f-tmhNbPXRDgMc9VSU7nAxKtoV8hCd2twIim1Ikq58uExIrXWgnyEF0DwbMJPpmVA/exec';
 
@@ -224,7 +242,8 @@ const state = {
   ],
   openCats:{},
   budgetSubtab:'categorieen',
-  currentView:'dashboard'
+  currentView:'dashboard',
+  orderMode:false
 };
 
 function uid(prefix){ return `${prefix}_${Date.now()}_${Math.floor(Math.random()*100000)}`; }
@@ -368,11 +387,6 @@ function renderDashboard(){
   const cats = orderedCats();
   const sorted = cats.slice().sort((a,b)=>totalForCategory(b.id)-totalForCategory(a.id));
   const top3 = sorted.slice(0,3);
-  const grootste = sorted[0];
-  const vasteLastenCats = cats.filter(c => ['woning','zorgverzekering','telefoon','leningen','auto'].some(k => c.naam.toLowerCase().includes(k)));
-  const vasteLasten = vasteLastenCats.reduce((sum,c)=>sum + totalForCategory(c.id), 0);
-  const vastePct = total ? (vasteLasten / total) * 100 : 0;
-  const inkomenGebruik = inkomstenTotaal() ? (total / inkomstenTotaal()) * 100 : 0;
 
   document.getElementById('v-dashboard').innerHTML = `
     <div class="hero">
@@ -426,13 +440,6 @@ function renderDashboard(){
         `).join('')}
       </div>
     </div>
-
-    <div class="sec">Inzicht</div>
-    <div class="insight-card">
-      <div class="insight-line"><strong>${grootste ? escapeHtml(grootste.naam) : 'Geen categorie'}</strong> is je grootste kostenpost met <strong>${grootste ? fmt(totalForCategory(grootste.id)) : fmt(0)}</strong>.</div>
-      <div class="insight-line">Je vaste lasten zijn ongeveer <strong>${vastePct.toFixed(0)}%</strong> van je totale budget.</div>
-      <div class="insight-line">Je gebruikt nu <strong>${inkomenGebruik.toFixed(0)}%</strong> van je inkomen voor je budgetten.</div>
-    </div>
   `;
 }
 function renderBudget(){
@@ -453,7 +460,7 @@ function renderBudget(){
     <div class="budget-toolbar">
       <div class="sec" style="margin:0">Categorieën</div>
       <div class="budget-toolbar-actions">
-        <button class="pill-btn" onclick="toggleAllCategories()">${allCategoriesOpen() ? 'Alles sluiten' : 'Alles openen'}</button>
+        <button class="pill-btn" onclick="toggleOrderMode()">${state.orderMode ? 'Klaar' : 'Order'}</button>
         <button class="btn sm" onclick="addCategory()">+ Categorie</button>
       </div>
     </div>
@@ -470,15 +477,14 @@ function renderBudget(){
                   <span class="mono" style="min-width:88px;text-align:right">${fmt(totalForCategory(cat.id))}</span>
                 </div>
                 <div class="cat-meta">${postsCount(cat.id)} posten</div>
-                
+                ${state.orderMode ? `
+                  <div class="order-row">
+                    <span class="muted">Volgorde</span>
+                    <input class="input small order-input" type="number" value="${Number(cat.volgorde||0)}" onchange="setCategoryOrder('${cat.id}', this.value)">
+                  </div>
+                ` : ``}
               </div>
-              <button class="category-ghost-btn" onclick="toggleCategoryActions('${cat.id}')" title="Acties">⋯</button>
-            </div>
-            <div class="category-actions-strip">
-              <button class="swipe-mini-btn" onclick="moveCategoryUp('${cat.id}')">Omhoog</button>
-              <button class="swipe-mini-btn" onclick="moveCategoryDown('${cat.id}')">Omlaag</button>
-              <button class="swipe-mini-btn" onclick="toggleCategory('${cat.id}')">${isOpen ? 'Sluit' : 'Open'}</button>
-              <button class="swipe-mini-btn danger" onclick="removeCategory('${cat.id}')">Verwijder</button>
+              <button class="collapse-btn" onclick="toggleCategory('${cat.id}')" title="${isOpen ? 'Sluit' : 'Open'}">${isOpen ? '⌃' : '⌄'}</button>
             </div>
           </div>
           ${isOpen ? `
@@ -493,7 +499,10 @@ function renderBudget(){
                   </div>
                 </div>
               `).join('')}
-              <button class="btn secondary" onclick="addBudgetPost('${cat.id}')">+ Post toevoegen</button>
+              <div class="inline" style="margin-top:8px">
+                <button class="btn secondary" onclick="addBudgetPost('${cat.id}')" style="flex:1">+ Post toevoegen</button>
+                <button class="btn danger sm" onclick="removeCategory('${cat.id}')">Verwijder categorie</button>
+              </div>
             </div>
           ` : ''}
         </div>
@@ -527,9 +536,32 @@ function renderBudget(){
 function renderLeningen(){
   const totaalRestant = state.leningen.reduce((s,l)=>s+(Number(l.totaal||0)-Number(l.betaald||0)),0);
   document.getElementById('v-leningen').innerHTML = `
+    <div class="loan-hero">
+      <div class="loan-hero-top">
+        <div>
+          <div class="hero-label">LENINGEN OVERZICHT</div>
+          <div class="loan-hero-title">${state.leningen.length} actieve leningen</div>
+        </div>
+        <div class="loan-hero-pct">${fmtShort(totaalRestant)}</div>
+      </div>
+      <div class="loan-stats">
+        <div class="loan-stat">
+          <div class="loan-stat-label">Restant</div>
+          <div class="loan-stat-val">${fmt(totaalRestant)}</div>
+        </div>
+        <div class="loan-stat">
+          <div class="loan-stat-label">Totaal</div>
+          <div class="loan-stat-val">${fmt(state.leningen.reduce((s,l)=>s+Number(l.totaal||0),0))}</div>
+        </div>
+        <div class="loan-stat">
+          <div class="loan-stat-label">Betaald</div>
+          <div class="loan-stat-val">${fmt(state.leningen.reduce((s,l)=>s+Number(l.betaald||0),0))}</div>
+        </div>
+      </div>
+    </div>
+
     <div class="card">
       <div class="sec" style="margin-top:0">Leningen</div>
-      <div class="note" style="margin-bottom:12px">Totaal restant: <span class="mono">${fmt(totaalRestant)}</span></div>
       ${state.leningen.map((l, idx)=>{
         const restant = Number(l.totaal||0) - Number(l.betaald||0);
         const pct = Number(l.totaal||0) ? Math.min(100, (Number(l.betaald||0)/Number(l.totaal||0))*100) : 0;
@@ -537,7 +569,7 @@ function renderLeningen(){
           <div class="loan-card">
             <div class="loan-top">
               <input class="input" value="${escapeHtml(l.naam)}" onchange="updateLoanName(${idx}, this.value)">
-              <div class="mono" style="min-width:84px;text-align:right;color:var(--accent2)">${pct.toFixed(0)}%</div>
+              <div class="loan-hero-pct" style="font-size:20px">${pct.toFixed(0)}%</div>
             </div>
             <div class="track"><div class="fill" style="width:${pct}%;background:${l.kleur||'#7c6af7'}"></div></div>
             <div class="loan-progress-row">
@@ -547,19 +579,22 @@ function renderLeningen(){
             <div class="loan-inputs">
               <div class="loan-metric">
                 <div class="loan-metric-label">Totaal</div>
-                <input class="input small" type="number" value="${Number(l.totaal||0)}" onchange="updateLoanTotal(${idx}, this.value)" style="width:100%">
+                <input class="input" type="number" value="${Number(l.totaal||0)}" onchange="updateLoanTotal(${idx}, this.value)">
               </div>
               <div class="loan-metric">
                 <div class="loan-metric-label">Betaald</div>
-                <input class="input small" type="number" value="${Number(l.betaald||0)}" onchange="updateLoanPaid(${idx}, this.value)" style="width:100%">
+                <div class="inline">
+                  <input class="input" type="number" value="${Number(l.betaald||0)}" onchange="updateLoanPaid(${idx}, this.value)">
+                  <button class="loan-addpay" onclick="addLoanPayment(${idx})">+ Aflossing</button>
+                </div>
               </div>
             </div>
           </div>
         `;
       }).join('')}
-      <div class="stack" style="margin-top:14px">
-        <button class="btn secondary" onclick="addLoan()">+ Lening</button>
-        <button class="btn" onclick="saveToSheets()">☁️ Opslaan in Sheets</button>
+      <div class="loan-actions">
+        <button class="loan-save" onclick="addLoan()">+ Lening</button>
+        <button class="loan-addpay" onclick="saveToSheets()">☁️ Opslaan</button>
       </div>
     </div>
   `;
@@ -586,6 +621,81 @@ function closeSettings(){
   const tabBtn = [...document.querySelectorAll('.tab')].find(b => b.textContent.trim().toLowerCase() === target);
   if(tabBtn) go(target, tabBtn);
   else go('dashboard', document.querySelectorAll('.tab')[0]);
+}
+
+function toggleOrderMode(){
+  state.orderMode = !state.orderMode;
+  renderBudget();
+}
+function setCategoryOrder(catId, value){
+  const v = Math.max(1, parseInt(value || '1', 10));
+  const cats = orderedCats();
+  const idx = cats.findIndex(c => c.id === catId);
+  if(idx < 0) return;
+  const moved = cats.splice(idx, 1)[0];
+  cats.splice(Math.min(v - 1, cats.length), 0, moved);
+  state.categorieen = cats.map((c, i) => ({...c, volgorde:i+1}));
+  persistLocal();
+  renderBudget();
+}
+function confettiBurst(){
+  const canvas = document.getElementById('confetti-layer');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = innerWidth * dpr;
+  canvas.height = innerHeight * dpr;
+  canvas.style.width = innerWidth + 'px';
+  canvas.style.height = innerHeight + 'px';
+  ctx.scale(dpr, dpr);
+  const pieces = Array.from({length: 90}, () => ({
+    x: innerWidth * (0.25 + Math.random() * 0.5),
+    y: innerHeight * (0.18 + Math.random() * 0.12),
+    vx: -5 + Math.random() * 10,
+    vy: -9 - Math.random() * 7,
+    g: 0.22 + Math.random() * 0.08,
+    s: 4 + Math.random() * 6,
+    r: Math.random() * Math.PI,
+    vr: -0.15 + Math.random() * 0.3,
+    c: ['#ff3cac','#2b86ff','#00ffa3','#ffc857','#ffffff'][Math.floor(Math.random()*5)],
+    life: 0
+  }));
+  let frame = 0;
+  function tick(){
+    ctx.clearRect(0,0,innerWidth,innerHeight);
+    pieces.forEach(p => {
+      p.life++;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += p.g;
+      p.r += p.vr;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.r);
+      ctx.fillStyle = p.c;
+      ctx.fillRect(-p.s/2, -p.s/2, p.s, p.s * 0.7);
+      ctx.restore();
+    });
+    frame++;
+    if(frame < 70) requestAnimationFrame(tick);
+    else ctx.clearRect(0,0,innerWidth,innerHeight);
+  }
+  tick();
+}
+function addLoanPayment(idx){
+  const amount = prompt('Hoeveel wil je aflossen?');
+  if(!amount) return;
+  const val = Number(String(amount).replace(',','.'));
+  if(!isFinite(val) || val <= 0){
+    showToast('Geen geldig bedrag');
+    return;
+  }
+  const loan = state.leningen[idx];
+  loan.betaald = Math.min(Number(loan.totaal || 0), Number(loan.betaald || 0) + val);
+  persistLocal();
+  renderLeningen();
+  confettiBurst();
+  showToast('Aflossing toegevoegd');
 }
 
 function escapeHtml(v){ return String(v ?? '').replaceAll('&','&amp;').replaceAll('"','&quot;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
