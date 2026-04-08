@@ -579,12 +579,6 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
   border:1px solid rgba(255,255,255,0.06);
   border-radius:10px;
 }
-.post-row .btn.sm.danger{
-  min-width:38px;
-  height:38px;
-  padding:0;
-  border-radius:10px;
-}
 .category-actions-footer{
   display:flex;
   gap:8px;
@@ -718,9 +712,21 @@ button:active,
 }
 .post-row-content{
   position:relative;z-index:2;will-change:transform;
+  display:grid;grid-template-columns:minmax(0,1fr) 112px;align-items:center;column-gap:10px;
+  width:100%;
   transition:transform .32s cubic-bezier(.22,1,.36,1);
 }
 .post-row.swiping .post-row-content{transition:none}
+.post-row .input{
+  width:100%;
+  min-width:0;
+  margin:0;
+}
+.post-row .input.small{
+  width:100%;
+  min-width:0;
+  text-align:right;
+}
 .swipe-delete-bg{
   position:absolute;inset:0;border-radius:12px;overflow:hidden;
   display:flex;align-items:center;justify-content:flex-end;padding-right:12px;
@@ -1164,8 +1170,7 @@ function renderBudget(){
                     </div>
                     <div class="post-row-content">
                       <input class="input" value="${escapeHtml(item.post)}" onchange="renameBudgetPost('${item.id}', this.value)">
-                      <input class="input small" type="number" value="${Number(item.budget||0)}" onchange="updateBudgetAmount('${item.id}', this.value)">
-                      <button class="btn sm danger" onclick="removeBudgetPost('${item.id}')">✕</button>
+                      <input class="input small" type="number" inputmode="decimal" value="${Number(item.budget||0)}" onchange="updateBudgetAmount('${item.id}', this.value)">
                     </div>
                   </div>
                 `).join('')}
