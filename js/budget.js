@@ -1,11 +1,8 @@
 function renderBudget(){
-  ensureBudgetSelection();
   const total = budgetTotaal();
   const cats = orderedCats();
-  const selectedCatId = state.budgetSelectedCategoryId;
-  const selectedCat = cats.find(c => c.id === selectedCatId) || null;
-  const selectedItems = selectedCat ? itemsForCategory(selectedCat.id) : [];
   const remaining = budgetRemaining();
+
   const budgetHtml = state.budgetSubtab === 'inkomsten' ? `
     <div class="budget-income-layout">
       <div class="budget-overview-card card">
@@ -53,101 +50,78 @@ function renderBudget(){
       </div>
     </div>
 
-    <div class="budget-shell-grid ${selectedCat ? 'has-selection' : ''}">
-      <div class="budget-sidebar">
-        <div class="budget-section-head">
-          <div>
-            <div class="sec" style="margin:0">Categorieën</div>
-            <div class="budget-section-copy">Kies een categorie om posten te bekijken of aan te passen.</div>
-          </div>
-          <button class="btn secondary budget-small-btn" onclick="openBudgetComposer('category')">Nieuw</button>
-        </div>
+    <div class="stack">
+      ${cats.length ? cats.map(cat => {
+        const rows = itemsForCategory(cat.id);
+        const catTotal = totalForCategory(cat.id);
+        const count = rows.length;
 
-        <div class="budget-category-list">
-          ${cats.length ? cats.map(cat => {
-            const catTotal = totalForCategory(cat.id);
-            const count = postsCount(cat.id);
-            const topPosts = itemsForCategory(cat.id).slice(0,2);
-            const selected = selectedCatId === cat.id;
-            return `
-              <button class="budget-category-card ${selected ? 'active' : ''}" onclick="selectBudgetCategory('${cat.id}')">
-                <div class="budget-category-card-top">
-                  <div>
-                    <div class="budget-category-name">${escapeHtml(cat.naam)}</div>
-                    <div class="budget-category-sub">${count} ${count === 1 ? 'post' : 'posten'}</div>
-                  </div>
-                  <div class="budget-category-amount">${fmtShort(catTotal)}</div>
-                </div>
-                <div class="budget-category-progress"><div class="budget-category-progress-fill" style="width:${Math.min(100, budgetUsagePct(cat.id))}%"></div></div>
-                <div class="budget-category-preview">
-                  ${topPosts.length ? topPosts.map(p => `<span>${escapeHtml(p.post)}</span>`).join('') : '<span>Nog geen posten</span>'}
-                </div>
-              </button>
-            `;
-          }).join('') : `
-            <div class="card budget-empty-card">
-              <div class="budget-empty-title">Nog geen categorieën</div>
-              <div class="budget-empty-copy">Maak eerst een categorie aan. Daarna voeg je makkelijk posten en bedragen toe.</div>
-              <button class="btn" onclick="openBudgetComposer('category')">Eerste categorie</button>
+        return `
+          <div class="card budget-category-block">
+            <div class="budget-category-block-head">
+              <div>
+                <div class="budget-category-name">${escapeHtml(cat.naam)}</div>
+                <div class="budget-category-sub">${count} ${count === 1 ? 'post' : 'posten'} · ${fmt(catTotal)}</div>
+              </div>
+              <div class="budget-category-head-actions">
+                <button class="pill-btn" onclick="addBudgetPost('${cat.id}')">+ Post</button>
+                <button class="icon-btn" onclick="openBudgetComposer('category','${cat.id}')" title="Categorie wijzigen">✎</button>
+                <button class="icon-btn" onclick="removeCategory('${cat.id}')" title="Categorie verwijderen">✕</button>
+              </div>
             </div>
-          `}
-        </div>
-      </div>
 
-      <div class="budget-detail card">
-        ${selectedCat ? `
-          <div class="budget-detail-head">
-            <div>
-              <div class="budget-kicker">Geselecteerde categorie</div>
-              <div class="budget-detail-title">${escapeHtml(selectedCat.naam)}</div>
-              <div class="budget-detail-sub">${selectedItems.length} ${selectedItems.length === 1 ? 'post' : 'posten'} · ${fmt(totalForCategory(selectedCat.id))}</div>
+            <div class="budget-category-progress">
+              <div class="budget-category-progress-fill" style="width:${Math.min(100, budgetUsagePct(cat.id))}%"></div>
             </div>
-          </div>
 
-          ${selectedItems.length ? `
-            <div class="budget-line-list">
-              ${selectedItems.map(item => `
-                <div class="post-row budget-line-row" data-id="${item.id}" ontouchstart="swipeStart(event, '${item.id}')" ontouchmove="swipeMove(event, '${item.id}')" ontouchend="swipeEnd(event, '${item.id}')">
-                  <div class="swipe-delete-bg">
-                    <div class="swipe-action">
-                      <span class="swipe-action-icon">✕</span>
-                      <span class="swipe-action-label">Verwijder</span>
+            ${rows.length ? `
+              <div class="budget-line-list">
+                ${rows.map(item => `
+                  <div class="post-row budget-line-row" data-id="${item.id}" ontouchstart="swipeStart(event, '${item.id}')" ontouchmove="swipeMove(event, '${item.id}')" ontouchend="swipeEnd(event, '${item.id}')">
+                    <div class="swipe-delete-bg">
+                      <div class="swipe-action">
+                        <span class="swipe-action-icon">✕</span>
+                        <span class="swipe-action-label">Verwijder</span>
+                      </div>
+                    </div>
+
+                    <div class="post-row-content budget-line-content">
+                      <button class="budget-line-main" onclick="openBudgetComposer('post','${item.id}')">
+                        <span class="budget-line-name">${escapeHtml(item.post)}</span>
+                        <span class="budget-line-hint">Tik om te wijzigen</span>
+                      </button>
+
+                      <div class="budget-line-right">
+                        <button class="budget-chip" onclick="event.stopPropagation();quickAdjustBudget('${item.id}',-10)">-10</button>
+                        <button class="budget-chip" onclick="event.stopPropagation();quickAdjustBudget('${item.id}',10)">+10</button>
+                        <button class="budget-line-amount" onclick="event.stopPropagation();openBudgetComposer('post','${item.id}')">${fmt(item.budget)}</button>
+                        <button class="icon-btn" onclick="event.stopPropagation();removeBudgetPost('${item.id}')" title="Verwijder">✕</button>
+                      </div>
                     </div>
                   </div>
-                  <div class="post-row-content budget-line-content">
-                    <button class="budget-line-main" onclick="openBudgetComposer('post','${item.id}')">
-                      <span class="budget-line-name">${escapeHtml(item.post)}</span>
-                      <span class="budget-line-hint">Tik om te wijzigen</span>
-                    </button>
-                    <div class="budget-line-right">
-                      <button class="budget-chip" onclick="event.stopPropagation();quickAdjustBudget('${item.id}',-10)">-10</button>
-                      <button class="budget-chip" onclick="event.stopPropagation();quickAdjustBudget('${item.id}',10)">+10</button>
-                      <button class="budget-line-amount" onclick="event.stopPropagation();openBudgetComposer('post','${item.id}')">${fmt(item.budget)}</button>
-                      <button class="icon-btn" onclick="event.stopPropagation();removeBudgetPost('${item.id}')" title="Verwijder">✕</button>
-                    </div>
-                  </div>
-                </div>
-              `).join('')}
-            </div>
-          ` : `
-            <div class="budget-empty-state">
-              <div class="budget-empty-title">Nog geen posten in deze categorie</div>
-              <div class="budget-empty-copy">Voeg je eerste post toe, bijvoorbeeld huur, boodschappen of streaming.</div>
-              <button class="btn" onclick="openBudgetComposer('post', null, '${selectedCat.id}')">Eerste post toevoegen</button>
-            </div>
-          `}
-        ` : `
-          <div class="budget-empty-state budget-empty-state-large">
-            <div class="budget-empty-title">Kies een categorie</div>
-            <div class="budget-empty-copy">Selecteer links een categorie. Op iPhone staat de detailkaart automatisch onder de lijst.</div>
+                `).join('')}
+              </div>
+            ` : `
+              <div class="budget-empty-state">
+                <div class="budget-empty-title">Nog geen posten in deze categorie</div>
+                <div class="budget-empty-copy">Voeg je eerste post toe, bijvoorbeeld huur, boodschappen of streaming.</div>
+                <button class="btn" onclick="openBudgetComposer('post', null, '${cat.id}')">Eerste post toevoegen</button>
+              </div>
+            `}
           </div>
-        `}
-      </div>
+        `;
+      }).join('') : `
+        <div class="card budget-empty-card">
+          <div class="budget-empty-title">Nog geen categorieën</div>
+          <div class="budget-empty-copy">Maak eerst een categorie aan. Daarna voeg je makkelijk posten en bedragen toe.</div>
+          <button class="btn" onclick="openBudgetComposer('category')">Eerste categorie</button>
+        </div>
+      `}
     </div>
 
     <div class="budget-mobile-actions">
       <button class="btn secondary" onclick="openBudgetComposer('category')">+ Categorie</button>
-      <button class="btn" onclick="openBudgetComposer('post', null, state.budgetSelectedCategoryId)" ${selectedCat ? '' : 'disabled'}>+ Post</button>
+      <button class="btn" onclick="openFirstCategoryPostComposer()" ${cats.length ? '' : 'disabled'}>+ Post</button>
     </div>
   `;
 
@@ -210,16 +184,26 @@ function selectBudgetCategory(catId){
   renderBudget();
 }
 
+function openFirstCategoryPostComposer(){
+  const firstCat = orderedCats()[0];
+  if(!firstCat){
+    showToast('Maak eerst een categorie aan');
+    return;
+  }
+  openBudgetComposer('post', null, firstCat.id);
+}
+
 function openBudgetComposer(mode='category', targetId=null, categoryId=null){
-  ensureBudgetSelection();
   state.budgetComposerOpen = true;
   state.budgetComposerMode = mode;
   state.budgetComposerTargetId = targetId || null;
   state.budgetComposerCategoryId = categoryId || null;
+
   if(mode === 'post' && !state.budgetComposerCategoryId){
     const target = targetId ? state.budget.find(r => r.id === targetId) : null;
-    state.budgetComposerCategoryId = target?.categorieId || state.budgetSelectedCategoryId || orderedCats()[0]?.id || null;
+    state.budgetComposerCategoryId = target?.categorieId || orderedCats()[0]?.id || null;
   }
+
   renderBudgetComposer();
 }
 
@@ -234,25 +218,31 @@ function closeBudgetComposer(){
 function renderBudgetComposer(){
   const root = document.getElementById('budget-modal-root');
   if(!root) return;
+
   if(!state.budgetComposerOpen || state.currentView !== 'budget' || state.budgetSubtab !== 'categorieen'){
     root.innerHTML = '';
     return;
   }
+
   const mode = state.budgetComposerMode;
   const cats = orderedCats();
+
   const category = mode === 'category' && state.budgetComposerTargetId
     ? state.categorieen.find(c => c.id === state.budgetComposerTargetId)
     : null;
+
   const post = mode === 'post' && state.budgetComposerTargetId
     ? state.budget.find(r => r.id === state.budgetComposerTargetId)
     : null;
-  const currentCategoryId = post?.categorieId || state.budgetComposerCategoryId || state.budgetSelectedCategoryId || cats[0]?.id || '';
+
+  const currentCategoryId = post?.categorieId || state.budgetComposerCategoryId || cats[0]?.id || '';
+
   root.innerHTML = `
     <div class="budget-modal-backdrop" onclick="closeBudgetComposer()">
       <div class="budget-modal-sheet ${mode === 'post' ? 'post-mode' : 'category-mode'}" onclick="event.stopPropagation()">
         <div class="budget-modal-handle"></div>
         <div class="budget-modal-title">${mode === 'category' ? (category ? 'Categorie wijzigen' : 'Nieuwe categorie') : (post ? 'Post wijzigen' : 'Nieuwe post')}</div>
-        <div class="budget-modal-copy">${mode === 'category' ? 'Maak categorieën aan als blokken. De details pas je daarna per categorie aan.' : 'Maak een post aan of wijzig een bestaand bedrag zonder dat de pagina als een spreadsheet voelt.'}</div>
+        <div class="budget-modal-copy">${mode === 'category' ? 'Maak categorieën aan als blokken. De details pas je daarna per categorie aan.' : 'Maak een post aan of wijzig een bestaand bedrag snel en simpel.'}</div>
 
         ${mode === 'category' ? `
           <div class="stack">
@@ -287,7 +277,11 @@ function renderBudgetComposer(){
       </div>
     </div>
   `;
-  const focusId = mode === 'category' ? 'composer-category-name' : (post ? 'composer-post-amount' : 'composer-post-name');
+
+  const focusId = mode === 'category'
+    ? 'composer-category-name'
+    : (post ? 'composer-post-amount' : 'composer-post-name');
+
   setTimeout(()=>{
     const el = document.getElementById(focusId);
     if(el){
@@ -299,33 +293,38 @@ function renderBudgetComposer(){
 
 function saveBudgetComposer(){
   const mode = state.budgetComposerMode;
+
   if(mode === 'category'){
     const input = document.getElementById('composer-category-name');
     const name = (input?.value || '').trim();
+
     if(!name){
       showToast('Geef de categorie een naam');
       return;
     }
+
     if(state.budgetComposerTargetId){
       const cat = state.categorieen.find(c => c.id === state.budgetComposerTargetId);
       if(cat) cat.naam = name;
     }else{
       const newCat = { id: uid('cat'), naam: name, volgorde: state.categorieen.length + 1 };
       state.categorieen.push(newCat);
-      state.budgetSelectedCategoryId = newCat.id;
     }
   }else{
     const name = (document.getElementById('composer-post-name')?.value || '').trim();
     const amount = Number(document.getElementById('composer-post-amount')?.value || 0);
     const categoryId = document.getElementById('composer-post-category')?.value || state.budgetComposerCategoryId;
+
     if(!categoryId){
       showToast('Maak eerst een categorie aan');
       return;
     }
+
     if(!name){
       showToast('Geef de post een naam');
       return;
     }
+
     if(state.budgetComposerTargetId){
       const row = state.budget.find(r => r.id === state.budgetComposerTargetId);
       if(row){
@@ -342,8 +341,8 @@ function saveBudgetComposer(){
         volgorde: itemsForCategory(categoryId).length + 1
       });
     }
-    state.budgetSelectedCategoryId = categoryId;
   }
+
   normalizeData();
   persistLocal();
   closeBudgetComposer();
@@ -361,19 +360,20 @@ function removeCategory(catId){
   const cat = state.categorieen.find(c => c.id === catId);
   if(!cat) return;
   if(!confirm(`Categorie "${cat.naam}" verwijderen inclusief alle posten?`)) return;
+
   state.categorieen = state.categorieen.filter(c=>c.id!==catId);
   state.budget = state.budget.filter(r=>r.categorieId!==catId);
-  ensureBudgetSelection();
+
   persistLocal(); rerenderAll();
 }
 
 function toggleCategory(catId){ selectBudgetCategory(catId); }
 
-function allCategoriesOpen(){ return false; }
+function allCategoriesOpen(){ return true; }
 
 function toggleAllCategories(){}
 
-function addBudgetPost(catId){ openBudgetComposer('post', null, catId || state.budgetSelectedCategoryId); }
+function addBudgetPost(catId){ openBudgetComposer('post', null, catId); }
 
 function renameBudgetPost(id, value){
   const row = state.budget.find(r=>r.id===id); if(!row) return;
@@ -396,10 +396,13 @@ function removeBudgetPost(id){
   const row = state.budget.find(r=>r.id===id);
   if(!row) return;
   if(!confirm(`Post "${row.post}" verwijderen?`)) return;
+
   const catId = row.categorieId;
   state.budget = state.budget.filter(r=>r.id!==id);
+
   const rows = itemsForCategory(catId);
   rows.forEach((item, idx)=> item.volgorde = idx + 1);
+
   persistLocal(); rerenderAll();
 }
 
