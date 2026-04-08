@@ -61,28 +61,40 @@ body[data-theme="carbon"]{
   --shadow:0 10px 30px rgba(0,0,0,.38);
 }
 body[data-theme="sakura"]{
-  --bg:#fffafb;
-  --surface:#ffffff;
-  --surface2:#fff0f5;
-  --surface3:#ffe4ec;
-  --border:rgba(255,182,193,0.35);
-  --text:#2a1f24;
-  --muted:#8c6b75;
-  --accent:#ff6fa5;
-  --accent2:#ffb7d5;
-  --green:#ff8fb1;
-  --red:#ff5c8a;
-  --amber:#ffc2d1;
-  --shadow:0 10px 30px rgba(255,105,135,0.12);
-}
-body[data-theme="sakura"]{
+  color-scheme:dark;
+  --bg:#0b080d;
+  --surface:#151018;
+  --surface2:#1b1320;
+  --surface3:#261b2b;
+  --border:rgba(255,218,230,0.12);
+  --text:#fff7fb;
+  --muted:#c8b3bf;
+  --accent:#ff79b0;
+  --accent2:#ffd2e2;
+  --green:#7cf0c5;
+  --red:#ff7aa8;
+  --amber:#ffd27a;
+  --shadow:
+    0 24px 60px rgba(0,0,0,.55),
+    0 10px 28px rgba(0,0,0,.32),
+    0 0 30px rgba(255,121,176,.10);
   background:
-    radial-gradient(circle at 20% 20%, #ffe4ec 0%, transparent 40%),
-    radial-gradient(circle at 80% 30%, #ffd6e0 0%, transparent 40%),
-    #fffafb;
+    radial-gradient(circle at 18% 18%, rgba(255,150,200,.18) 0%, transparent 34%),
+    radial-gradient(circle at 84% 20%, rgba(255,210,230,.10) 0%, transparent 28%),
+    radial-gradient(circle at 50% 120%, rgba(255,115,175,.12) 0%, transparent 44%),
+    linear-gradient(180deg,#140d15 0%, #0b080d 58%, #09070b 100%);
 }
 body[data-theme="sakura"] .header{
-  background:linear-gradient(180deg,rgba(255,250,251,.96) 86%, rgba(255,250,251,0));
+  background:linear-gradient(180deg,rgba(14,10,15,.96) 0%, rgba(14,10,15,.82) 72%, rgba(14,10,15,0) 100%);
+  backdrop-filter:blur(18px) saturate(155%);
+}
+body[data-theme="sakura"] .title span,
+body[data-theme="sakura"] .cat-b,
+body[data-theme="sakura"] .category-total,
+body[data-theme="sakura"] .sq-val,
+body[data-theme="sakura"] .top3-amount{
+  color:#ffc6dc !important;
+  text-shadow:0 0 14px rgba(255,121,176,.18);
 }
 body[data-theme="sakura"] .card,
 body[data-theme="sakura"] .sq-bar,
@@ -90,51 +102,144 @@ body[data-theme="sakura"] .top3-row,
 body[data-theme="sakura"] .alloc-wrap,
 body[data-theme="sakura"] .loan-hero,
 body[data-theme="sakura"] .loan-stat,
-body[data-theme="sakura"] .loan-metric{
-  background:rgba(255,255,255,0.85);
-  backdrop-filter:blur(6px);
+body[data-theme="sakura"] .loan-metric,
+body[data-theme="sakura"] .insight-card,
+body[data-theme="sakura"] .premium-cat-card,
+body[data-theme="sakura"] .menu-sheet{
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.015)),
+    rgba(24,17,27,.82);
+  border:1px solid rgba(255,218,230,.12);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.06),
+    0 20px 44px rgba(0,0,0,.42),
+    0 0 22px rgba(255,121,176,.06);
+  backdrop-filter:blur(16px) saturate(145%);
+}
+body[data-theme="sakura"] .hero,
+body[data-theme="sakura"] .loan-hero{
+  background:
+    radial-gradient(circle at top right, rgba(255,154,197,.14), transparent 34%),
+    radial-gradient(circle at bottom left, rgba(255,215,232,.06), transparent 34%),
+    linear-gradient(135deg, rgba(33,24,36,.96), rgba(20,15,24,.96) 52%, rgba(15,11,18,.98));
+  border:1px solid rgba(255,197,219,.14);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.06),
+    0 24px 50px rgba(0,0,0,.46),
+    0 0 30px rgba(255,121,176,.09);
+}
+body[data-theme="sakura"] .hero::before{
+  background:radial-gradient(circle,rgba(255,137,187,.18) 0%, transparent 72%);
+}
+body[data-theme="sakura"] .hero-label,
+body[data-theme="sakura"] .hero-sub-label,
+body[data-theme="sakura"] .loan-stat-label,
+body[data-theme="sakura"] .alloc-val,
+body[data-theme="sakura"] .category-meta,
+body[data-theme="sakura"] .cat-meta,
+body[data-theme="sakura"] .sq-label,
+body[data-theme="sakura"] .sq-note,
+body[data-theme="sakura"] .top3-sub,
+body[data-theme="sakura"] .note,
+body[data-theme="sakura"] .muted{
+  color:var(--muted) !important;
+}
+body[data-theme="sakura"] .hero-sub-val,
+body[data-theme="sakura"] .loan-hero-pct{
+  color:#ffd4e3 !important;
+  text-shadow:0 0 18px rgba(255,121,176,.18) !important;
+}
+body[data-theme="sakura"] .hero-amount.pos{
+  color:var(--green);
+  text-shadow:0 0 16px rgba(124,240,197,.26);
+}
+body[data-theme="sakura"] .hero-amount.neg{
+  color:var(--red);
+  text-shadow:0 0 16px rgba(255,122,168,.28);
 }
 body[data-theme="sakura"] .btn,
-body[data-theme="sakura"] .loan-save,
 body[data-theme="sakura"] .loan-addpay{
-  background:#fff0f5;
-  color:var(--text);
-  border:1px solid rgba(255,182,193,0.4);
+  background:linear-gradient(135deg,#ff78b0 0%, #e45f9a 48%, #b44d82 100%);
+  color:#fff8fb;
+  border:1px solid rgba(255,215,229,.14);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.16),
+    0 14px 28px rgba(180,77,130,.28),
+    0 0 20px rgba(255,121,176,.12);
 }
 body[data-theme="sakura"] .btn.secondary,
 body[data-theme="sakura"] .pill-btn,
 body[data-theme="sakura"] .collapse-btn,
 body[data-theme="sakura"] .badge-btn,
-body[data-theme="sakura"] .loan-edit-btn{
-  background:#fff0f5;
+body[data-theme="sakura"] .loan-edit-btn,
+body[data-theme="sakura"] .icon-btn,
+body[data-theme="sakura"] .swipe-mini-btn,
+body[data-theme="sakura"] .menu-btn,
+body[data-theme="sakura"] .loan-save{
+  background:linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.015)), rgba(27,19,32,.92);
   color:var(--text);
-  border:1px solid rgba(255,182,193,0.4);
+  border:1px solid rgba(255,218,230,.12);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
+}
+body[data-theme="sakura"] .btn.ghost{
+  background:rgba(255,121,176,.08);
+  border:1px solid rgba(255,169,205,.2);
+  color:#ffd7e5;
 }
 body[data-theme="sakura"] .input,
 body[data-theme="sakura"] .subtab,
-body[data-theme="sakura"] .post-row .input{
-  background:#fff;
-  border:1px solid rgba(255,182,193,0.4);
+body[data-theme="sakura"] .post-row .input,
+body[data-theme="sakura"] .category-inner,
+body[data-theme="sakura"] .post-row{
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)),
+    rgba(18,13,22,.9);
+  border:1px solid rgba(255,218,230,.10);
   color:var(--text);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
 }
-body[data-theme="sakura"] .hero{
-  background:linear-gradient(135deg,#fff7fa,#ffeaf2,#fffafb);
-  border:1px solid rgba(255,182,193,0.35);
+body[data-theme="sakura"] .tab.active,
+body[data-theme="sakura"] .subtab.active{
+  background:linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.02)), rgba(31,22,36,.96);
+  border-color:rgba(255,195,218,.16);
+  color:var(--text);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.06),
+    0 10px 22px rgba(0,0,0,.24),
+    0 0 16px rgba(255,121,176,.08);
 }
-body[data-theme="sakura"] .hero-sub-val,
-body[data-theme="sakura"] .cat-b,
-body[data-theme="sakura"] .category-total,
-body[data-theme="sakura"] .sq-val,
-body[data-theme="sakura"] .top3-amount,
-body[data-theme="sakura"] .loan-hero-pct{
-  color:#ff5c8a !important;
-  text-shadow:none !important;
+body[data-theme="sakura"] .prog,
+body[data-theme="sakura"] .track,
+body[data-theme="sakura"] .alloc-bar{
+  background:rgba(255,255,255,.05);
 }
 body[data-theme="sakura"] .prog-fill,
 body[data-theme="sakura"] .fill,
 body[data-theme="sakura"] .alloc-fill{
-  background:linear-gradient(90deg,#ff9ec0,#ff6fa5,#ffc2d1) !important;
-  box-shadow:none !important;
+  background:linear-gradient(90deg,#ffd8e5 0%, #ff8dbd 38%, #ff6fa7 65%, #d95b91 100%) !important;
+  box-shadow:
+    0 0 12px rgba(255,121,176,.26),
+    0 0 24px rgba(255,121,176,.12) !important;
+}
+body[data-theme="sakura"] .loan-percent-badge,
+body[data-theme="sakura"] .loan-hero-pct{
+  background:linear-gradient(90deg,#ffe1eb 0%, #ff9dc7 50%, #ff74ab 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent !important;
+  text-shadow:none !important;
+}
+body[data-theme="sakura"] .swipe-delete-bg{
+  background:linear-gradient(135deg,rgba(255,122,168,.18),rgba(255,122,168,.08));
+}
+body[data-theme="sakura"] .premium-cat-card::after{
+  background:radial-gradient(circle,rgba(255,210,228,.10),transparent 70%);
+}
+body[data-theme="sakura"] .menu-handle{
+  background:rgba(255,218,230,.14);
+}
+body[data-theme="sakura"] #menu-overlay{
+  background:rgba(6,4,8,.58);
 }
 #sakura-layer{
   position:fixed;
@@ -150,26 +255,21 @@ body[data-theme="sakura"] #sakura-layer{
 .sakura-petal{
   position:absolute;
   top:-40px;
-  width:14px;
-  height:14px;
-  background:radial-gradient(circle at 30% 30%, #fff7fb 0%, #ffd6e6 40%, #ffb3cf 100%);
-  border-radius:70% 0 70% 0;
-  opacity:.75;
-  filter:drop-shadow(0 2px 4px rgba(255,105,135,.18));
+  width:12px;
+  height:12px;
+  background:radial-gradient(circle at 30% 30%, #fff9fc 0%, #ffdce9 45%, #ffb4cf 100%);
+  border-radius:72% 0 72% 0;
+  opacity:.42;
+  filter:blur(.2px) drop-shadow(0 2px 6px rgba(255,105,135,.18));
+  mix-blend-mode:screen;
   animation-name:sakuraFall;
   animation-timing-function:linear;
   animation-iteration-count:infinite;
 }
 @keyframes sakuraFall{
-  0%{transform:translate3d(0,0,0) rotate(0deg); opacity:0}
-  10%{opacity:.8}
-  100%{transform:translate3d(var(--drift,40px),110vh,0) rotate(360deg); opacity:.15}
-}
-
-  --bg:#0c0f12;--surface:#14181d;--surface2:#1b2128;--surface3:#252c35;
-  --border:rgba(255,255,255,0.08);--text:#eef2f5;--muted:#8b96a3;
-  --accent:#8fa3b8;--accent2:#6f879b;--green:#87a98a;--red:#c98787;--amber:#b89a6a;
-  --shadow:0 10px 30px rgba(0,0,0,.24);
+  0%{transform:translate3d(0,0,0) rotate(0deg) scale(.9); opacity:0}
+  12%{opacity:.46}
+  100%{transform:translate3d(var(--drift,40px),110vh,0) rotate(360deg) scale(1.08); opacity:.08}
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{scroll-behavior:smooth}
@@ -509,7 +609,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 
 </style>
 </head>
-<body>
+<body data-theme="midnight">
 <div id="sakura-layer"></div>
 <div class="shell" id="app-shell" ontouchstart="appSwipeStart(event)" ontouchmove="appSwipeMove(event)" ontouchend="appSwipeEnd(event)">
   <div class="header">
@@ -1028,18 +1128,50 @@ function syncSakuraPetals(){
     layer.appendChild(petal);
   }
 }
-function applyTheme(theme){
-  document.body.setAttribute('data-theme', theme || 'midnight');
-  try{ localStorage.setItem('bv_theme', theme || 'midnight'); }catch(e){}
+const THEME_KEY = 'bv_theme_pref_v2';
+const LEGACY_THEME_KEY = 'bv_theme';
+const THEME_COLORS = {
+  midnight:'#0a0a0f',
+  carbon:'#101214',
+  sakura:'#140d15'
+};
+const ALLOWED_THEMES = new Set(['midnight','carbon','sakura']);
+
+function updateThemeMeta(theme){
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if(meta) meta.setAttribute('content', THEME_COLORS[theme] || THEME_COLORS.midnight);
+}
+
+function getStoredTheme(){
+  try{
+    const stored = localStorage.getItem(THEME_KEY);
+    const legacy = localStorage.getItem(LEGACY_THEME_KEY);
+    const resolved = stored || legacy || 'midnight';
+    if(ALLOWED_THEMES.has(resolved)){
+      if(!stored) localStorage.setItem(THEME_KEY, resolved);
+      return resolved;
+    }
+  }catch(e){}
+  return 'midnight';
+}
+
+function applyTheme(theme, options = {}){
+  const resolved = ALLOWED_THEMES.has(theme) ? theme : 'midnight';
+  const shouldPersist = options.persist !== false;
+  document.body.setAttribute('data-theme', resolved);
+  document.documentElement.style.colorScheme = 'dark';
+  updateThemeMeta(resolved);
+  if(shouldPersist){
+    try{
+      localStorage.setItem(THEME_KEY, resolved);
+      localStorage.setItem(LEGACY_THEME_KEY, resolved);
+    }catch(e){}
+  }
   syncSakuraPetals();
 }
+
 function loadTheme(){
-  try{
-    const theme = localStorage.getItem('bv_theme') || 'midnight';
-    applyTheme(theme);
-  }catch(e){
-    applyTheme('midnight');
-  }
+  applyTheme(getStoredTheme(), { persist:false });
 }
 
 function renderInstellingen(){
@@ -1048,7 +1180,7 @@ function renderInstellingen(){
     <div class="card">
       <div class="sec" style="margin-top:0">Weergave</div>
       <div class="settings-list">
-        <div class="note">Kies een stijl voor je app.</div>
+        <div class="note">Kies één theme voor dit apparaat. Je keuze blijft opgeslagen totdat je het zelf aanpast.</div>
         <select class="input" onchange="applyTheme(this.value)" style="appearance:none">
           <option value="midnight" ${currentTheme==='midnight'?'selected':''}>Midnight RGB</option>
           <option value="carbon" ${currentTheme==='carbon'?'selected':''}>Carbon</option>
@@ -1233,6 +1365,9 @@ async function init(){
 }
 loadTheme();
 window.addEventListener('resize', syncSakuraPetals);
+window.addEventListener('storage', (e)=>{
+  if(e.key === THEME_KEY || e.key === LEGACY_THEME_KEY) loadTheme();
+});
 init();
 </script>
 </body>
