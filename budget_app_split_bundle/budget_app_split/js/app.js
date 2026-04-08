@@ -1,4 +1,4 @@
-function init(){
+async function init(){
   restoreLocal();
   normalizeData();
   rerenderAll();

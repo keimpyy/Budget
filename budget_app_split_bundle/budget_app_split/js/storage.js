@@ -20,18 +20,18 @@ function restoreLocal(){
   }catch(e){}
 }
 
-function safeJson(res){
+async function safeJson(res){
   const text = await res.text();
   try { return JSON.parse(text); }
   catch(e){ return { ok:false, error:'Parse fout', raw:text.slice(0,200) }; }
 }
 
-function sheetsGet(){
+async function sheetsGet(){
   const res = await fetch(state.sheetsUrl + '?action=getAll', { redirect:'follow' });
   return safeJson(res);
 }
 
-function sheetsPost(data){
+async function sheetsPost(data){
   const res = await fetch(state.sheetsUrl, { method:'POST', redirect:'follow', body: JSON.stringify(data) });
   return safeJson(res);
 }
@@ -90,7 +90,7 @@ function toRows(){
   };
 }
 
-function applySheets(data){
+async function loadFromSheets(){
   if(data.inkomsten) state.inkomsten = data.inkomsten.map(r=>({ naam: String(r.naam || ''), bedrag: Number(r.bedrag || 0) }));
   if(data.categorieen) state.categorieen = data.categorieen.map((r,i)=>({ id: String(r.id || uid('cat')), naam: String(r.naam || ''), volgorde: Number(r.volgorde || (i+1)) }));
   if(data.budget) state.budget = data.budget.map((r,i)=>({ id: String(r.id || uid('bud')), categorieId: String(r.categorieId || ''), post: String(r.post || ''), budget: Number(r.budget || 0), volgorde: Number(r.volgorde || (i+1)) }));
@@ -100,7 +100,7 @@ function applySheets(data){
   rerenderAll();
 }
 
-function loadFromSheets(){
+async function loadFromSheets(){
   const saveStatus = document.getElementById('save-status');
   if(saveStatus) saveStatus.textContent = 'Ophalen...';
   try{
@@ -119,7 +119,7 @@ function loadFromSheets(){
   }
 }
 
-function saveToSheets(){
+async function saveToSheets(){
   const status = document.getElementById('save-status');
   if(status) status.textContent = 'Opslaan...';
   try{
