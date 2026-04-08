@@ -1,5 +1,4 @@
 const THEME_KEY = 'bv_theme_pref_v2';
-
 const LEGACY_THEME_KEY = 'bv_theme';
 
 const THEME_COLORS = {
@@ -31,11 +30,14 @@ function getStoredTheme(){
 function syncThemeSelection(theme){
   const root = document.getElementById('v-instellingen');
   if(!root || !root.children.length) return;
+
   const themeLabel = theme === 'midnight' ? 'Midnight RGB' : theme === 'carbon' ? 'Carbon' : 'Sakura v2';
   const badge = root.querySelector('.settings-badge');
   const value = root.querySelector('.current-theme-value');
+
   if(badge) badge.textContent = themeLabel;
   if(value) value.textContent = themeLabel;
+
   root.querySelectorAll('.theme-tile').forEach(tile => {
     const tileTheme = tile.getAttribute('data-theme');
     const active = tileTheme === theme;
@@ -47,16 +49,22 @@ function syncThemeSelection(theme){
 function applyTheme(theme, options = {}){
   const resolved = ALLOWED_THEMES.has(theme) ? theme : 'midnight';
   const shouldPersist = options.persist !== false;
+
   document.body.setAttribute('data-theme', resolved);
   document.documentElement.style.colorScheme = 'dark';
   updateThemeMeta(resolved);
+
   if(shouldPersist){
     try{
       localStorage.setItem(THEME_KEY, resolved);
       localStorage.setItem(LEGACY_THEME_KEY, resolved);
     }catch(e){}
   }
-  syncSakuraPetals();
+
+  if(typeof syncSakuraPetals === 'function'){
+    syncSakuraPetals();
+  }
+
   syncThemeSelection(resolved);
 }
 
@@ -132,7 +140,7 @@ function renderInstellingen(){
             <span class="settings-row-note">Gebruik ophalen of opslaan wanneer jij zelf wilt syncen.</span>
           </span>
         </div>
-        <div class="settings-endpoint mono">${escapeHtml(state.sheetsUrl)}</div>
+        <div class="settings-endpoint mono">${typeof escapeHtml === 'function' ? escapeHtml(state.sheetsUrl || '') : (state.sheetsUrl || '')}</div>
         <div class="settings-actions-grid">
           <button class="btn secondary" onclick="loadFromSheets()">Ophalen</button>
           <button class="btn" onclick="saveToSheets()">Opslaan</button>
@@ -159,4 +167,17 @@ function cycleTheme(){
   const current = document.body.getAttribute('data-theme') || 'midnight';
   const idx = order.indexOf(current);
   applyTheme(order[(idx + 1) % order.length]);
+}
+
+function renderSettings(){
+  renderInstellingen();
+}
+
+function closeSettings(){
+  const budgetBtn = document.querySelector('.tabs .tab:nth-child(2)');
+  if(budgetBtn){
+    go('budget', budgetBtn);
+  }else{
+    go('budget');
+  }
 }
