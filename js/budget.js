@@ -1,154 +1,227 @@
-function renderBudget(){
+function renderBudget() {
   const total = budgetTotaal();
   const cats = orderedCats();
   const remaining = budgetRemaining();
+  const incomeView = state.budgetSubtab === 'inkomsten';
 
-  const budgetHtml = state.budgetSubtab === 'inkomsten' ? `
-    <div class="budget-income-layout">
-      <div class="budget-overview-card card">
-        <div class="budget-overview-top">
-          <div>
-            <div class="budget-kicker">Inkomsten</div>
-            <div class="budget-overview-amount">${fmt(inkomstenTotaal())}</div>
-          </div>
-          <button class="btn secondary budget-small-btn" onclick="addIncomeRow()">+ Inkomst</button>
-        </div>
-        <div class="budget-overview-meta">
-          <span>${state.inkomsten.length} bronnen</span>
-          <span>${remaining >= 0 ? 'Ruimte over' : 'Tekort'}: ${fmt(Math.abs(remaining))}</span>
-        </div>
-      </div>
-
-      <div class="stack">
-        ${state.inkomsten.map((r, idx)=>`
-          <div class="card income-row-card">
-            <div class="income-row-head">
-              <input class="input" value="${escapeHtml(r.naam)}" onchange="updateIncomeName(${idx}, this.value)" placeholder="Naam inkomen">
-              <button class="icon-btn" onclick="removeIncomeRow(${idx})" title="Verwijder">✕</button>
-            </div>
-            <div class="income-amount-row">
-              <div class="budget-inline-label">Bedrag per maand</div>
-              <input class="input income-amount-input" type="number" inputmode="decimal" value="${Number(r.bedrag||0)}" onchange="updateIncomeAmount(${idx}, this.value)">
-            </div>
-          </div>
-        `).join('')}
-      </div>
-    </div>
-  ` : `
-    <div class="budget-overview-card card">
-      <div class="budget-overview-top">
-        <div>
-          <div class="budget-kicker">Budget planner</div>
-          <div class="budget-overview-amount">${fmt(total)}</div>
-        </div>
-        <button class="btn budget-primary-btn" onclick="openBudgetComposer('category')">+ Categorie</button>
-      </div>
-      <div class="budget-overview-meta">
-        <span>${cats.length} categorieën</span>
-        <span>${state.budget.length} posten</span>
-        <span style="color:${remaining>=0?'var(--green)':'var(--red)'}">${remaining>=0?'Over':'Tekort'} ${fmt(Math.abs(remaining))}</span>
-      </div>
-    </div>
-
-    <div class="stack">
-      ${cats.length ? cats.map(cat => {
-        const rows = itemsForCategory(cat.id);
-        const catTotal = totalForCategory(cat.id);
-        const count = rows.length;
-
-        return `
-          <div class="card budget-category-block">
-            <div class="budget-category-block-head">
-              <div>
-                <div class="budget-category-name">${escapeHtml(cat.naam)}</div>
-                <div class="budget-category-sub">${count} ${count === 1 ? 'post' : 'posten'} · ${fmt(catTotal)}</div>
-              </div>
-              <div class="budget-category-head-actions">
-                <button class="pill-btn" onclick="addBudgetPost('${cat.id}')">+ Post</button>
-                <button class="icon-btn" onclick="openBudgetComposer('category','${cat.id}')" title="Categorie wijzigen">✎</button>
-                <button class="icon-btn" onclick="removeCategory('${cat.id}')" title="Categorie verwijderen">✕</button>
+  const incomeHtml = `
+    <section class="budget-page">
+      <div class="budget-shell budget-shell--single">
+        <div class="budget-main">
+          <section class="card budget-hero">
+            <div class="budget-hero__content">
+              <div class="budget-kicker">Inkomsten</div>
+              <div class="budget-hero__amount">${fmt(inkomstenTotaal())}</div>
+              <div class="budget-hero__meta">
+                <span>${state.inkomsten.length} bronnen</span>
+                <span class="${remaining >= 0 ? 'is-positive' : 'is-negative'}">
+                  ${remaining >= 0 ? 'Ruimte over' : 'Tekort'}: ${fmt(Math.abs(remaining))}
+                </span>
               </div>
             </div>
-
-            <div class="budget-category-progress">
-              <div class="budget-category-progress-fill" style="width:${Math.min(100, budgetUsagePct(cat.id))}%"></div>
+            <div class="budget-hero__actions">
+              <button class="btn" onclick="addIncomeRow()">+ Inkomst</button>
             </div>
+          </section>
 
-            ${rows.length ? `
-              <div class="budget-line-list">
-                ${rows.map(item => `
-                  <div class="post-row budget-line-row" data-id="${item.id}" ontouchstart="swipeStart(event, '${item.id}')" ontouchmove="swipeMove(event, '${item.id}')" ontouchend="swipeEnd(event, '${item.id}')">
-                    <div class="swipe-delete-bg">
-                      <div class="swipe-action">
-                        <span class="swipe-action-icon">✕</span>
-                        <span class="swipe-action-label">Verwijder</span>
-                      </div>
-                    </div>
+          <section class="budget-list">
+            ${state.inkomsten.map((r, idx) => `
+              <article class="card budget-item budget-item--income">
+                <div class="budget-item__main">
+                  <label class="budget-field">
+                    <span class="budget-field__label">Naam</span>
+                    <input
+                      class="input"
+                      value="${escapeHtml(r.naam)}"
+                      onchange="updateIncomeName(${idx}, this.value)"
+                      placeholder="Naam inkomen"
+                    >
+                  </label>
 
-                    <div class="post-row-content budget-line-content">
-                      <button class="budget-line-main" onclick="openBudgetComposer('post','${item.id}')">
-                        <span class="budget-line-name">${escapeHtml(item.post)}</span>
-                        <span class="budget-line-hint">Tik om te wijzigen</span>
-                      </button>
+                  <label class="budget-field budget-field--amount">
+                    <span class="budget-field__label">Bedrag per maand</span>
+                    <input
+                      class="input"
+                      type="number"
+                      inputmode="decimal"
+                      value="${Number(r.bedrag || 0)}"
+                      onchange="updateIncomeAmount(${idx}, this.value)"
+                    >
+                  </label>
+                </div>
 
-                      <div class="budget-line-right">
-                        <button class="budget-chip" onclick="event.stopPropagation();quickAdjustBudget('${item.id}',-10)">-10</button>
-                        <button class="budget-chip" onclick="event.stopPropagation();quickAdjustBudget('${item.id}',10)">+10</button>
-                        <button class="budget-line-amount" onclick="event.stopPropagation();openBudgetComposer('post','${item.id}')">${fmt(item.budget)}</button>
-                        <button class="icon-btn" onclick="event.stopPropagation();removeBudgetPost('${item.id}')" title="Verwijder">✕</button>
-                      </div>
-                    </div>
-                  </div>
-                `).join('')}
-              </div>
-            ` : `
-              <div class="budget-empty-state">
-                <div class="budget-empty-title">Nog geen posten in deze categorie</div>
-                <div class="budget-empty-copy">Voeg je eerste post toe, bijvoorbeeld huur, boodschappen of streaming.</div>
-                <button class="btn" onclick="openBudgetComposer('post', null, '${cat.id}')">Eerste post toevoegen</button>
-              </div>
-            `}
-          </div>
-        `;
-      }).join('') : `
-        <div class="card budget-empty-card">
-          <div class="budget-empty-title">Nog geen categorieën</div>
-          <div class="budget-empty-copy">Maak eerst een categorie aan. Daarna voeg je makkelijk posten en bedragen toe.</div>
-          <button class="btn" onclick="openBudgetComposer('category')">Eerste categorie</button>
+                <div class="budget-item__actions">
+                  <button class="icon-btn" onclick="removeIncomeRow(${idx})" title="Verwijder">✕</button>
+                </div>
+              </article>
+            `).join('')}
+          </section>
         </div>
-      `}
-    </div>
 
-    <div class="budget-mobile-actions">
-      <button class="btn secondary" onclick="openBudgetComposer('category')">+ Categorie</button>
-      <button class="btn" onclick="openFirstCategoryPostComposer()" ${cats.length ? '' : 'disabled'}>+ Post</button>
-    </div>
+        <aside class="budget-sidebar">
+          ${renderBudgetSummaryCard(total, remaining)}
+        </aside>
+      </div>
+    </section>
+  `;
+
+  const categoriesHtml = `
+    <section class="budget-page">
+      <div class="budget-shell">
+        <div class="budget-main">
+          <section class="card budget-hero">
+            <div class="budget-hero__content">
+              <div class="budget-kicker">Budget planner</div>
+              <div class="budget-hero__amount">${fmt(total)}</div>
+              <div class="budget-hero__meta">
+                <span>${cats.length} categorieën</span>
+                <span>${state.budget.length} posten</span>
+                <span class="${remaining >= 0 ? 'is-positive' : 'is-negative'}">
+                  ${remaining >= 0 ? 'Over' : 'Tekort'} ${fmt(Math.abs(remaining))}
+                </span>
+              </div>
+            </div>
+            <div class="budget-hero__actions">
+              <button class="btn" onclick="openBudgetComposer('category')">+ Categorie</button>
+            </div>
+          </section>
+
+          ${
+            cats.length
+              ? `<section class="budget-category-list">
+                  ${cats.map(cat => {
+                    const rows = itemsForCategory(cat.id);
+                    const catTotal = totalForCategory(cat.id);
+                    const count = rows.length;
+                    const pct = Math.min(100, budgetUsagePct(cat.id));
+
+                    return `
+                      <article class="card budget-category-card">
+                        <header class="budget-category-card__head">
+                          <div class="budget-category-card__titlewrap">
+                            <h3 class="budget-category-card__title">${escapeHtml(cat.naam)}</h3>
+                            <div class="budget-category-card__meta">
+                              ${count} ${count === 1 ? 'post' : 'posten'} · ${fmt(catTotal)}
+                            </div>
+                          </div>
+
+                          <div class="budget-category-card__actions">
+                            <button class="pill-btn" onclick="addBudgetPost('${cat.id}')">+ Post</button>
+                            <button class="icon-btn" onclick="openBudgetComposer('category','${cat.id}')" title="Categorie wijzigen">✎</button>
+                            <button class="icon-btn" onclick="removeCategory('${cat.id}')" title="Categorie verwijderen">✕</button>
+                          </div>
+                        </header>
+
+                        <div class="budget-progress" aria-hidden="true">
+                          <div class="budget-progress__fill" style="width:${pct}%"></div>
+                        </div>
+
+                        ${
+                          rows.length
+                            ? `<div class="budget-post-list">
+                                ${rows.map(item => `
+                                  <article
+                                    class="budget-post-card"
+                                    data-id="${item.id}"
+                                    ontouchstart="swipeStart(event, '${item.id}')"
+                                    ontouchmove="swipeMove(event, '${item.id}')"
+                                    ontouchend="swipeEnd(event, '${item.id}')"
+                                  >
+                                    <div class="swipe-delete-bg">
+                                      <div class="swipe-action">
+                                        <span class="swipe-action-icon">✕</span>
+                                        <span class="swipe-action-label">Verwijder</span>
+                                      </div>
+                                    </div>
+
+                                    <div class="budget-post-card__content">
+                                      <button class="budget-post-card__main" onclick="openBudgetComposer('post','${item.id}')">
+                                        <span class="budget-post-card__name">${escapeHtml(item.post)}</span>
+                                        <span class="budget-post-card__hint">Tik om te wijzigen</span>
+                                      </button>
+
+                                      <div class="budget-post-card__right">
+                                        <div class="budget-post-card__quick">
+                                          <button class="budget-chip" onclick="event.stopPropagation();quickAdjustBudget('${item.id}',-10)">-10</button>
+                                          <button class="budget-chip" onclick="event.stopPropagation();quickAdjustBudget('${item.id}',10)">+10</button>
+                                        </div>
+
+                                        <button class="budget-post-card__amount" onclick="event.stopPropagation();openBudgetComposer('post','${item.id}')">
+                                          ${fmt(item.budget)}
+                                        </button>
+
+                                        <button class="icon-btn" onclick="event.stopPropagation();removeBudgetPost('${item.id}')" title="Verwijder">✕</button>
+                                      </div>
+                                    </div>
+                                  </article>
+                                `).join('')}
+                              </div>`
+                            : `
+                              <div class="budget-empty-state">
+                                <div class="budget-empty-title">Nog geen posten in deze categorie</div>
+                                <div class="budget-empty-copy">Voeg je eerste post toe, bijvoorbeeld huur, boodschappen of streaming.</div>
+                                <button class="btn" onclick="openBudgetComposer('post', null, '${cat.id}')">Eerste post toevoegen</button>
+                              </div>
+                            `
+                        }
+                      </article>
+                    `;
+                  }).join('')}
+                </section>`
+              : `
+                <section class="card budget-empty-card">
+                  <div class="budget-empty-title">Nog geen categorieën</div>
+                  <div class="budget-empty-copy">Maak eerst een categorie aan. Daarna voeg je makkelijk posten en bedragen toe.</div>
+                  <button class="btn" onclick="openBudgetComposer('category')">Eerste categorie</button>
+                </section>
+              `
+          }
+        </div>
+
+        <aside class="budget-sidebar">
+          ${renderBudgetSummaryCard(total, remaining)}
+        </aside>
+      </div>
+
+      <div class="budget-mobile-bar">
+        <button class="btn secondary" onclick="openBudgetComposer('category')">+ Categorie</button>
+        <button class="btn" onclick="openFirstCategoryPostComposer()" ${cats.length ? '' : 'disabled'}>+ Post</button>
+      </div>
+    </section>
   `;
 
   document.getElementById('v-budget').innerHTML = `
-    <div class="subtabs">
-      <button class="subtab ${state.budgetSubtab==='inkomsten'?'active':''}" onclick="setBudgetSubtab('inkomsten')">Inkomsten</button>
-      <button class="subtab ${state.budgetSubtab==='categorieen'?'active':''}" onclick="setBudgetSubtab('categorieen')">Categorieën / Uitgaven</button>
+    <div class="subtabs budget-subtabs">
+      <button class="subtab ${incomeView ? 'active' : ''}" onclick="setBudgetSubtab('inkomsten')">Inkomsten</button>
+      <button class="subtab ${!incomeView ? 'active' : ''}" onclick="setBudgetSubtab('categorieen')">Categorieën / Uitgaven</button>
     </div>
-    ${budgetHtml}
-    <div class="card budget-summary-card">
-      <div class="row">
-        <div style="font-weight:700">Totaal budget</div>
-        <div class="mono" style="color:var(--accent)">${fmt(total)}</div>
-      </div>
-      <div class="row" style="margin-top:8px">
-        <div class="muted">Overschot</div>
-        <div class="mono" style="color:${remaining>=0?'var(--green)':'var(--red)'}">${fmt(remaining)}</div>
-      </div>
-      <div class="stack" style="margin-top:14px">
-        <button class="btn" onclick="saveToSheets()">☁️ Opslaan in Sheets</button>
-        <button class="btn secondary" onclick="loadFromSheets()">↻ Opnieuw ophalen</button>
-      </div>
-      <div id="save-status" class="note" style="margin-top:10px"></div>
-    </div>
+    ${incomeView ? incomeHtml : categoriesHtml}
   `;
 
   renderBudgetComposer();
+}
+
+function renderBudgetSummaryCard(total, remaining) {
+  return `
+    <section class="card budget-summary-card">
+      <div class="budget-summary-card__row">
+        <span class="budget-summary-card__label">Totaal budget</span>
+        <strong class="mono budget-summary-card__value budget-summary-card__value--accent">${fmt(total)}</strong>
+      </div>
+
+      <div class="budget-summary-card__row">
+        <span class="budget-summary-card__label muted">Overschot</span>
+        <strong class="mono budget-summary-card__value ${remaining >= 0 ? 'is-positive' : 'is-negative'}">${fmt(remaining)}</strong>
+      </div>
+
+      <div class="budget-summary-card__actions">
+        <button class="btn" onclick="saveToSheets()">☁️ Opslaan in Sheets</button>
+        <button class="btn secondary" onclick="loadFromSheets()">↻ Opnieuw ophalen</button>
+      </div>
+
+      <div id="save-status" class="note budget-summary-card__note"></div>
+    </section>
+  `;
 }
 
 function updateIncomeName(idx, value){

@@ -1,2 +1,113 @@
-/* Opgesplitste plek voor extra styles. De app werkt al volledig via base.css.
-   Je kunt later selectors vanuit base.css hierheen verplaatsen per onderdeel. */
+/* Split from base.css: shared components and interactions */
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:14px 16px;margin-bottom:10px;box-shadow:var(--shadow);transition:transform .15s ease, opacity .15s ease}
+.card.dragging{opacity:.45;transform:scale(.985)}
+.cat-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px}
+.cat-name{font-size:15px;font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cat-b{font-family:monospace;font-size:14px;font-weight:600;color:var(--accent)}
+.cat-meta{font-size:11px;color:var(--muted);margin-top:3px}
+.prog{background:var(--surface3);border-radius:99px;height:5px;overflow:hidden}
+.prog-fill{height:100%;border-radius:99px;background:var(--accent)}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.input{font-size:16px!important;background:var(--surface2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:inherit;padding:10px 14px;width:100%;outline:none}
+.input.small{width:110px;text-align:right;font-family:monospace}
+.btn{background:linear-gradient(135deg,var(--accent),#9b8af7);border:none;border-radius:14px;color:#fff;font-family:inherit;font-size:15px;font-weight:700;padding:14px 16px;cursor:pointer}
+.btn.secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.btn.ghost{background:transparent;color:var(--accent);border:1px solid rgba(124,106,247,.35)}
+.btn.danger{background:rgba(255,107,107,.14);color:var(--red);border:1px solid rgba(255,107,107,.25)}
+.btn.sm{padding:8px 10px;border-radius:10px;font-size:12px}
+.stack{display:flex;flex-direction:column;gap:8px}
+.inline{display:flex;gap:8px;align-items:center}
+.muted{color:var(--muted)}
+.mono{font-family:monospace}
+.post-row{position:relative;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:8px;transition:transform .2s ease}
+.post-row.swiping{transition:none}
+.post-row-content{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;z-index:2}
+.swipe-delete-bg{position:absolute;inset:0;border-radius:12px;background:linear-gradient(135deg,rgba(255,107,107,.16),rgba(255,107,107,.08));display:flex;align-items:center;justify-content:flex-end;padding-right:16px;color:var(--red);font-size:12px;font-weight:800;opacity:0;transition:opacity .15s ease;z-index:1}
+.post-row.reveal-delete .swipe-delete-bg{opacity:1}
+
+.icon-btn{width:38px;height:38px;border-radius:12px;border:1px solid var(--border);background:var(--surface2);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.pill-btn{height:38px;padding:0 12px;border-radius:12px;border:1px solid var(--border);background:var(--surface2);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:700;font-size:12px}
+.category-card{position:relative;overflow:hidden}
+.category-card-content{position:relative;z-index:2}
+.category-actions-strip{display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);gap:8px;flex-wrap:wrap}
+.category-card.reveal-edit .category-actions-strip{display:flex}
+.swipe-mini-btn{height:40px;padding:0 12px;border-radius:12px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-weight:800;cursor:pointer}
+.swipe-mini-btn.danger{background:rgba(255,107,107,.14);color:var(--red);border-color:rgba(255,107,107,.25)}
+.category-name-input{min-width:0}
+.category-swipe-hint{font-size:11px;color:var(--muted);margin-top:3px}
+.category-ghost-btn{width:36px;height:36px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+
+.loan-percent-badge{margin-left:12px}
+
+#confetti-layer{position:fixed;inset:0;pointer-events:none;z-index:2000}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.glow{
+  box-shadow:0 0 0 rgba(0,0,0,0),
+             0 0 20px rgba(255,60,172,0.15),
+             0 0 40px rgba(43,134,255,0.1);
+}
+.prog-fill{
+  background:linear-gradient(90deg,#ff3cac,#2b86ff,#00ffa3);
+  box-shadow:0 0 10px rgba(255,60,172,0.4);
+}
+.hero-amount.pos{
+  color:#00ffa3;
+  text-shadow:0 0 12px rgba(0,255,163,.4);
+}
+.hero-amount.neg{
+  color:#ff4d4f;
+  text-shadow:0 0 12px rgba(255,77,79,.4);
+}
+
+
+
+
+:root{--press-scale:.975;}
+button,
+.btn,
+.menu-btn,
+.pill-btn,
+.icon-btn,
+.collapse-btn,
+.loan-save,
+.loan-addpay,
+.tab,
+.subtab,
+.badge-btn,
+.swipe-mini-btn,
+.theme-tile,
+.settings-row-button{
+  transform:translateZ(0);
+  transition:transform .14s ease, filter .18s ease, opacity .18s ease, box-shadow .2s ease, border-color .2s ease, background-color .2s ease;
+}
+button:active,
+.btn:active,
+.menu-btn:active,
+.pill-btn:active,
+.icon-btn:active,
+.collapse-btn:active,
+.loan-save:active,
+.loan-addpay:active,
+.tab:active,
+.subtab:active,
+.badge-btn:active,
+.swipe-mini-btn:active,
+.theme-tile:active,
+.settings-row-button:active{
+  transform:scale(var(--press-scale));
+  filter:brightness(.98) saturate(1.04);
+}
+.btn:active,
+.menu-btn:active,
+.pill-btn:active,
+.icon-btn:active,
+.loan-save:active,
+.loan-addpay:active,
+.theme-tile:active,
+.settings-row-button:active{
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05), inset 0 10px 18px rgba(0,0,0,.18);
+}
+

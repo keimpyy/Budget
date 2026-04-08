@@ -1,2 +1,59 @@
-/* Opgesplitste plek voor extra styles. De app werkt al volledig via base.css.
-   Je kunt later selectors vanuit base.css hierheen verplaatsen per onderdeel. */
+/* Split from base.css: settings styles */
+
+.settings-list{display:flex;flex-direction:column;gap:10px}
+
+.settings-panel{display:flex;flex-direction:column;gap:12px}
+.settings-hero{
+  display:flex;justify-content:space-between;align-items:flex-start;gap:14px;
+  padding:18px 18px 16px;
+  background:linear-gradient(180deg,var(--surface),var(--surface2));
+}
+.settings-kicker{font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.settings-title{font-size:24px;font-weight:800;letter-spacing:-.03em}
+.settings-subtitle{margin-top:6px;font-size:13px;line-height:1.55;color:var(--muted);max-width:30ch}
+.settings-badge{
+  flex-shrink:0;padding:10px 12px;border-radius:14px;border:1px solid var(--border);
+  background:linear-gradient(180deg,var(--surface2),var(--surface3));color:var(--text);
+  font-size:12px;font-weight:800;letter-spacing:.02em;
+}
+.settings-group{padding:10px 12px 12px}
+.settings-group-title{padding:4px 6px 10px;font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);font-weight:800}
+.settings-row{
+  width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:14px 12px;border-radius:16px;border:1px solid var(--border);background:var(--surface2);color:var(--text);
+}
+.settings-row + .settings-row{margin-top:8px}
+.settings-row.static{background:linear-gradient(180deg,var(--surface2),var(--surface));cursor:default}
+.settings-row.compact{padding:12px}
+.settings-row-button{cursor:pointer;font-family:inherit;text-align:left}
+.settings-row-main{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}
+.settings-row-label{font-size:15px;font-weight:700}
+.settings-row-note{font-size:12px;color:var(--muted);line-height:1.4}
+.settings-row-side{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.settings-value{font-size:13px;font-weight:700;color:var(--accent)}
+.settings-chevron{font-size:22px;line-height:1;color:var(--muted);transform:translateY(-1px)}
+.settings-endpoint{
+  margin-top:10px;padding:12px;border-radius:14px;background:var(--surface2);border:1px solid var(--border);
+  color:var(--muted);font-size:11px;word-break:break-all;line-height:1.5;
+}
+.settings-actions-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.settings-back-btn{width:100%;margin-top:10px}
+.theme-picker{display:grid;grid-template-columns:1fr;gap:10px;margin-top:10px}
+.theme-tile{
+  width:100%;display:flex;align-items:center;gap:12px;padding:14px;border-radius:18px;border:1px solid var(--border);
+  background:linear-gradient(180deg,var(--surface2),var(--surface));color:var(--text);cursor:pointer;font-family:inherit;text-align:left;
+}
+.theme-tile.active{border-color:rgba(255,255,255,.14);box-shadow:0 12px 28px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.04)}
+.theme-swatch{width:42px;height:42px;border-radius:14px;display:block;flex-shrink:0;border:1px solid rgba(255,255,255,.08);box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.theme-swatch-midnight{background:linear-gradient(135deg,#09090d,#1a1330 48%,#101827)}
+.theme-swatch-carbon{background:linear-gradient(135deg,#0e1215,#20262d 54%,#29323c)}
+.theme-swatch-sakura{background:linear-gradient(135deg,#100b12,#261524 54%,#3d1f34)}
+.theme-copy{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}
+.theme-name{font-size:15px;font-weight:800}
+.theme-note{font-size:12px;color:var(--muted)}
+.theme-check{
+  width:26px;height:26px;border-radius:999px;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  background:var(--surface3);border:1px solid var(--border);font-size:12px;opacity:.3;transform:scale(.85);
+  transition:opacity .2s ease, transform .2s ease, background-color .2s ease, border-color .2s ease;
+}
+.theme-tile.active .theme-check{opacity:1;transform:scale(1);background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent}
