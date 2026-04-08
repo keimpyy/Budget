@@ -846,6 +846,7 @@ const state = {
   openCats:{},
   budgetSubtab:'categorieen',
   currentView:'dashboard',
+  lastNonSettingsView:'dashboard',
 };
 
 function uid(prefix){ return `${prefix}_${Date.now()}_${Math.floor(Math.random()*100000)}`; }
@@ -1011,6 +1012,8 @@ function go(name,btn){
   const newIdx = Math.max(0, order.indexOf(name));
   const dir = newIdx >= oldIdx ? 'left' : 'right';
 
+  if(name === 'instellingen' && current && current !== 'instellingen') state.lastNonSettingsView = current;
+  if(name !== 'instellingen') state.lastNonSettingsView = name;
   state.currentView = name;
 
   if(name==='dashboard') renderDashboard();
@@ -1039,6 +1042,11 @@ function go(name,btn){
 function openSettings(){
   const btn = document.getElementById('settings-tab-btn');
   go('instellingen', btn);
+}
+function closeSettings(){
+  const target = state.lastNonSettingsView || 'dashboard';
+  const btn = [...document.querySelectorAll('.tab')].find(b => b.textContent.trim().toLowerCase() === target) || document.querySelector('.tab');
+  if(btn) go(target, btn);
 }
 function setBudgetSubtab(tab){ state.budgetSubtab = tab; renderBudget(); }
 
@@ -1331,6 +1339,22 @@ function getStoredTheme(){
   return 'midnight';
 }
 
+function syncThemeSelection(theme){
+  const root = document.getElementById('v-instellingen');
+  if(!root || !root.children.length) return;
+  const themeLabel = theme === 'midnight' ? 'Midnight RGB' : theme === 'carbon' ? 'Carbon' : 'Sakura v2';
+  const badge = root.querySelector('.settings-badge');
+  const value = root.querySelector('.current-theme-value');
+  if(badge) badge.textContent = themeLabel;
+  if(value) value.textContent = themeLabel;
+  root.querySelectorAll('.theme-tile').forEach(tile => {
+    const tileTheme = tile.getAttribute('data-theme');
+    const active = tileTheme === theme;
+    tile.classList.toggle('active', active);
+    tile.setAttribute('aria-selected', String(active));
+  });
+}
+
 function applyTheme(theme, options = {}){
   const resolved = ALLOWED_THEMES.has(theme) ? theme : 'midnight';
   const shouldPersist = options.persist !== false;
@@ -1344,6 +1368,7 @@ function applyTheme(theme, options = {}){
     }catch(e){}
   }
   syncSakuraPetals();
+  syncThemeSelection(resolved);
 }
 
 function loadTheme(){
@@ -1377,13 +1402,13 @@ function renderInstellingen(){
             <span class="settings-row-note">Tik om door de themes te wisselen</span>
           </span>
           <span class="settings-row-side">
-            <span class="settings-value">${themeLabel}</span>
+            <span class="settings-value current-theme-value">${themeLabel}</span>
             <span class="settings-chevron">›</span>
           </span>
         </button>
 
         <div class="theme-picker" role="listbox" aria-label="Theme keuze">
-          <button class="theme-tile ${currentTheme==='midnight'?'active':''}" onclick="applyTheme('midnight')" aria-selected="${currentTheme==='midnight'}">
+          <button class="theme-tile ${currentTheme==='midnight'?'active':''}" data-theme="midnight" onclick="applyTheme('midnight')" aria-selected="${currentTheme==='midnight'}">
             <span class="theme-swatch theme-swatch-midnight"></span>
             <span class="theme-copy">
               <span class="theme-name">Midnight RGB</span>
@@ -1391,7 +1416,7 @@ function renderInstellingen(){
             </span>
             <span class="theme-check">✓</span>
           </button>
-          <button class="theme-tile ${currentTheme==='carbon'?'active':''}" onclick="applyTheme('carbon')" aria-selected="${currentTheme==='carbon'}">
+          <button class="theme-tile ${currentTheme==='carbon'?'active':''}" data-theme="carbon" onclick="applyTheme('carbon')" aria-selected="${currentTheme==='carbon'}">
             <span class="theme-swatch theme-swatch-carbon"></span>
             <span class="theme-copy">
               <span class="theme-name">Carbon</span>
@@ -1399,7 +1424,7 @@ function renderInstellingen(){
             </span>
             <span class="theme-check">✓</span>
           </button>
-          <button class="theme-tile ${currentTheme==='sakura'?'active':''}" onclick="applyTheme('sakura')" aria-selected="${currentTheme==='sakura'}">
+          <button class="theme-tile ${currentTheme==='sakura'?'active':''}" data-theme="sakura" onclick="applyTheme('sakura')" aria-selected="${currentTheme==='sakura'}">
             <span class="theme-swatch theme-swatch-sakura"></span>
             <span class="theme-copy">
               <span class="theme-name">Sakura v2</span>
@@ -1519,21 +1544,38 @@ function toggleCategoryActions(id){
 }
 
 
-// Premium swipe to delete
+// Optimized swipe to delete
 const swipeState = {};
-const SWIPE_MAX = 132;
-const SWIPE_SNAP = 92;
-const SWIPE_REVEAL = 36;
-const SWIPE_DELETE_THRESHOLD = 116;
+const SWIPE_MAX = 120;
+const SWIPE_SNAP = 88;
+const SWIPE_REVEAL = 34;
+const SWIPE_DELETE_THRESHOLD = 108;
+
+function setSwipeX(stateRef, x){
+  stateRef.x = x;
+  if(stateRef.frame) return;
+  stateRef.frame = requestAnimationFrame(() => {
+    stateRef.frame = null;
+    const row = stateRef.row;
+    const content = stateRef.content;
+    if(!row || !content) return;
+    const nextX = stateRef.x || 0;
+    const progress = Math.min(1, Math.max(0, Math.abs(nextX) / SWIPE_DELETE_THRESHOLD));
+    row.style.setProperty('--swipe-progress', progress.toFixed(3));
+    row.classList.toggle('reveal-delete', Math.abs(nextX) > SWIPE_REVEAL);
+    row.classList.toggle('snap-open', Math.abs(nextX) > SWIPE_SNAP * 0.92);
+    content.style.transform = `translate3d(${nextX}px,0,0)`;
+  });
+}
 
 function closeSwipeRow(row){
   if(!row) return;
   const content = row.querySelector('.post-row-content');
   if(content){
-    content.style.transition = 'transform .32s cubic-bezier(.22,1,.36,1)';
-    content.style.transform = 'translateX(0px)';
+    content.style.transition = 'transform .22s cubic-bezier(.22,1,.36,1)';
+    content.style.transform = 'translate3d(0,0,0)';
   }
-  row.classList.remove('reveal-delete','snap-open');
+  row.classList.remove('reveal-delete','snap-open','swiping');
   row.style.setProperty('--swipe-progress', 0);
 }
 
@@ -1541,15 +1583,15 @@ function openSwipeRow(row){
   if(!row) return;
   const content = row.querySelector('.post-row-content');
   if(content){
-    content.style.transition = 'transform .32s cubic-bezier(.22,1,.36,1)';
-    content.style.transform = `translateX(-${SWIPE_SNAP}px)`;
+    content.style.transition = 'transform .22s cubic-bezier(.22,1,.36,1)';
+    content.style.transform = `translate3d(-${SWIPE_SNAP}px,0,0)`;
   }
   row.classList.add('reveal-delete','snap-open');
   row.style.setProperty('--swipe-progress', 1);
 }
 
 function closeOtherSwipeRows(activeId){
-  document.querySelectorAll('.post-row.reveal-delete').forEach(row => {
+  document.querySelectorAll('.post-row.reveal-delete, .post-row.snap-open').forEach(row => {
     if(row.dataset.id !== String(activeId)) closeSwipeRow(row);
   });
 }
@@ -1562,61 +1604,61 @@ function swipeStart(e, id){
   const content = row.querySelector('.post-row-content');
   const currentOpen = row.classList.contains('snap-open') ? -SWIPE_SNAP : 0;
   swipeState[id] = {
+    row,
+    content,
     startX: touch.clientX,
     startY: touch.clientY,
     x: currentOpen,
     baseX: currentOpen,
     locked: false,
-    isHorizontal: false
+    isHorizontal: false,
+    frame: null
   };
   row.classList.add('swiping');
   if(content) content.style.transition = 'none';
 }
 
 function swipeMove(e, id){
-  const row = document.querySelector(`.post-row[data-id="${id}"]`);
-  if(!row || !swipeState[id]) return;
-  const content = row.querySelector('.post-row-content');
-  const touch = e.changedTouches[0];
   const stateRef = swipeState[id];
+  if(!stateRef || !stateRef.row) return;
+  const touch = e.changedTouches[0];
   const rawDx = touch.clientX - stateRef.startX;
   const rawDy = touch.clientY - stateRef.startY;
 
   if(!stateRef.locked){
     if(Math.abs(rawDx) < 6 && Math.abs(rawDy) < 6) return;
     stateRef.locked = true;
-    stateRef.isHorizontal = Math.abs(rawDx) > Math.abs(rawDy) * 1.15;
+    stateRef.isHorizontal = Math.abs(rawDx) > Math.abs(rawDy) * 1.2;
   }
   if(!stateRef.isHorizontal) return;
 
   e.preventDefault();
 
   let nextX = stateRef.baseX + rawDx;
-  if(nextX > 26) nextX = 26 - Math.pow(26 - nextX, 0.78);
-  if(nextX < -SWIPE_MAX) nextX = -SWIPE_MAX - Math.pow(Math.abs(nextX + SWIPE_MAX), 0.82) * 0.22;
-  nextX = Math.max(-SWIPE_MAX - 16, Math.min(18, nextX));
-
-  stateRef.x = nextX;
-  const progress = Math.min(1, Math.max(0, Math.abs(nextX) / SWIPE_DELETE_THRESHOLD));
-  row.style.setProperty('--swipe-progress', progress.toFixed(3));
-  row.classList.toggle('reveal-delete', Math.abs(nextX) > SWIPE_REVEAL);
-  row.classList.toggle('snap-open', Math.abs(nextX) > SWIPE_SNAP * 0.9);
-  if(content) content.style.transform = `translateX(${nextX}px)`;
+  if(nextX > 18) nextX = 18 - Math.pow(18 - nextX, 0.72);
+  if(nextX < -SWIPE_MAX) nextX = -SWIPE_MAX - Math.pow(Math.abs(nextX + SWIPE_MAX), 0.76) * 0.16;
+  nextX = Math.max(-SWIPE_MAX - 12, Math.min(12, nextX));
+  setSwipeX(stateRef, nextX);
 }
 
 function swipeEnd(e, id){
-  const row = document.querySelector(`.post-row[data-id="${id}"]`);
-  if(!row || !swipeState[id]) return;
   const stateRef = swipeState[id];
+  if(!stateRef || !stateRef.row) return;
+  const row = stateRef.row;
   const dx = stateRef.x || 0;
   row.classList.remove('swiping');
+
+  if(stateRef.frame){
+    cancelAnimationFrame(stateRef.frame);
+    stateRef.frame = null;
+  }
 
   if(dx <= -SWIPE_DELETE_THRESHOLD){
     openSwipeRow(row);
     setTimeout(() => {
       if(confirm('Post verwijderen?')) removeBudgetPost(id);
       else closeSwipeRow(row);
-    }, 90);
+    }, 70);
   } else if(dx <= -SWIPE_REVEAL){
     openSwipeRow(row);
   } else {
