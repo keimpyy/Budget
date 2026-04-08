@@ -607,6 +607,177 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
   margin-bottom:2px;
 }
 
+
+
+/* v3 polish pass: app-ish settings, tactile buttons, premium swipe */
+:root{--press-scale:.975;}
+button,
+.btn,
+.menu-btn,
+.pill-btn,
+.icon-btn,
+.collapse-btn,
+.loan-save,
+.loan-addpay,
+.tab,
+.subtab,
+.badge-btn,
+.swipe-mini-btn,
+.theme-tile,
+.settings-row-button{
+  transform:translateZ(0);
+  transition:transform .14s ease, filter .18s ease, opacity .18s ease, box-shadow .2s ease, border-color .2s ease, background-color .2s ease;
+}
+button:active,
+.btn:active,
+.menu-btn:active,
+.pill-btn:active,
+.icon-btn:active,
+.collapse-btn:active,
+.loan-save:active,
+.loan-addpay:active,
+.tab:active,
+.subtab:active,
+.badge-btn:active,
+.swipe-mini-btn:active,
+.theme-tile:active,
+.settings-row-button:active{
+  transform:scale(var(--press-scale));
+  filter:brightness(.98) saturate(1.04);
+}
+.btn:active,
+.menu-btn:active,
+.pill-btn:active,
+.icon-btn:active,
+.loan-save:active,
+.loan-addpay:active,
+.theme-tile:active,
+.settings-row-button:active{
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05), inset 0 10px 18px rgba(0,0,0,.18);
+}
+
+.settings-panel{display:flex;flex-direction:column;gap:12px}
+.settings-hero{
+  display:flex;justify-content:space-between;align-items:flex-start;gap:14px;
+  padding:18px 18px 16px;
+  background:linear-gradient(180deg,var(--surface),var(--surface2));
+}
+.settings-kicker{font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.settings-title{font-size:24px;font-weight:800;letter-spacing:-.03em}
+.settings-subtitle{margin-top:6px;font-size:13px;line-height:1.55;color:var(--muted);max-width:30ch}
+.settings-badge{
+  flex-shrink:0;padding:10px 12px;border-radius:14px;border:1px solid var(--border);
+  background:linear-gradient(180deg,var(--surface2),var(--surface3));color:var(--text);
+  font-size:12px;font-weight:800;letter-spacing:.02em;
+}
+.settings-group{padding:10px 12px 12px}
+.settings-group-title{padding:4px 6px 10px;font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);font-weight:800}
+.settings-row{
+  width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:14px 12px;border-radius:16px;border:1px solid var(--border);background:var(--surface2);color:var(--text);
+}
+.settings-row + .settings-row{margin-top:8px}
+.settings-row.static{background:linear-gradient(180deg,var(--surface2),var(--surface));cursor:default}
+.settings-row.compact{padding:12px}
+.settings-row-button{cursor:pointer;font-family:inherit;text-align:left}
+.settings-row-main{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}
+.settings-row-label{font-size:15px;font-weight:700}
+.settings-row-note{font-size:12px;color:var(--muted);line-height:1.4}
+.settings-row-side{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.settings-value{font-size:13px;font-weight:700;color:var(--accent)}
+.settings-chevron{font-size:22px;line-height:1;color:var(--muted);transform:translateY(-1px)}
+.settings-endpoint{
+  margin-top:10px;padding:12px;border-radius:14px;background:var(--surface2);border:1px solid var(--border);
+  color:var(--muted);font-size:11px;word-break:break-all;line-height:1.5;
+}
+.settings-actions-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.settings-back-btn{width:100%;margin-top:10px}
+.theme-picker{display:grid;grid-template-columns:1fr;gap:10px;margin-top:10px}
+.theme-tile{
+  width:100%;display:flex;align-items:center;gap:12px;padding:14px;border-radius:18px;border:1px solid var(--border);
+  background:linear-gradient(180deg,var(--surface2),var(--surface));color:var(--text);cursor:pointer;font-family:inherit;text-align:left;
+}
+.theme-tile.active{border-color:rgba(255,255,255,.14);box-shadow:0 12px 28px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.04)}
+.theme-swatch{width:42px;height:42px;border-radius:14px;display:block;flex-shrink:0;border:1px solid rgba(255,255,255,.08);box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.theme-swatch-midnight{background:linear-gradient(135deg,#09090d,#1a1330 48%,#101827)}
+.theme-swatch-carbon{background:linear-gradient(135deg,#0e1215,#20262d 54%,#29323c)}
+.theme-swatch-sakura{background:linear-gradient(135deg,#100b12,#261524 54%,#3d1f34)}
+.theme-copy{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}
+.theme-name{font-size:15px;font-weight:800}
+.theme-note{font-size:12px;color:var(--muted)}
+.theme-check{
+  width:26px;height:26px;border-radius:999px;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  background:var(--surface3);border:1px solid var(--border);font-size:12px;opacity:.3;transform:scale(.85);
+  transition:opacity .2s ease, transform .2s ease, background-color .2s ease, border-color .2s ease;
+}
+.theme-tile.active .theme-check{opacity:1;transform:scale(1);background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent}
+
+.post-row{
+  overflow:hidden;
+  --swipe-progress:0;
+}
+.post-row-content{
+  position:relative;z-index:2;will-change:transform;
+  transition:transform .32s cubic-bezier(.22,1,.36,1);
+}
+.post-row.swiping .post-row-content{transition:none}
+.swipe-delete-bg{
+  position:absolute;inset:0;border-radius:12px;overflow:hidden;
+  display:flex;align-items:center;justify-content:flex-end;padding-right:12px;
+  background:
+    radial-gradient(circle at 82% 50%, rgba(255,255,255,.22), transparent 22%),
+    linear-gradient(135deg, rgba(255,92,138,.92), rgba(255,111,165,.82) 48%, rgba(255,174,205,.66));
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08), inset 0 0 30px rgba(255,255,255,.08), 0 0 28px rgba(255,92,138,.28);
+  opacity:calc(.2 + (var(--swipe-progress) * .8));
+  transform:scaleX(calc(.94 + (var(--swipe-progress) * .06)));
+  transform-origin:right center;
+  transition:opacity .18s ease, transform .22s ease, box-shadow .22s ease;
+  z-index:1;
+}
+.swipe-delete-bg::before{
+  content:'';position:absolute;inset:-20% auto -20% 46%;width:50%;
+  background:linear-gradient(120deg, transparent 0%, rgba(255,255,255,.24) 50%, transparent 100%);
+  transform:translateX(calc(60% - (var(--swipe-progress) * 90%))) skewX(-16deg);
+  opacity:calc(var(--swipe-progress) * .9);
+  transition:transform .18s ease, opacity .18s ease;
+}
+.swipe-action{
+  position:relative;z-index:2;display:flex;align-items:center;gap:9px;
+  padding:10px 12px;border-radius:999px;
+  background:rgba(255,255,255,.12);backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 10px 24px rgba(0,0,0,.18);
+  color:#fff;
+  opacity:calc(.15 + (var(--swipe-progress) * .85));
+  transform:translateX(calc(26px - (var(--swipe-progress) * 26px))) scale(calc(.82 + (var(--swipe-progress) * .18)));
+  transition:transform .18s ease, opacity .18s ease;
+}
+.swipe-action-icon{
+  width:24px;height:24px;border-radius:999px;display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.18);font-size:12px;font-weight:900;
+}
+.swipe-action-label{font-size:12px;font-weight:800;letter-spacing:.02em}
+.post-row.reveal-delete .swipe-delete-bg{opacity:1}
+.post-row.reveal-delete .swipe-action{opacity:1}
+.post-row.snap-open .swipe-delete-bg{box-shadow:inset 0 0 0 1px rgba(255,255,255,.08), inset 0 0 30px rgba(255,255,255,.1), 0 0 34px rgba(255,92,138,.38)}
+
+body[data-theme="sakura"] .settings-hero,
+body[data-theme="sakura"] .settings-group,
+body[data-theme="sakura"] .settings-row,
+body[data-theme="sakura"] .theme-tile{
+  background:linear-gradient(180deg, rgba(32,20,31,.88), rgba(22,14,24,.92));
+  border-color:rgba(255,182,193,.14);
+}
+body[data-theme="sakura"] .theme-tile.active,
+body[data-theme="sakura"] .settings-row-button{
+  box-shadow:0 14px 34px rgba(0,0,0,.38), 0 0 22px rgba(255,105,135,.08);
+}
+body[data-theme="sakura"] .settings-value,
+body[data-theme="sakura"] .settings-badge,
+body[data-theme="sakura"] .theme-check{
+  color:#ffe8f1;
+}
+
 </style>
 </head>
 <body data-theme="midnight">
@@ -977,7 +1148,12 @@ function renderBudget(){
               <div class="category-inner">
                 ${itemsForCategory(cat.id).map(item => `
                   <div class="post-row" data-id="${item.id}" ontouchstart="swipeStart(event, '${item.id}')" ontouchmove="swipeMove(event, '${item.id}')" ontouchend="swipeEnd(event, '${item.id}')">
-                    <div class="swipe-delete-bg">Verwijder</div>
+                    <div class="swipe-delete-bg">
+                      <div class="swipe-action">
+                        <span class="swipe-action-icon">✕</span>
+                        <span class="swipe-action-label">Verwijder</span>
+                      </div>
+                    </div>
                     <div class="post-row-content">
                       <input class="input" value="${escapeHtml(item.post)}" onchange="renameBudgetPost('${item.id}', this.value)">
                       <input class="input small" type="number" value="${Number(item.budget||0)}" onchange="updateBudgetAmount('${item.id}', this.value)">
@@ -1176,32 +1352,99 @@ function loadTheme(){
 
 function renderInstellingen(){
   const currentTheme = document.body.getAttribute('data-theme') || 'midnight';
-  document.getElementById('v-instellingen').innerHTML = `
-    <div class="card">
-      <div class="sec" style="margin-top:0">Weergave</div>
-      <div class="settings-list">
-        <div class="note">Kies één theme voor dit apparaat. Je keuze blijft opgeslagen totdat je het zelf aanpast.</div>
-        <select class="input" onchange="applyTheme(this.value)" style="appearance:none">
-          <option value="midnight" ${currentTheme==='midnight'?'selected':''}>Midnight RGB</option>
-          <option value="carbon" ${currentTheme==='carbon'?'selected':''}>Carbon</option>
-          <option value="sakura" ${currentTheme==='sakura'?'selected':''}>Sakura</option>
-        </select>
-      </div>
-    </div>
+  const themeLabel = currentTheme === 'midnight'
+    ? 'Midnight RGB'
+    : currentTheme === 'carbon'
+      ? 'Carbon'
+      : 'Sakura v2';
 
-    <div class="card">
-      <div class="sec" style="margin-top:0">Synchronisatie</div>
-      <div class="settings-list">
-        <div class="note">De app is gekoppeld aan Google Sheets en gebruikt cache als fallback.</div>
-        <div class="note mono">${escapeHtml(state.sheetsUrl)}</div>
-        <div class="inline">
-          <button class="btn secondary" onclick="loadFromSheets()" style="flex:1">Ophalen</button>
-          <button class="btn secondary" onclick="saveToSheets()" style="flex:1">Opslaan</button>
+  document.getElementById('v-instellingen').innerHTML = `
+    <div class="settings-panel">
+      <div class="settings-hero card">
+        <div>
+          <div class="settings-kicker">Instellingen</div>
+          <div class="settings-title">App voorkeuren</div>
+          <div class="settings-subtitle">Alles wordt lokaal per apparaat opgeslagen en blijft staan totdat jij het zelf wijzigt.</div>
         </div>
-        <button class="btn secondary" onclick="closeSettings()">Terug</button>
+        <div class="settings-badge">${themeLabel}</div>
+      </div>
+
+      <div class="settings-group card">
+        <div class="settings-group-title">Weergave</div>
+        <button class="settings-row settings-row-button" onclick="cycleTheme()">
+          <span class="settings-row-main">
+            <span class="settings-row-label">Actief theme</span>
+            <span class="settings-row-note">Tik om door de themes te wisselen</span>
+          </span>
+          <span class="settings-row-side">
+            <span class="settings-value">${themeLabel}</span>
+            <span class="settings-chevron">›</span>
+          </span>
+        </button>
+
+        <div class="theme-picker" role="listbox" aria-label="Theme keuze">
+          <button class="theme-tile ${currentTheme==='midnight'?'active':''}" onclick="applyTheme('midnight')" aria-selected="${currentTheme==='midnight'}">
+            <span class="theme-swatch theme-swatch-midnight"></span>
+            <span class="theme-copy">
+              <span class="theme-name">Midnight RGB</span>
+              <span class="theme-note">Neon, contrast, premium</span>
+            </span>
+            <span class="theme-check">✓</span>
+          </button>
+          <button class="theme-tile ${currentTheme==='carbon'?'active':''}" onclick="applyTheme('carbon')" aria-selected="${currentTheme==='carbon'}">
+            <span class="theme-swatch theme-swatch-carbon"></span>
+            <span class="theme-copy">
+              <span class="theme-name">Carbon</span>
+              <span class="theme-note">Rustig, staal, zakelijk</span>
+            </span>
+            <span class="theme-check">✓</span>
+          </button>
+          <button class="theme-tile ${currentTheme==='sakura'?'active':''}" onclick="applyTheme('sakura')" aria-selected="${currentTheme==='sakura'}">
+            <span class="theme-swatch theme-swatch-sakura"></span>
+            <span class="theme-copy">
+              <span class="theme-name">Sakura v2</span>
+              <span class="theme-note">Donker, blossom glow, luxe</span>
+            </span>
+            <span class="theme-check">✓</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="settings-group card">
+        <div class="settings-group-title">Synchronisatie</div>
+        <div class="settings-row static">
+          <span class="settings-row-main">
+            <span class="settings-row-label">Google Sheets koppeling</span>
+            <span class="settings-row-note">Gebruik ophalen of opslaan wanneer jij zelf wilt syncen.</span>
+          </span>
+        </div>
+        <div class="settings-endpoint mono">${escapeHtml(state.sheetsUrl)}</div>
+        <div class="settings-actions-grid">
+          <button class="btn secondary" onclick="loadFromSheets()">Ophalen</button>
+          <button class="btn" onclick="saveToSheets()">Opslaan</button>
+        </div>
+      </div>
+
+      <div class="settings-group card">
+        <div class="settings-group-title">Info</div>
+        <div class="settings-row static compact">
+          <span class="settings-row-main">
+            <span class="settings-row-label">Theme opslag</span>
+            <span class="settings-row-note">Lokaal op dit apparaat, niet via browser cache.</span>
+          </span>
+          <span class="settings-value">Actief</span>
+        </div>
+        <button class="btn secondary settings-back-btn" onclick="closeSettings()">Terug</button>
       </div>
     </div>
   `;
+}
+
+function cycleTheme(){
+  const order = ['midnight','carbon','sakura'];
+  const current = document.body.getAttribute('data-theme') || 'midnight';
+  const idx = order.indexOf(current);
+  applyTheme(order[(idx + 1) % order.length]);
 }
 function escapeHtml(v){ return String(v ?? '').replaceAll('&','&amp;').replaceAll('"','&quot;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
 function updateIncomeName(idx, value){ state.inkomsten[idx].naam = value.trim(); persistLocal(); renderDashboard(); }
@@ -1276,45 +1519,112 @@ function toggleCategoryActions(id){
 }
 
 
-// iPhone-style swipe to delete
+// Premium swipe to delete
 const swipeState = {};
+const SWIPE_MAX = 132;
+const SWIPE_SNAP = 92;
+const SWIPE_REVEAL = 36;
+const SWIPE_DELETE_THRESHOLD = 116;
+
+function closeSwipeRow(row){
+  if(!row) return;
+  const content = row.querySelector('.post-row-content');
+  if(content){
+    content.style.transition = 'transform .32s cubic-bezier(.22,1,.36,1)';
+    content.style.transform = 'translateX(0px)';
+  }
+  row.classList.remove('reveal-delete','snap-open');
+  row.style.setProperty('--swipe-progress', 0);
+}
+
+function openSwipeRow(row){
+  if(!row) return;
+  const content = row.querySelector('.post-row-content');
+  if(content){
+    content.style.transition = 'transform .32s cubic-bezier(.22,1,.36,1)';
+    content.style.transform = `translateX(-${SWIPE_SNAP}px)`;
+  }
+  row.classList.add('reveal-delete','snap-open');
+  row.style.setProperty('--swipe-progress', 1);
+}
+
+function closeOtherSwipeRows(activeId){
+  document.querySelectorAll('.post-row.reveal-delete').forEach(row => {
+    if(row.dataset.id !== String(activeId)) closeSwipeRow(row);
+  });
+}
+
 function swipeStart(e, id){
   const touch = e.changedTouches[0];
-  swipeState[id] = { startX: touch.clientX, x:0 };
+  const row = document.querySelector(`.post-row[data-id="${id}"]`);
+  if(!row) return;
+  closeOtherSwipeRows(id);
+  const content = row.querySelector('.post-row-content');
+  const currentOpen = row.classList.contains('snap-open') ? -SWIPE_SNAP : 0;
+  swipeState[id] = {
+    startX: touch.clientX,
+    startY: touch.clientY,
+    x: currentOpen,
+    baseX: currentOpen,
+    locked: false,
+    isHorizontal: false
+  };
+  row.classList.add('swiping');
+  if(content) content.style.transition = 'none';
 }
+
 function swipeMove(e, id){
   const row = document.querySelector(`.post-row[data-id="${id}"]`);
   if(!row || !swipeState[id]) return;
   const content = row.querySelector('.post-row-content');
   const touch = e.changedTouches[0];
-  const dx = touch.clientX - swipeState[id].startX;
-  if(dx > 0) return;
-  swipeState[id].x = Math.max(-96, dx);
-  content.style.transform = `translateX(${swipeState[id].x}px)`;
-  row.classList.toggle('reveal-delete', Math.abs(swipeState[id].x) > 28);
+  const stateRef = swipeState[id];
+  const rawDx = touch.clientX - stateRef.startX;
+  const rawDy = touch.clientY - stateRef.startY;
+
+  if(!stateRef.locked){
+    if(Math.abs(rawDx) < 6 && Math.abs(rawDy) < 6) return;
+    stateRef.locked = true;
+    stateRef.isHorizontal = Math.abs(rawDx) > Math.abs(rawDy) * 1.15;
+  }
+  if(!stateRef.isHorizontal) return;
+
+  e.preventDefault();
+
+  let nextX = stateRef.baseX + rawDx;
+  if(nextX > 26) nextX = 26 - Math.pow(26 - nextX, 0.78);
+  if(nextX < -SWIPE_MAX) nextX = -SWIPE_MAX - Math.pow(Math.abs(nextX + SWIPE_MAX), 0.82) * 0.22;
+  nextX = Math.max(-SWIPE_MAX - 16, Math.min(18, nextX));
+
+  stateRef.x = nextX;
+  const progress = Math.min(1, Math.max(0, Math.abs(nextX) / SWIPE_DELETE_THRESHOLD));
+  row.style.setProperty('--swipe-progress', progress.toFixed(3));
+  row.classList.toggle('reveal-delete', Math.abs(nextX) > SWIPE_REVEAL);
+  row.classList.toggle('snap-open', Math.abs(nextX) > SWIPE_SNAP * 0.9);
+  if(content) content.style.transform = `translateX(${nextX}px)`;
 }
+
 function swipeEnd(e, id){
   const row = document.querySelector(`.post-row[data-id="${id}"]`);
   if(!row || !swipeState[id]) return;
-  const content = row.querySelector('.post-row-content');
-  const dx = swipeState[id].x || 0;
-  if(dx < -72){
-    content.style.transform = 'translateX(-84px)';
-    row.classList.add('reveal-delete');
+  const stateRef = swipeState[id];
+  const dx = stateRef.x || 0;
+  row.classList.remove('swiping');
+
+  if(dx <= -SWIPE_DELETE_THRESHOLD){
+    openSwipeRow(row);
     setTimeout(() => {
       if(confirm('Post verwijderen?')) removeBudgetPost(id);
-      else{
-        content.style.transform = '';
-        row.classList.remove('reveal-delete');
-      }
-    }, 80);
+      else closeSwipeRow(row);
+    }, 90);
+  } else if(dx <= -SWIPE_REVEAL){
+    openSwipeRow(row);
   } else {
-    content.style.transform = '';
-    row.classList.remove('reveal-delete');
+    closeSwipeRow(row);
   }
+
   delete swipeState[id];
 }
-
 async function loadFromSheets(){
   const saveStatus = document.getElementById('save-status');
   if(saveStatus) saveStatus.textContent = 'Ophalen...';
