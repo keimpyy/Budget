@@ -784,6 +784,107 @@ body[data-theme="sakura"] .theme-check{
   color:#ffe8f1;
 }
 
+
+/* budget redesign v6 */
+#budget-modal-root{position:fixed;inset:0;z-index:1400;pointer-events:none}
+#budget-modal-root > *{pointer-events:auto}
+.budget-overview-card{margin-bottom:14px;border-radius:22px;padding:18px}
+.budget-overview-top{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
+.budget-kicker{font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.budget-overview-amount{font-size:32px;font-weight:900;letter-spacing:-1.4px}
+.budget-overview-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.budget-overview-meta span,
+.budget-category-preview span,
+.budget-line-hint{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 10px;border-radius:999px;
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  font-size:11px;color:var(--muted)
+}
+.budget-shell-grid{display:grid;grid-template-columns:1fr;gap:14px}
+.budget-sidebar,.budget-detail{min-width:0}
+.budget-section-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px}
+.budget-section-copy{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.5}
+.budget-category-list{display:flex;flex-direction:column;gap:10px}
+.budget-category-card{
+  width:100%;text-align:left;cursor:pointer;color:inherit;
+  background:var(--surface);border:1px solid var(--border);border-radius:18px;
+  padding:14px 14px 12px;box-shadow:var(--shadow)
+}
+.budget-category-card.active{border-color:rgba(255,255,255,.18);transform:translateY(-1px)}
+.budget-category-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.budget-category-name{font-size:16px;font-weight:800}
+.budget-category-sub{font-size:12px;color:var(--muted);margin-top:3px}
+.budget-category-amount{font-family:monospace;font-size:15px;font-weight:700;color:var(--accent)}
+.budget-category-progress{height:8px;border-radius:999px;background:var(--surface3);overflow:hidden;margin:12px 0 10px}
+.budget-category-progress-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#ff3cac,#2b86ff,#00ffa3)}
+.budget-category-preview{display:flex;flex-wrap:wrap;gap:6px}
+.budget-detail{border-radius:22px;padding:16px}
+.budget-detail-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px}
+.budget-detail-title{font-size:26px;font-weight:900;letter-spacing:-.8px}
+.budget-detail-sub{font-size:13px;color:var(--muted);margin-top:5px}
+.budget-detail-head-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.budget-small-btn{height:40px;padding:0 14px;border-radius:12px;font-size:13px}
+.budget-line-list{display:flex;flex-direction:column;gap:10px}
+.budget-line-row{margin-top:0;padding:0;border-radius:16px;overflow:hidden}
+.budget-line-content{padding:10px;gap:10px;align-items:center}
+.budget-line-main{
+  flex:1;min-width:0;border:none;background:transparent;color:inherit;text-align:left;
+  display:flex;flex-direction:column;gap:4px;padding:4px 2px;cursor:pointer
+}
+.budget-line-name{font-size:15px;font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.budget-line-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.budget-chip{
+  height:34px;padding:0 10px;border-radius:10px;border:1px solid var(--border);
+  background:var(--surface2);color:var(--text);font-weight:800;cursor:pointer
+}
+.budget-line-amount{
+  height:38px;padding:0 12px;border-radius:12px;border:1px solid var(--border);
+  background:var(--surface2);color:var(--text);font-weight:900;font-family:monospace;cursor:pointer
+}
+.budget-empty-state,.budget-empty-card{
+  border-radius:18px;padding:20px;display:flex;flex-direction:column;gap:10px
+}
+.budget-empty-state-large{min-height:280px;justify-content:center}
+.budget-empty-title{font-size:18px;font-weight:800}
+.budget-empty-copy{font-size:13px;color:var(--muted);line-height:1.6}
+.budget-mobile-actions{
+  position:sticky;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);
+  display:flex;gap:10px;margin-top:14px;z-index:5
+}
+.budget-mobile-actions .btn{flex:1}
+.budget-modal-backdrop{
+  position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(8px);
+  display:flex;align-items:flex-end;justify-content:center;padding:16px
+}
+.budget-modal-sheet{
+  width:min(100%,560px);background:var(--surface);border:1px solid var(--border);
+  border-radius:24px;box-shadow:var(--shadow);padding:14px 16px calc(env(safe-area-inset-bottom,0px) + 18px);
+  animation:sheetUp .2s ease
+}
+.budget-modal-handle{width:42px;height:5px;border-radius:999px;background:var(--surface3);margin:4px auto 14px}
+.budget-modal-title{font-size:20px;font-weight:900;letter-spacing:-.4px}
+.budget-modal-copy{font-size:13px;color:var(--muted);line-height:1.6;margin:8px 0 14px}
+.budget-modal-actions{display:flex;gap:10px;margin-top:16px}
+.budget-modal-actions .btn{flex:1}
+.budget-inline-label{font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px}
+.composer-amount-input{font-size:24px!important;font-weight:800}
+.budget-income-layout{display:flex;flex-direction:column;gap:12px}
+.income-row-card{border-radius:18px}
+.income-row-head{display:flex;gap:8px;align-items:center}
+.income-amount-row{margin-top:12px}
+.income-amount-input{font-family:monospace;font-size:22px!important;font-weight:800}
+@media (min-width: 960px){
+  .shell{max-width:1220px}
+  .content{padding:18px 24px 34px}
+  #v-budget .subtabs{max-width:420px}
+  .budget-shell-grid{grid-template-columns:360px minmax(0,1fr);align-items:start}
+  .budget-detail{min-height:520px}
+  .budget-mobile-actions{position:static}
+  .budget-modal-backdrop{align-items:center}
+  .budget-modal-sheet{padding-bottom:18px}
+}
+
 </style>
 </head>
 <body data-theme="midnight">
@@ -808,6 +909,7 @@ body[data-theme="sakura"] .theme-check{
     <div id="v-instellingen" class="view"></div>
   </div>
 </div>
+<div id="budget-modal-root"></div>
 
 <div id="startup-overlay">
   <svg width="0" height="0" style="position:absolute">
@@ -853,6 +955,11 @@ const state = {
   budgetSubtab:'categorieen',
   currentView:'dashboard',
   lastNonSettingsView:'dashboard',
+  budgetSelectedCategoryId:null,
+  budgetComposerOpen:false,
+  budgetComposerMode:'category',
+  budgetComposerTargetId:null,
+  budgetComposerCategoryId:null,
 };
 
 function uid(prefix){ return `${prefix}_${Date.now()}_${Math.floor(Math.random()*100000)}`; }
@@ -866,6 +973,23 @@ function orderedCats(){ return [...state.categorieen].sort((a,b)=>(a.volgorde||0
 function itemsForCategory(catId){ return state.budget.filter(r=>String(r.categorieId) === String(catId)).sort((a,b)=>(a.volgorde||0)-(b.volgorde||0)); }
 function totalForCategory(catId){ return itemsForCategory(catId).reduce((s,r)=>s + Number(r.budget || 0), 0); }
 function postsCount(catId){ return itemsForCategory(catId).length; }
+
+function ensureBudgetSelection(){
+  const cats = orderedCats();
+  if(!cats.length){
+    state.budgetSelectedCategoryId = null;
+    return null;
+  }
+  const exists = cats.some(c => c.id === state.budgetSelectedCategoryId);
+  if(!exists) state.budgetSelectedCategoryId = cats[0].id;
+  return state.budgetSelectedCategoryId;
+}
+function budgetRemaining(){ return overschot(); }
+function budgetUsagePct(catId){
+  const total = budgetTotaal();
+  return total ? (totalForCategory(catId) / total) * 100 : 0;
+}
+
 
 function persistLocal(){
   const cache = {
@@ -919,6 +1043,7 @@ function normalizeData(){
     const rows = itemsForCategory(cat.id);
     rows.forEach((row, idx)=>{ row.volgorde = idx + 1; });
   }
+  ensureBudgetSelection();
 }
 function toRows(){
   normalizeData();
@@ -1119,71 +1244,161 @@ function renderDashboard(){
   `;
 }
 function renderBudget(){
+  ensureBudgetSelection();
   const total = budgetTotaal();
+  const cats = orderedCats();
+  const selectedCatId = state.budgetSelectedCategoryId;
+  const selectedCat = cats.find(c => c.id === selectedCatId) || null;
+  const selectedItems = selectedCat ? itemsForCategory(selectedCat.id) : [];
+  const remaining = budgetRemaining();
   const budgetHtml = state.budgetSubtab === 'inkomsten' ? `
-    <div class="card">
-      <div class="sec" style="margin-top:0">Inkomsten</div>
+    <div class="budget-income-layout">
+      <div class="budget-overview-card card">
+        <div class="budget-overview-top">
+          <div>
+            <div class="budget-kicker">Inkomsten</div>
+            <div class="budget-overview-amount">${fmt(inkomstenTotaal())}</div>
+          </div>
+          <button class="btn secondary budget-small-btn" onclick="addIncomeRow()">+ Inkomst</button>
+        </div>
+        <div class="budget-overview-meta">
+          <span>${state.inkomsten.length} bronnen</span>
+          <span>${remaining >= 0 ? 'Ruimte over' : 'Tekort'}: ${fmt(Math.abs(remaining))}</span>
+        </div>
+      </div>
+
       <div class="stack">
         ${state.inkomsten.map((r, idx)=>`
-          <div class="row">
-            <input class="input" value="${escapeHtml(r.naam)}" onchange="updateIncomeName(${idx}, this.value)">
-            <input class="input small" type="number" value="${Number(r.bedrag||0)}" onchange="updateIncomeAmount(${idx}, this.value)">
+          <div class="card income-row-card">
+            <div class="income-row-head">
+              <input class="input" value="${escapeHtml(r.naam)}" onchange="updateIncomeName(${idx}, this.value)" placeholder="Naam inkomen">
+              <button class="icon-btn" onclick="removeIncomeRow(${idx})" title="Verwijder">✕</button>
+            </div>
+            <div class="income-amount-row">
+              <div class="budget-inline-label">Bedrag per maand</div>
+              <input class="input income-amount-input" type="number" inputmode="decimal" value="${Number(r.bedrag||0)}" onchange="updateIncomeAmount(${idx}, this.value)">
+            </div>
           </div>
         `).join('')}
       </div>
     </div>
   ` : `
-    <div class="budget-toolbar">
-      <div class="row" style="justify-content:space-between">
-        <div class="sec" style="margin:0">Categorieën</div>
-        <div class="budget-toolbar-actions">
-          <button class="btn sm" onclick="addCategory()">+ Categorie</button>
+    <div class="budget-overview-card card">
+      <div class="budget-overview-top">
+        <div>
+          <div class="budget-kicker">Budget planner</div>
+          <div class="budget-overview-amount">${fmt(total)}</div>
         </div>
+        <button class="btn budget-primary-btn" onclick="openBudgetComposer('category')">+ Categorie</button>
+      </div>
+      <div class="budget-overview-meta">
+        <span>${cats.length} categorieën</span>
+        <span>${state.budget.length} posten</span>
+        <span style="color:${remaining>=0?'var(--green)':'var(--red)'}">${remaining>=0?'Over':'Tekort'} ${fmt(Math.abs(remaining))}</span>
       </div>
     </div>
 
-    ${orderedCats().map(cat => {
-      const isOpen = !!state.openCats[cat.id];
-      return `
-        <div class="card category-card" id="cat-card-${cat.id}" data-id="${cat.id}">
-          <div class="category-card-content">
-            <div class="category-head-main">
-              <div class="category-text">
-                <div class="category-title-row">
-                  <input class="input category-name-input" value="${escapeHtml(cat.naam)}" onchange="renameCategory('${cat.id}', this.value)">
-                  <span class="category-total">${fmt(totalForCategory(cat.id))}</span>
-                </div>
-                <div class="category-meta">${postsCount(cat.id)} posten</div>
-              </div>
-              <button class="collapse-btn" onclick="toggleCategory('${cat.id}')" title="${isOpen ? 'Sluit' : 'Open'}">${isOpen ? '⌃' : '⌄'}</button>
-            </div>
+    <div class="budget-shell-grid ${selectedCat ? 'has-selection' : ''}">
+      <div class="budget-sidebar">
+        <div class="budget-section-head">
+          <div>
+            <div class="sec" style="margin:0">Categorieën</div>
+            <div class="budget-section-copy">Kies een categorie om posten te bekijken of aan te passen.</div>
+          </div>
+          <button class="btn secondary budget-small-btn" onclick="openBudgetComposer('category')">Nieuw</button>
+        </div>
 
-            ${isOpen ? `
-              <div class="category-inner">
-                ${itemsForCategory(cat.id).map(item => `
-                  <div class="post-row" data-id="${item.id}" ontouchstart="swipeStart(event, '${item.id}')" ontouchmove="swipeMove(event, '${item.id}')" ontouchend="swipeEnd(event, '${item.id}')">
-                    <div class="swipe-delete-bg">
-                      <div class="swipe-action">
-                        <span class="swipe-action-icon">✕</span>
-                        <span class="swipe-action-label">Verwijder</span>
-                      </div>
-                    </div>
-                    <div class="post-row-content">
-                      <input class="input" value="${escapeHtml(item.post)}" onchange="renameBudgetPost('${item.id}', this.value)">
-                      <input class="input small" type="number" inputmode="decimal" value="${Number(item.budget||0)}" onchange="updateBudgetAmount('${item.id}', this.value)">
+        <div class="budget-category-list">
+          ${cats.length ? cats.map(cat => {
+            const catTotal = totalForCategory(cat.id);
+            const count = postsCount(cat.id);
+            const topPosts = itemsForCategory(cat.id).slice(0,2);
+            const selected = selectedCatId === cat.id;
+            return `
+              <button class="budget-category-card ${selected ? 'active' : ''}" onclick="selectBudgetCategory('${cat.id}')">
+                <div class="budget-category-card-top">
+                  <div>
+                    <div class="budget-category-name">${escapeHtml(cat.naam)}</div>
+                    <div class="budget-category-sub">${count} ${count === 1 ? 'post' : 'posten'}</div>
+                  </div>
+                  <div class="budget-category-amount">${fmtShort(catTotal)}</div>
+                </div>
+                <div class="budget-category-progress"><div class="budget-category-progress-fill" style="width:${Math.min(100, budgetUsagePct(cat.id))}%"></div></div>
+                <div class="budget-category-preview">
+                  ${topPosts.length ? topPosts.map(p => `<span>${escapeHtml(p.post)}</span>`).join('') : '<span>Nog geen posten</span>'}
+                </div>
+              </button>
+            `;
+          }).join('') : `
+            <div class="card budget-empty-card">
+              <div class="budget-empty-title">Nog geen categorieën</div>
+              <div class="budget-empty-copy">Maak eerst een categorie aan. Daarna voeg je makkelijk posten en bedragen toe.</div>
+              <button class="btn" onclick="openBudgetComposer('category')">Eerste categorie</button>
+            </div>
+          `}
+        </div>
+      </div>
+
+      <div class="budget-detail card">
+        ${selectedCat ? `
+          <div class="budget-detail-head">
+            <div>
+              <div class="budget-kicker">Geselecteerde categorie</div>
+              <div class="budget-detail-title">${escapeHtml(selectedCat.naam)}</div>
+              <div class="budget-detail-sub">${selectedItems.length} ${selectedItems.length === 1 ? 'post' : 'posten'} · ${fmt(totalForCategory(selectedCat.id))}</div>
+            </div>
+            <div class="budget-detail-head-actions">
+              <button class="btn secondary budget-small-btn" onclick="openBudgetComposer('category','${selectedCat.id}')">Wijzig</button>
+              <button class="btn secondary budget-small-btn" onclick="openBudgetComposer('post', null, '${selectedCat.id}')">+ Post</button>
+              <button class="btn danger budget-small-btn" onclick="removeCategory('${selectedCat.id}')">Verwijder</button>
+            </div>
+          </div>
+
+          ${selectedItems.length ? `
+            <div class="budget-line-list">
+              ${selectedItems.map(item => `
+                <div class="post-row budget-line-row" data-id="${item.id}" ontouchstart="swipeStart(event, '${item.id}')" ontouchmove="swipeMove(event, '${item.id}')" ontouchend="swipeEnd(event, '${item.id}')">
+                  <div class="swipe-delete-bg">
+                    <div class="swipe-action">
+                      <span class="swipe-action-icon">✕</span>
+                      <span class="swipe-action-label">Verwijder</span>
                     </div>
                   </div>
-                `).join('')}
-                <div class="category-actions-footer">
-                  <button class="btn secondary" onclick="addBudgetPost('${cat.id}')" style="flex:1">+ Post toevoegen</button>
-                  <button class="btn danger" onclick="removeCategory('${cat.id}')">Verwijder</button>
+                  <div class="post-row-content budget-line-content">
+                    <button class="budget-line-main" onclick="openBudgetComposer('post','${item.id}')">
+                      <span class="budget-line-name">${escapeHtml(item.post)}</span>
+                      <span class="budget-line-hint">Tik om te wijzigen</span>
+                    </button>
+                    <div class="budget-line-right">
+                      <button class="budget-chip" onclick="event.stopPropagation();quickAdjustBudget('${item.id}',-10)">-10</button>
+                      <button class="budget-chip" onclick="event.stopPropagation();quickAdjustBudget('${item.id}',10)">+10</button>
+                      <button class="budget-line-amount" onclick="event.stopPropagation();openBudgetComposer('post','${item.id}')">${fmt(item.budget)}</button>
+                      <button class="icon-btn" onclick="event.stopPropagation();removeBudgetPost('${item.id}')" title="Verwijder">✕</button>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ` : ''}
+              `).join('')}
+            </div>
+          ` : `
+            <div class="budget-empty-state">
+              <div class="budget-empty-title">Nog geen posten in deze categorie</div>
+              <div class="budget-empty-copy">Voeg je eerste post toe, bijvoorbeeld huur, boodschappen of streaming.</div>
+              <button class="btn" onclick="openBudgetComposer('post', null, '${selectedCat.id}')">Eerste post toevoegen</button>
+            </div>
+          `}
+        ` : `
+          <div class="budget-empty-state budget-empty-state-large">
+            <div class="budget-empty-title">Kies een categorie</div>
+            <div class="budget-empty-copy">Selecteer links een categorie. Op iPhone staat de detailkaart automatisch onder de lijst.</div>
           </div>
-        </div>
-      `;
-    }).join('')}
+        `}
+      </div>
+    </div>
+
+    <div class="budget-mobile-actions">
+      <button class="btn secondary" onclick="openBudgetComposer('category')">+ Categorie</button>
+      <button class="btn" onclick="openBudgetComposer('post', null, state.budgetSelectedCategoryId)" ${selectedCat ? '' : 'disabled'}>+ Post</button>
+    </div>
   `;
 
   document.getElementById('v-budget').innerHTML = `
@@ -1199,7 +1414,7 @@ function renderBudget(){
       </div>
       <div class="row" style="margin-top:8px">
         <div class="muted">Overschot</div>
-        <div class="mono" style="color:${overschot()>=0?'var(--green)':'var(--red)'}">${fmt(overschot())}</div>
+        <div class="mono" style="color:${remaining>=0?'var(--green)':'var(--red)'}">${fmt(remaining)}</div>
       </div>
       <div class="stack" style="margin-top:14px">
         <button class="btn" onclick="saveToSheets()">☁️ Opslaan in Sheets</button>
@@ -1208,7 +1423,10 @@ function renderBudget(){
       <div id="save-status" class="note" style="margin-top:10px"></div>
     </div>
   `;
+
+  renderBudgetComposer();
 }
+
 function renderLeningen(){
   const totaalRestant = state.leningen.reduce((s,l)=>s+(Number(l.totaal||0)-Number(l.betaald||0)),0);
   const totaalLening = state.leningen.reduce((s,l)=>s+Number(l.totaal||0),0);
@@ -1477,38 +1695,188 @@ function cycleTheme(){
   applyTheme(order[(idx + 1) % order.length]);
 }
 function escapeHtml(v){ return String(v ?? '').replaceAll('&','&amp;').replaceAll('"','&quot;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
-function updateIncomeName(idx, value){ state.inkomsten[idx].naam = value.trim(); persistLocal(); renderDashboard(); }
-function updateIncomeAmount(idx, value){ state.inkomsten[idx].bedrag = Number(value||0); persistLocal(); rerenderAll(); }
-function addCategory(){
-  const name = prompt('Naam van de nieuwe categorie?');
-  if(!name) return;
-  state.categorieen.push({ id: uid('cat'), naam: name.trim(), volgorde: state.categorieen.length + 1 });
-  persistLocal(); renderBudget();
+function updateIncomeName(idx, value){
+  if(!state.inkomsten[idx]) return;
+  state.inkomsten[idx].naam = value.trim() || 'Inkomsten';
+  persistLocal(); rerenderAll();
 }
+function updateIncomeAmount(idx, value){
+  if(!state.inkomsten[idx]) return;
+  state.inkomsten[idx].bedrag = Number(value||0);
+  persistLocal(); rerenderAll();
+}
+function addIncomeRow(){
+  state.inkomsten.push({ naam:'Nieuwe inkomsten', bedrag:0 });
+  persistLocal(); rerenderAll();
+}
+function removeIncomeRow(idx){
+  if(!state.inkomsten[idx]) return;
+  if(state.inkomsten.length <= 1){
+    showToast('Laat minimaal één inkomstenregel staan');
+    return;
+  }
+  if(!confirm('Inkomstenregel verwijderen?')) return;
+  state.inkomsten.splice(idx,1);
+  persistLocal(); rerenderAll();
+}
+function selectBudgetCategory(catId){
+  state.budgetSelectedCategoryId = catId;
+  renderBudget();
+}
+function openBudgetComposer(mode='category', targetId=null, categoryId=null){
+  ensureBudgetSelection();
+  state.budgetComposerOpen = true;
+  state.budgetComposerMode = mode;
+  state.budgetComposerTargetId = targetId || null;
+  state.budgetComposerCategoryId = categoryId || null;
+  if(mode === 'post' && !state.budgetComposerCategoryId){
+    const target = targetId ? state.budget.find(r => r.id === targetId) : null;
+    state.budgetComposerCategoryId = target?.categorieId || state.budgetSelectedCategoryId || orderedCats()[0]?.id || null;
+  }
+  renderBudgetComposer();
+}
+function closeBudgetComposer(){
+  state.budgetComposerOpen = false;
+  state.budgetComposerMode = 'category';
+  state.budgetComposerTargetId = null;
+  state.budgetComposerCategoryId = null;
+  renderBudgetComposer();
+}
+function renderBudgetComposer(){
+  const root = document.getElementById('budget-modal-root');
+  if(!root) return;
+  if(!state.budgetComposerOpen || state.currentView !== 'budget' || state.budgetSubtab !== 'categorieen'){
+    root.innerHTML = '';
+    return;
+  }
+  const mode = state.budgetComposerMode;
+  const cats = orderedCats();
+  const category = mode === 'category' && state.budgetComposerTargetId
+    ? state.categorieen.find(c => c.id === state.budgetComposerTargetId)
+    : null;
+  const post = mode === 'post' && state.budgetComposerTargetId
+    ? state.budget.find(r => r.id === state.budgetComposerTargetId)
+    : null;
+  const currentCategoryId = post?.categorieId || state.budgetComposerCategoryId || state.budgetSelectedCategoryId || cats[0]?.id || '';
+  root.innerHTML = `
+    <div class="budget-modal-backdrop" onclick="closeBudgetComposer()">
+      <div class="budget-modal-sheet ${mode === 'post' ? 'post-mode' : 'category-mode'}" onclick="event.stopPropagation()">
+        <div class="budget-modal-handle"></div>
+        <div class="budget-modal-title">${mode === 'category' ? (category ? 'Categorie wijzigen' : 'Nieuwe categorie') : (post ? 'Post wijzigen' : 'Nieuwe post')}</div>
+        <div class="budget-modal-copy">${mode === 'category' ? 'Maak categorieën aan als blokken. De details pas je daarna per categorie aan.' : 'Maak een post aan of wijzig een bestaand bedrag zonder dat de pagina als een spreadsheet voelt.'}</div>
+
+        ${mode === 'category' ? `
+          <div class="stack">
+            <div>
+              <div class="budget-inline-label">Naam categorie</div>
+              <input id="composer-category-name" class="input" value="${escapeHtml(category?.naam || '')}" placeholder="Bijv. Boodschappen">
+            </div>
+          </div>
+        ` : `
+          <div class="stack">
+            <div>
+              <div class="budget-inline-label">Categorie</div>
+              <select id="composer-post-category" class="input">
+                ${cats.map(cat => `<option value="${cat.id}" ${cat.id === currentCategoryId ? 'selected' : ''}>${escapeHtml(cat.naam)}</option>`).join('')}
+              </select>
+            </div>
+            <div>
+              <div class="budget-inline-label">Naam post</div>
+              <input id="composer-post-name" class="input" value="${escapeHtml(post?.post || '')}" placeholder="Bijv. Albert Heijn">
+            </div>
+            <div>
+              <div class="budget-inline-label">Budget per maand</div>
+              <input id="composer-post-amount" class="input composer-amount-input" type="number" inputmode="decimal" value="${Number(post?.budget || 0)}" placeholder="0">
+            </div>
+          </div>
+        `}
+
+        <div class="budget-modal-actions">
+          <button class="btn secondary" onclick="closeBudgetComposer()">Annuleren</button>
+          <button class="btn" onclick="saveBudgetComposer()">Opslaan</button>
+        </div>
+      </div>
+    </div>
+  `;
+  const focusId = mode === 'category' ? 'composer-category-name' : (post ? 'composer-post-amount' : 'composer-post-name');
+  setTimeout(()=>{
+    const el = document.getElementById(focusId);
+    if(el){
+      el.focus();
+      if(el.setSelectionRange && el.value) el.setSelectionRange(el.value.length, el.value.length);
+    }
+  }, 30);
+}
+function saveBudgetComposer(){
+  const mode = state.budgetComposerMode;
+  if(mode === 'category'){
+    const input = document.getElementById('composer-category-name');
+    const name = (input?.value || '').trim();
+    if(!name){
+      showToast('Geef de categorie een naam');
+      return;
+    }
+    if(state.budgetComposerTargetId){
+      const cat = state.categorieen.find(c => c.id === state.budgetComposerTargetId);
+      if(cat) cat.naam = name;
+    }else{
+      const newCat = { id: uid('cat'), naam: name, volgorde: state.categorieen.length + 1 };
+      state.categorieen.push(newCat);
+      state.budgetSelectedCategoryId = newCat.id;
+    }
+  }else{
+    const name = (document.getElementById('composer-post-name')?.value || '').trim();
+    const amount = Number(document.getElementById('composer-post-amount')?.value || 0);
+    const categoryId = document.getElementById('composer-post-category')?.value || state.budgetComposerCategoryId;
+    if(!categoryId){
+      showToast('Maak eerst een categorie aan');
+      return;
+    }
+    if(!name){
+      showToast('Geef de post een naam');
+      return;
+    }
+    if(state.budgetComposerTargetId){
+      const row = state.budget.find(r => r.id === state.budgetComposerTargetId);
+      if(row){
+        row.post = name;
+        row.budget = amount;
+        row.categorieId = categoryId;
+      }
+    }else{
+      state.budget.push({
+        id: uid('bud'),
+        categorieId: categoryId,
+        post: name,
+        budget: amount,
+        volgorde: itemsForCategory(categoryId).length + 1
+      });
+    }
+    state.budgetSelectedCategoryId = categoryId;
+  }
+  normalizeData();
+  persistLocal();
+  closeBudgetComposer();
+  rerenderAll();
+}
+function addCategory(){ openBudgetComposer('category'); }
 function renameCategory(catId, value){
   const cat = state.categorieen.find(c=>c.id===catId); if(!cat) return;
   cat.naam = value.trim() || 'Nieuwe categorie'; persistLocal(); rerenderAll();
 }
 function removeCategory(catId){
-  if(!confirm('Categorie verwijderen inclusief alle posten?')) return;
+  const cat = state.categorieen.find(c => c.id === catId);
+  if(!cat) return;
+  if(!confirm(`Categorie "${cat.naam}" verwijderen inclusief alle posten?`)) return;
   state.categorieen = state.categorieen.filter(c=>c.id!==catId);
   state.budget = state.budget.filter(r=>r.categorieId!==catId);
+  ensureBudgetSelection();
   persistLocal(); rerenderAll();
 }
-function toggleCategory(catId){ state.openCats[catId] = !state.openCats[catId]; renderBudget(); }
-function allCategoriesOpen(){
-  const cats = orderedCats();
-  return cats.length && cats.every(c => !!state.openCats[c.id]);
-}
-function toggleAllCategories(){
-  const shouldOpen = !allCategoriesOpen();
-  orderedCats().forEach(c => state.openCats[c.id] = shouldOpen);
-  renderBudget();
-}
-function addBudgetPost(catId){
-  state.budget.push({ id: uid('bud'), categorieId: catId, post: 'Nieuwe post', budget: 0, volgorde: itemsForCategory(catId).length + 1 });
-  state.openCats[catId] = true; persistLocal(); renderBudget();
-}
+function toggleCategory(catId){ selectBudgetCategory(catId); }
+function allCategoriesOpen(){ return false; }
+function toggleAllCategories(){}
+function addBudgetPost(catId){ openBudgetComposer('post', null, catId || state.budgetSelectedCategoryId); }
 function renameBudgetPost(id, value){
   const row = state.budget.find(r=>r.id===id); if(!row) return;
   row.post = value.trim() || 'Nieuwe post'; persistLocal(); rerenderAll();
@@ -1517,7 +1885,22 @@ function updateBudgetAmount(id, value){
   const row = state.budget.find(r=>r.id===id); if(!row) return;
   row.budget = Number(value||0); persistLocal(); rerenderAll();
 }
-function removeBudgetPost(id){ state.budget = state.budget.filter(r=>r.id!==id); persistLocal(); rerenderAll(); }
+function quickAdjustBudget(id, delta){
+  const row = state.budget.find(r => r.id === id);
+  if(!row) return;
+  row.budget = Math.max(0, Number(row.budget || 0) + Number(delta || 0));
+  persistLocal(); rerenderAll();
+}
+function removeBudgetPost(id){
+  const row = state.budget.find(r=>r.id===id);
+  if(!row) return;
+  if(!confirm(`Post "${row.post}" verwijderen?`)) return;
+  const catId = row.categorieId;
+  state.budget = state.budget.filter(r=>r.id!==id);
+  const rows = itemsForCategory(catId);
+  rows.forEach((item, idx)=> item.volgorde = idx + 1);
+  persistLocal(); rerenderAll();
+}
 function toggleLoanEdit(id){ state.editingLoanId = state.editingLoanId === id ? null : id; renderLeningen(); }
 function updateLoanName(idx, value){ state.leningen[idx].naam = value.trim(); persistLocal(); renderLeningen(); }
 function updateLoanTotal(idx, value){ state.leningen[idx].totaal = Number(value||0); persistLocal(); renderLeningen(); }
@@ -1542,11 +1925,7 @@ function moveCategoryDown(catId){
   persistLocal();
   renderBudget();
 }
-function toggleCategoryActions(id){
-  const card = document.querySelector(`.category-card[data-id="${id}"]`);
-  if(!card) return;
-  card.classList.toggle('reveal-edit');
-}
+function toggleCategoryActions(id){}
 
 
 // Optimized swipe to delete
