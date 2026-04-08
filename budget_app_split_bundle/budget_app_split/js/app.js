@@ -1,3 +1,9 @@
+function rerenderAll(){
+  if(typeof renderAll === 'function'){
+    renderAll();
+  }
+}
+
 async function init(){
   restoreLocal();
 
@@ -5,11 +11,7 @@ async function init(){
     normalizeData();
   }
 
-  if(typeof renderAll === 'function'){
-    renderAll();
-  } else if(typeof rerenderAll === 'function'){
-    rerenderAll();
-  }
+  rerenderAll();
 
   try{
     const result = await sheetsGet();
