@@ -33,15 +33,23 @@ function renderDashboard(){
 
     <div class="sec">Grootste uitgaven</div>
     <div class="dashboard-top3">
-      ${top3.map((cat, idx) => `
-        <div class="top3-row">
-          <div class="top3-head">
-            <div class="top3-name">${idx+1}. ${escapeHtml(cat.naam)}</div>
-            <div class="top3-amount">${fmt(totalForCategory(cat.id))}</div>
-          </div>
-          <div class="top3-sub">${postsCount(cat.id)} posten · ${total ? ((totalForCategory(cat.id)/total)*100).toFixed(0) : 0}% van je budget</div>
-        </div>
-      `).join('')}
+      ${top3.map((cat, idx) => {
+        const count = postsCount(cat.id);
+        const clickable = count > 0;
+        return `
+          <button
+            class="top3-row ${clickable ? 'is-clickable' : 'is-static'}"
+            type="button"
+            ${clickable ? `onclick="openDashboardBudgetCategory('${cat.id}')"` : 'disabled'}
+          >
+            <div class="top3-head">
+              <div class="top3-name">${idx+1}. ${escapeHtml(cat.naam)}</div>
+              <div class="top3-amount">${fmt(totalForCategory(cat.id))}</div>
+            </div>
+            <div class="top3-sub">${count} posten · ${total ? ((totalForCategory(cat.id)/total)*100).toFixed(0) : 0}% van je budget</div>
+          </button>
+        `;
+      }).join('')}
     </div>
 
     <div class="sec">Verdeling budget</div>
@@ -59,4 +67,19 @@ function renderDashboard(){
       </div>
     </div>
   `;
+}
+
+function openDashboardBudgetCategory(catId){
+  const category = state.categorieen.find(cat => cat.id === catId);
+  if(!category || !postsCount(catId)) return;
+
+  state.budgetSubtab = 'categorieen';
+  state.budgetSelectedCategoryId = catId;
+  state.budgetFocusCategoryId = catId;
+
+  const budgetTab = [...document.querySelectorAll('.tab')].find(
+    btn => btn.textContent.trim().toLowerCase() === 'budget'
+  );
+
+  go('budget', budgetTab || null);
 }

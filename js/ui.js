@@ -172,156 +172,6 @@ function escapeHtml(v){
     .replaceAll('>','&gt;');
 }
 
-// Swipe to delete voor nieuwe budget cards
-
-const swipeState = {};
-const SWIPE_MAX = 120;
-const SWIPE_SNAP = 88;
-const SWIPE_REVEAL = 34;
-const SWIPE_DELETE_THRESHOLD = 108;
-
-function getSwipeRow(id){
-  return document.querySelector(`.budget-post-card[data-id="${id}"]`);
-}
-
-function getSwipeContent(row){
-  return row ? row.querySelector('.budget-post-card__content') : null;
-}
-
-function setSwipeX(stateRef, x){
-  stateRef.x = x;
-  if(stateRef.frame) return;
-
-  stateRef.frame = requestAnimationFrame(() => {
-    stateRef.frame = null;
-
-    const row = stateRef.row;
-    const content = stateRef.content;
-    if(!row || !content) return;
-
-    const nextX = stateRef.x || 0;
-    const progress = Math.min(1, Math.max(0, Math.abs(nextX) / SWIPE_DELETE_THRESHOLD));
-
-    row.style.setProperty('--swipe-progress', progress.toFixed(3));
-    row.classList.toggle('reveal-delete', Math.abs(nextX) > SWIPE_REVEAL);
-    row.classList.toggle('snap-open', Math.abs(nextX) > SWIPE_SNAP * 0.92);
-    content.style.transform = `translate3d(${nextX}px,0,0)`;
-  });
-}
-
-function closeSwipeRow(row){
-  if(!row) return;
-  const content = getSwipeContent(row);
-
-  if(content){
-    content.style.transition = 'transform .22s cubic-bezier(.22,1,.36,1)';
-    content.style.transform = 'translate3d(0,0,0)';
-  }
-
-  row.classList.remove('reveal-delete','snap-open','swiping');
-  row.style.setProperty('--swipe-progress', 0);
-}
-
-function openSwipeRow(row){
-  if(!row) return;
-  const content = getSwipeContent(row);
-
-  if(content){
-    content.style.transition = 'transform .22s cubic-bezier(.22,1,.36,1)';
-    content.style.transform = `translate3d(-${SWIPE_SNAP}px,0,0)`;
-  }
-
-  row.classList.add('reveal-delete','snap-open');
-  row.style.setProperty('--swipe-progress', 1);
-}
-
-function closeOtherSwipeRows(activeId){
-  document.querySelectorAll('.budget-post-card.reveal-delete, .budget-post-card.snap-open').forEach(row => {
-    if(row.dataset.id !== String(activeId)) closeSwipeRow(row);
-  });
-}
-
-function swipeStart(e, id){
-  const touch = e.changedTouches[0];
-  const row = getSwipeRow(id);
-  if(!row) return;
-
-  closeOtherSwipeRows(id);
-
-  const content = getSwipeContent(row);
-  const currentOpen = row.classList.contains('snap-open') ? -SWIPE_SNAP : 0;
-
-  swipeState[id] = {
-    row,
-    content,
-    startX: touch.clientX,
-    startY: touch.clientY,
-    x: currentOpen,
-    baseX: currentOpen,
-    locked: false,
-    isHorizontal: false,
-    frame: null
-  };
-
-  row.classList.add('swiping');
-  if(content) content.style.transition = 'none';
-}
-
-function swipeMove(e, id){
-  const stateRef = swipeState[id];
-  if(!stateRef || !stateRef.row) return;
-
-  const touch = e.changedTouches[0];
-  const rawDx = touch.clientX - stateRef.startX;
-  const rawDy = touch.clientY - stateRef.startY;
-
-  if(!stateRef.locked){
-    if(Math.abs(rawDx) < 6 && Math.abs(rawDy) < 6) return;
-    stateRef.locked = true;
-    stateRef.isHorizontal = Math.abs(rawDx) > Math.abs(rawDy) * 1.2;
-  }
-
-  if(!stateRef.isHorizontal) return;
-
-  e.preventDefault();
-
-  let nextX = stateRef.baseX + rawDx;
-  if(nextX > 18) nextX = 18 - Math.pow(18 - nextX, 0.72);
-  if(nextX < -SWIPE_MAX) nextX = -SWIPE_MAX - Math.pow(Math.abs(nextX + SWIPE_MAX), 0.76) * 0.16;
-  nextX = Math.max(-SWIPE_MAX - 12, Math.min(12, nextX));
-
-  setSwipeX(stateRef, nextX);
-}
-
-function swipeEnd(e, id){
-  const stateRef = swipeState[id];
-  if(!stateRef || !stateRef.row) return;
-
-  const row = stateRef.row;
-  const dx = stateRef.x || 0;
-  row.classList.remove('swiping');
-
-  if(stateRef.frame){
-    cancelAnimationFrame(stateRef.frame);
-    stateRef.frame = null;
-  }
-
-  if(dx <= -SWIPE_DELETE_THRESHOLD){
-    openSwipeRow(row);
-    setTimeout(() => {
-      openConfirmModal('Post verwijderen?', 'Weet je zeker dat je deze post wilt verwijderen?', () => {
-        removeBudgetPost(id);
-      });
-    }, 70);
-  }else if(dx <= -SWIPE_REVEAL){
-    openSwipeRow(row);
-  }else{
-    closeSwipeRow(row);
-  }
-
-  delete swipeState[id];
-}
-
 function openAppModal(type, payload = null, onConfirm = null){
   state.appModalOpen = true;
   state.appModalType = type;
@@ -346,6 +196,16 @@ function confirmAppModal(){
   const fn = state.appModalOnConfirm;
   closeAppModal();
   if(typeof fn === 'function') fn();
+}
+
+function togglePasswordVisibility(inputId, button){
+  const input = document.getElementById(inputId);
+  if(!input || !button) return;
+
+  const nextType = input.type === 'password' ? 'text' : 'password';
+  input.type = nextType;
+  button.textContent = nextType === 'password' ? '👁' : '🙈';
+  button.setAttribute('aria-label', nextType === 'password' ? 'Toon wachtwoord' : 'Verberg wachtwoord');
 }
 
 function renderAppModal(){
@@ -440,13 +300,21 @@ function renderAppModal(){
             </div>
             <div>
               <div class="budget-inline-label">Wachtwoord</div>
-              <input
-                id="cloud-login-password"
-                class="input"
-                type="password"
-                autocomplete="current-password"
-                placeholder="Wachtwoord"
-              >
+              <div class="password-field">
+                <input
+                  id="cloud-login-password"
+                  class="input password-field-input"
+                  type="password"
+                  autocomplete="current-password"
+                  placeholder="Wachtwoord"
+                >
+                <button
+                  type="button"
+                  class="password-toggle-btn"
+                  onclick="togglePasswordVisibility('cloud-login-password', this)"
+                  aria-label="Toon wachtwoord"
+                >👁</button>
+              </div>
             </div>
           </div>
 

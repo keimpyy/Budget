@@ -93,10 +93,10 @@ ${cats.length
         const catTotal = totalForCategory(cat.id);
         const count = rows.length;
         const pct = Math.min(100, budgetUsagePct(cat.id));
-        const isOpen = !!state.openCats[cat.id];
+        const isOpen = state.budgetFocusCategoryId === cat.id || !!state.openCats[cat.id];
 
         return `
-          <article class="card budget-category-card">
+          <article class="card budget-category-card" data-category-id="${cat.id}">
             <header class="budget-category-card__head">
               <button
                 class="budget-category-card__titlewrap budget-category-card__toggle"
@@ -130,17 +130,7 @@ ${cats.length
                       <article
                         class="budget-post-card"
                         data-id="${item.id}"
-                        ontouchstart="swipeStart(event, '${item.id}')"
-                        ontouchmove="swipeMove(event, '${item.id}')"
-                        ontouchend="swipeEnd(event, '${item.id}')"
                       >
-                        <div class="swipe-delete-bg">
-                          <div class="swipe-action">
-                            <span class="swipe-action-icon">✕</span>
-                            <span class="swipe-action-label">Verwijder</span>
-                          </div>
-                        </div>
-
                         <div class="budget-post-card__content">
                           <button class="budget-post-card__main" onclick="openBudgetComposer('post','${item.id}')">
                             <span class="budget-post-card__name">${escapeHtml(item.post)}</span>
@@ -196,6 +186,14 @@ ${cats.length
     </div>
     ${incomeView ? incomeHtml : categoriesHtml}
   `;
+
+  if(!incomeView && state.budgetSelectedCategoryId){
+    requestAnimationFrame(() => {
+      const target = document.querySelector(`[data-category-id="${state.budgetSelectedCategoryId}"]`);
+      if(target) target.scrollIntoView({ behavior:'smooth', block:'start' });
+      state.budgetFocusCategoryId = null;
+    });
+  }
 
   renderBudgetComposer();
 }
@@ -487,3 +485,4 @@ function toggleBudgetCategory(catId){
   persistLocal();
   renderBudget();
 }
+

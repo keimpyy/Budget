@@ -9,6 +9,31 @@ body{
   background:var(--bg);
   color:var(--text);
   font-family:'Segoe UI',system-ui,sans-serif;
+  --nav-tilt:9deg;
+  --nav-shift:16px;
+  --nav-enter-duration:.26s;
+  --nav-exit-duration:.18s;
+}
+
+body[data-theme="sakura"]{
+  --nav-tilt:7deg;
+  --nav-shift:14px;
+  --nav-enter-duration:.3s;
+  --nav-exit-duration:.2s;
+}
+
+body[data-theme="neon"]{
+  --nav-tilt:10deg;
+  --nav-shift:18px;
+  --nav-enter-duration:.22s;
+  --nav-exit-duration:.16s;
+}
+
+body[data-theme="midnight"]{
+  --nav-tilt:8deg;
+  --nav-shift:16px;
+  --nav-enter-duration:.26s;
+  --nav-exit-duration:.18s;
 }
 
 .shell{
@@ -22,48 +47,78 @@ body{
 .content{
   flex:1;
   padding:10px 20px calc(env(safe-area-inset-bottom,0px) + 40px);
+  perspective:1400px;
 }
 
 .view{display:none}
 .view.active{display:block}
 
-.view.anim-enter-right{display:block;animation:slideEnterRight .26s ease both}
-.view.anim-enter-left{display:block;animation:slideEnterLeft .26s ease both}
-.view.anim-exit-left{display:block;animation:slideExitLeft .26s ease both}
-.view.anim-exit-right{display:block;animation:slideExitRight .26s ease both}
+.view.anim-enter-right{display:block;transform-origin:left center;animation:pageFlipEnterFromRight var(--nav-enter-duration) cubic-bezier(.2,.8,.2,1) both}
+.view.anim-enter-left{display:block;transform-origin:right center;animation:pageFlipEnterFromLeft var(--nav-enter-duration) cubic-bezier(.2,.8,.2,1) both}
+.view.anim-exit-left{display:block;transform-origin:left center;animation:pageFlipExitToLeft var(--nav-exit-duration) cubic-bezier(.3,.7,.3,1) both}
+.view.anim-exit-right{display:block;transform-origin:right center;animation:pageFlipExitToRight var(--nav-exit-duration) cubic-bezier(.3,.7,.3,1) both}
 
-@keyframes slideEnterRight{
-  from{opacity:.6;transform:translateX(26px)}
-  to{opacity:1;transform:translateX(0)}
+@keyframes pageFlipEnterFromRight{
+  from{
+    opacity:0;
+    transform:translateX(var(--nav-shift)) rotateY(calc(var(--nav-tilt) * -1));
+  }
+  to{
+    opacity:1;
+    transform:translateX(0) rotateY(0);
+  }
 }
 
-@keyframes slideEnterLeft{
-  from{opacity:.6;transform:translateX(-26px)}
-  to{opacity:1;transform:translateX(0)}
+@keyframes pageFlipEnterFromLeft{
+  from{
+    opacity:0;
+    transform:translateX(calc(var(--nav-shift) * -1)) rotateY(var(--nav-tilt));
+  }
+  to{
+    opacity:1;
+    transform:translateX(0) rotateY(0);
+  }
 }
 
-@keyframes slideExitLeft{
-  from{opacity:1;transform:translateX(0)}
-  to{opacity:.4;transform:translateX(-26px)}
+@keyframes pageFlipExitToLeft{
+  from{
+    opacity:1;
+    transform:translateX(0) rotateY(0);
+  }
+  to{
+    opacity:.18;
+    transform:translateX(calc(var(--nav-shift) * -0.6)) rotateY(calc(var(--nav-tilt) * .45));
+  }
 }
 
-@keyframes slideExitRight{
-  from{opacity:1;transform:translateX(0)}
-  to{opacity:.4;transform:translateX(26px)}
+@keyframes pageFlipExitToRight{
+  from{
+    opacity:1;
+    transform:translateX(0) rotateY(0);
+  }
+  to{
+    opacity:.18;
+    transform:translateX(calc(var(--nav-shift) * .6)) rotateY(calc(var(--nav-tilt) * -.45));
+  }
 }
 
 .header{
   padding:calc(env(safe-area-inset-top,0px) + 18px) 20px 0;
   position:sticky;
   top:0;
-  background:linear-gradient(180deg,var(--bg) 86%, rgba(10,10,15,0));
-  backdrop-filter:blur(12px);
+  background:linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--bg) 68%, transparent) 0%,
+    color-mix(in srgb, var(--bg) 40%, transparent) 62%,
+    rgba(10,10,15,0) 100%
+  );
+  backdrop-filter:blur(9px);
   z-index:100;
 }
 
 .header-top{
   display:flex;
-  justify-content:space-between;
+  justify-content:flex-end;
   align-items:center;
   margin-bottom:14px;
   gap:12px;
@@ -132,7 +187,7 @@ body{
   background:var(--surface2);
   border:1px solid var(--border);
   border-radius:20px;
-  padding:6px 10px;
+  padding:5px 9px;
   font-family:monospace;
   cursor:pointer;
 }
@@ -153,14 +208,14 @@ body{
 }
 
 .account-avatar-btn{
-  width:38px;
-  height:38px;
-  border-radius:14px;
+  width:34px;
+  height:34px;
+  border-radius:12px;
   border:1px solid var(--border);
   background:linear-gradient(135deg,var(--accent),var(--accent2));
   color:#fff;
   font-family:inherit;
-  font-size:14px;
+  font-size:13px;
   font-weight:900;
   cursor:pointer;
   box-shadow:var(--shadow);
@@ -168,22 +223,26 @@ body{
 
 .account-menu-panel{
   position:absolute;
-  top:calc(100% + 10px);
+  top:calc(100% + 8px);
   right:0;
-  width:min(280px, calc(100vw - 40px));
+  width:min(250px, calc(100vw - 40px));
   padding:14px;
-  border-radius:20px;
+  border-radius:18px;
   border:1px solid var(--border);
   background:linear-gradient(180deg,var(--surface),var(--surface2));
   box-shadow:var(--shadow);
   z-index:150;
+  display:grid;
+  gap:12px;
+  justify-items:center;
+  text-align:center;
 }
 
 .account-menu-head{
   display:flex;
   flex-direction:column;
-  gap:4px;
-  margin-bottom:12px;
+  gap:3px;
+  align-items:center;
 }
 
 .account-menu-kicker{
@@ -197,10 +256,11 @@ body{
   font-size:12px;
   line-height:1.5;
   word-break:break-all;
+  max-width:100%;
 }
 
 .account-menu-group{
-  margin-bottom:12px;
+  width:100%;
 }
 
 .account-menu-label{
@@ -213,20 +273,22 @@ body{
 }
 
 .account-theme-row{
-  display:flex;
-  flex-wrap:wrap;
+  display:grid;
+  grid-template-columns:repeat(3, minmax(0, 1fr));
   gap:8px;
+  width:100%;
 }
 
 .account-theme-chip{
   min-height:34px;
-  padding:0 12px;
+  width:100%;
+  padding:0 10px;
   border-radius:999px;
   border:1px solid var(--border);
   background:var(--surface2);
   color:var(--text);
   font-family:inherit;
-  font-size:12px;
+  font-size:11px;
   font-weight:700;
   cursor:pointer;
 }
@@ -238,9 +300,15 @@ body{
 }
 
 .account-menu-actions{
-  display:flex;
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
   gap:8px;
-  justify-content:flex-end;
+  width:100%;
+}
+
+.account-menu-actions .btn{
+  width:100%;
+  justify-content:center;
 }
 
 .note{font-size:12px;color:var(--muted);line-height:1.6}

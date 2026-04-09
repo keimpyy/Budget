@@ -21,6 +21,7 @@ const state = {
   currentView:'dashboard',
   lastNonSettingsView:'dashboard',
   budgetSelectedCategoryId:null,
+  budgetFocusCategoryId:null,
   budgetComposerOpen:false,
   budgetComposerMode:'category',
   budgetComposerTargetId:null,

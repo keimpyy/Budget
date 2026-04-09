@@ -13,7 +13,7 @@
   --red:#ff4d4f;
   --amber:#ffc857;
 
-  --shadow:0 10px 30px rgba(0,0,0,.5);
+  --shadow:0 10px 22px rgba(0,0,0,.18);
 }
 
 /* Theme 1: Sakura */
@@ -31,9 +31,8 @@ body[data-theme="sakura"]{
   --red:#ff7aa8;
   --amber:#ffd27a;
   --shadow:
-    0 24px 60px rgba(0,0,0,.55),
-    0 10px 28px rgba(0,0,0,.32),
-    0 0 40px rgba(255,121,176,.18);
+    0 12px 28px rgba(0,0,0,.2),
+    0 0 18px rgba(255,121,176,.08);
 }
 
 /* Theme 2: Neon */
@@ -50,7 +49,7 @@ body[data-theme="neon"]{
   --green:#22c55e;
   --red:#ef4444;
   --amber:#facc15;
-  --shadow:0 10px 40px rgba(0,0,0,.5);
+  --shadow:0 12px 24px rgba(0,0,0,.2);
 }
 
 /* Fallback default */
@@ -68,7 +67,7 @@ body[data-theme="midnight"]{
   --green:#00ffa3;
   --red:#ff4d4f;
   --amber:#ffc857;
-  --shadow:0 10px 30px rgba(0,0,0,.5);
+  --shadow:0 10px 22px rgba(0,0,0,.18);
 }
 
 /* Theme-specific UI polish */
@@ -93,8 +92,8 @@ body[data-theme="sakura"] .loan-percent-badge{
 
 body[data-theme="sakura"] .card{
   box-shadow:
-    0 10px 30px rgba(0,0,0,.45),
-    0 0 20px rgba(255,121,176,.08);
+    0 10px 22px rgba(0,0,0,.18),
+    0 0 12px rgba(255,121,176,.05);
 }
 
 body[data-theme="neon"] .btn{
