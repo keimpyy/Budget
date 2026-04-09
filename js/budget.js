@@ -57,7 +57,6 @@ function renderBudget() {
             `).join('')}
           </section>
         </div>
-
         <aside class="budget-sidebar"></aside>
       </div>
     </section>
@@ -183,10 +182,7 @@ ${cats.length
   `
 }
         </div>
-
-        <aside class="budget-sidebar">
-          ${renderBudgetSummaryCard(total, remaining)}
-        </aside>
+        <aside class="budget-sidebar"></aside>
       </div>
     </section>
   `;
