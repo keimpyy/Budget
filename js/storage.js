@@ -49,11 +49,25 @@ async function getCloudMemberRecord(){
   }
 
   const supabase = getSupabaseClient();
-  const { data, error } = await supabase
+  let { data, error } = await supabase
     .from('household_members')
     .select('household_key, theme_preference')
     .eq('user_id', user.id)
     .maybeSingle();
+
+  if(error && /theme_preference/i.test(error.message || '')){
+    const fallback = await supabase
+      .from('household_members')
+      .select('household_key')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    data = fallback.data ? {
+      household_key: fallback.data.household_key,
+      theme_preference: 'midnight'
+    } : null;
+    error = fallback.error;
+  }
 
   if(error) throw error;
   return data || null;
@@ -85,6 +99,11 @@ async function saveThemePreference(theme){
     .update({ theme_preference: resolved })
     .eq('user_id', user.id)
     .eq('household_key', householdKey);
+
+  if(error && /theme_preference/i.test(error.message || '')){
+    setCloudThemePreference(resolved);
+    return { ok:true, skipped:true };
+  }
 
   if(error){
     return { ok:false, error:error.message || 'Theme opslaan mislukt' };
@@ -118,6 +137,10 @@ async function syncCloudSession(){
 
   if(typeof renderInstellingen === 'function' && state.currentView === 'instellingen'){
     renderInstellingen();
+  }
+
+  if(typeof renderHeaderActions === 'function'){
+    renderHeaderActions();
   }
 }
 
@@ -536,6 +559,7 @@ async function signInToCloud(emailArg, passwordArg){
     if(error) throw error;
 
     state.cloudUserEmail = data?.user?.email || email.trim();
+    state.accountMenuOpen = false;
     setCloudHouseholdKey('');
     await syncCloudSession();
     setCloudStatus(`Ingelogd als ${state.cloudUserEmail}`);
@@ -575,6 +599,7 @@ async function signOutFromCloud(){
     if(typeof applyTheme === 'function'){
       applyTheme('midnight', { persist:false, skipCloudPersist:true });
     }
+    closeAppModal();
     setCloudStatus('Uitgelogd');
 
     if(typeof renderInstellingen === 'function'){
