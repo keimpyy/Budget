@@ -28,6 +28,10 @@ function setCloudStatus(message){
   if(status) status.textContent = state.cloudStatus;
 }
 
+function setCloudHouseholdKey(householdKey){
+  state.cloudHouseholdKey = householdKey || '';
+}
+
 function getSupabaseClient(){
   if(window.supabaseClient) return window.supabaseClient;
   throw new Error('Supabase client niet geladen');
@@ -43,11 +47,41 @@ async function getCloudUser(){
   return user;
 }
 
+async function getCloudHouseholdKey(){
+  if(state.cloudHouseholdKey) return state.cloudHouseholdKey;
+
+  const user = await getCloudUser();
+  if(!user){
+    throw new Error('Log eerst in op Supabase');
+  }
+
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase
+    .from('household_members')
+    .select('household_key')
+    .eq('user_id', user.id)
+    .maybeSingle();
+
+  if(error){
+    throw error;
+  }
+
+  const householdKey = data?.household_key || '';
+  if(!householdKey){
+    throw new Error('Geen huishouden gekoppeld aan deze gebruiker');
+  }
+
+  setCloudHouseholdKey(householdKey);
+  return householdKey;
+}
+
 async function syncCloudSession(){
   try{
     await getCloudUser();
+    await getCloudHouseholdKey();
   }catch(e){
     state.cloudUserEmail = '';
+    state.cloudHouseholdKey = '';
   }
 
   if(typeof renderInstellingen === 'function' && state.currentView === 'instellingen'){
@@ -81,6 +115,13 @@ async function safeJson(res){
 }
 
 function normalizeData(){
+  state.inkomsten = state.inkomsten.map((row, idx) => ({
+    id: String(row.id || uid('inc')),
+    naam: String(row.naam || 'Nieuwe inkomstenbron'),
+    bedrag: Number(row.bedrag || 0),
+    volgorde: Number(row.volgorde || (idx + 1))
+  }));
+
   state.categorieen = orderedCats().map((cat, idx) => ({
     id: String(cat.id || uid('cat')),
     naam: String(cat.naam || 'Nieuwe categorie'),
@@ -93,6 +134,15 @@ function normalizeData(){
     post: String(row.post || 'Nieuwe post'),
     budget: Number(row.budget || 0),
     volgorde: Number(row.volgorde || 0)
+  }));
+
+  state.leningen = state.leningen.map((row, idx) => ({
+    id: String(row.id || uid('ln')),
+    naam: String(row.naam || 'Nieuwe lening'),
+    totaal: Number(row.totaal || 0),
+    betaald: Number(row.betaald || 0),
+    kleur: String(row.kleur || ''),
+    volgorde: Number(row.volgorde || (idx + 1))
   }));
 
   const validCatIds = new Set(state.categorieen.map(c => c.id));
@@ -112,10 +162,11 @@ function toRows(){
   normalizeData();
 
   return {
-    action:'saveAll',
     inkomsten: state.inkomsten.map(r => ({
+      id: r.id,
       naam: r.naam || '',
-      bedrag: Number(r.bedrag || 0)
+      bedrag: Number(r.bedrag || 0),
+      volgorde: Number(r.volgorde || 0)
     })),
     categorieen: orderedCats().map((c, i) => ({
       id: c.id,
@@ -136,16 +187,19 @@ function toRows(){
       naam: r.naam || '',
       totaal: Number(r.totaal || 0),
       betaald: Number(r.betaald || 0),
-      kleur: String(r.kleur || '')
+      kleur: String(r.kleur || ''),
+      volgorde: Number(r.volgorde || 0)
     }))
   };
 }
 
 function applyCloudData(data){
   if(data.inkomsten){
-    state.inkomsten = data.inkomsten.map(r => ({
+    state.inkomsten = data.inkomsten.map((r, i) => ({
+      id: String(r.id || uid('inc')),
       naam: String(r.naam || ''),
-      bedrag: Number(r.bedrag || 0)
+      bedrag: Number(r.bedrag || 0),
+      volgorde: Number(r.volgorde || (i + 1))
     }));
   }
 
@@ -168,12 +222,13 @@ function applyCloudData(data){
   }
 
   if(data.leningen){
-    state.leningen = data.leningen.map(r => ({
+    state.leningen = data.leningen.map((r, i) => ({
       id: String(r.id || uid('ln')),
       naam: String(r.naam || ''),
       totaal: Number(r.totaal || 0),
       betaald: Number(r.betaald || 0),
-      kleur: String(r.kleur || '')
+      kleur: String(r.kleur || ''),
+      volgorde: Number(r.volgorde || (i + 1))
     }));
   }
 
@@ -187,23 +242,97 @@ async function fetchCloudState(){
   if(!user){
     return { ok:false, error:'Log eerst in op Supabase' };
   }
+  const householdKey = await getCloudHouseholdKey();
 
   const supabase = getSupabaseClient();
-  const { data, error } = await supabase
-    .from('app_state')
-    .select('inkomsten,categorieen,budget,leningen')
-    .eq('owner_user_id', user.id)
-    .maybeSingle();
+  const [
+    incomeResult,
+    categoryResult,
+    budgetResult,
+    loanResult
+  ] = await Promise.all([
+    supabase
+      .from('income_items')
+      .select('id,name,amount,sort_order')
+      .eq('household_key', householdKey)
+      .order('sort_order', { ascending:true }),
+    supabase
+      .from('categories')
+      .select('id,name,sort_order')
+      .eq('household_key', householdKey)
+      .order('sort_order', { ascending:true }),
+    supabase
+      .from('budget_items')
+      .select('id,category_id,name,amount,sort_order')
+      .eq('household_key', householdKey)
+      .order('sort_order', { ascending:true }),
+    supabase
+      .from('loans')
+      .select('id,name,total,paid,color,sort_order')
+      .eq('household_key', householdKey)
+      .order('sort_order', { ascending:true })
+  ]);
 
+  const error = incomeResult.error || categoryResult.error || budgetResult.error || loanResult.error;
   if(error){
     return { ok:false, error:error.message || 'Ophalen mislukt' };
   }
 
-  if(!data){
-    return { ok:true, inkomsten:[], categorieen:[], budget:[], leningen:[] };
+  return {
+    ok:true,
+    inkomsten: (incomeResult.data || []).map((row, idx) => ({
+      id: row.id,
+      naam: row.name || '',
+      bedrag: Number(row.amount || 0),
+      volgorde: Number(row.sort_order || (idx + 1))
+    })),
+    categorieen: (categoryResult.data || []).map((row, idx) => ({
+      id: row.id,
+      naam: row.name || '',
+      volgorde: Number(row.sort_order || (idx + 1))
+    })),
+    budget: (budgetResult.data || []).map((row, idx) => ({
+      id: row.id,
+      categorieId: row.category_id || '',
+      post: row.name || '',
+      budget: Number(row.amount || 0),
+      volgorde: Number(row.sort_order || (idx + 1))
+    })),
+    leningen: (loanResult.data || []).map((row, idx) => ({
+      id: row.id,
+      naam: row.name || '',
+      totaal: Number(row.total || 0),
+      betaald: Number(row.paid || 0),
+      kleur: row.color || '',
+      volgorde: Number(row.sort_order || (idx + 1))
+    }))
+  };
+}
+
+async function replaceHouseholdTable(tableName, householdKey, rows, mapRow){
+  const supabase = getSupabaseClient();
+  const ids = rows.map(row => String(row.id)).filter(Boolean);
+
+  let deleteQuery = supabase
+    .from(tableName)
+    .delete()
+    .eq('household_key', householdKey);
+
+  if(ids.length){
+    deleteQuery = deleteQuery.not('id', 'in', `(${ids.map(id => `"${id}"`).join(',')})`);
   }
 
-  return { ok:true, ...data };
+  const { error: deleteError } = await deleteQuery;
+  if(deleteError) throw deleteError;
+
+  if(!rows.length) return;
+
+  const payload = rows.map(mapRow);
+  const { error: upsertError } = await supabase
+    .from(tableName)
+    .upsert(payload, { onConflict:'id' });
+
+  if(upsertError) throw upsertError;
 }
 
 async function saveCloudState(data){
@@ -211,22 +340,47 @@ async function saveCloudState(data){
   if(!user){
     return { ok:false, error:'Log eerst in op Supabase' };
   }
+  const householdKey = await getCloudHouseholdKey();
 
-  const supabase = getSupabaseClient();
-  const payload = {
-    owner_user_id: user.id,
-    inkomsten: data.inkomsten || [],
-    categorieen: data.categorieen || [],
-    budget: data.budget || [],
-    leningen: data.leningen || [],
-    updated_at: new Date().toISOString()
-  };
+  try{
+    await replaceHouseholdTable('income_items', householdKey, data.inkomsten || [], (row) => ({
+      id: String(row.id),
+      household_key: householdKey,
+      name: row.naam || '',
+      amount: Number(row.bedrag || 0),
+      sort_order: Number(row.volgorde || 0),
+      updated_at: new Date().toISOString()
+    }));
 
-  const { error } = await supabase
-    .from('app_state')
-    .upsert(payload, { onConflict:'owner_user_id' });
+    await replaceHouseholdTable('categories', householdKey, data.categorieen || [], (row) => ({
+      id: String(row.id),
+      household_key: householdKey,
+      name: row.naam || '',
+      sort_order: Number(row.volgorde || 0),
+      updated_at: new Date().toISOString()
+    }));
 
-  if(error){
+    await replaceHouseholdTable('budget_items', householdKey, data.budget || [], (row) => ({
+      id: String(row.id),
+      household_key: householdKey,
+      category_id: String(row.categorieId || ''),
+      name: row.post || '',
+      amount: Number(row.budget || 0),
+      sort_order: Number(row.volgorde || 0),
+      updated_at: new Date().toISOString()
+    }));
+
+    await replaceHouseholdTable('loans', householdKey, data.leningen || [], (row) => ({
+      id: String(row.id),
+      household_key: householdKey,
+      name: row.naam || '',
+      total: Number(row.totaal || 0),
+      paid: Number(row.betaald || 0),
+      color: String(row.kleur || ''),
+      sort_order: Number(row.volgorde || 0),
+      updated_at: new Date().toISOString()
+    }));
+  }catch(error){
     return { ok:false, error:error.message || 'Opslaan mislukt' };
   }
 
@@ -295,6 +449,8 @@ async function signInToCloud(){
     if(error) throw error;
 
     state.cloudUserEmail = data?.user?.email || email.trim();
+    setCloudHouseholdKey('');
+    await getCloudHouseholdKey();
     setCloudStatus(`Ingelogd als ${state.cloudUserEmail}`);
 
     if(typeof renderInstellingen === 'function'){
@@ -305,6 +461,7 @@ async function signInToCloud(){
     await loadFromCloud();
   }catch(e){
     state.cloudUserEmail = '';
+    state.cloudHouseholdKey = '';
     setCloudStatus(e.message || 'Inloggen mislukt');
     showToast('Inloggen mislukt');
   }
@@ -319,6 +476,7 @@ async function signOutFromCloud(){
     if(error) throw error;
 
     state.cloudUserEmail = '';
+    state.cloudHouseholdKey = '';
     setCloudStatus('Uitgelogd');
 
     if(typeof renderInstellingen === 'function'){
