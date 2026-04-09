@@ -7,7 +7,7 @@ window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBL
   }
 });
 
-window.supabaseClient.auth.onAuthStateChange(async (_event, session) => {
+window.supabaseClient.auth.onAuthStateChange(async (event, session) => {
   state.cloudUserEmail = session?.user?.email || '';
   state.cloudHouseholdKey = '';
   state.cloudThemePreference = 'midnight';
@@ -19,7 +19,14 @@ window.supabaseClient.auth.onAuthStateChange(async (_event, session) => {
 
   if(session?.user && typeof syncCloudSession === 'function'){
     try{
-      await syncCloudSession();
+      const hasSession = await syncCloudSession();
+      if(
+        hasSession &&
+        (event === 'INITIAL_SESSION' || event === 'SIGNED_IN') &&
+        typeof loadFromCloud === 'function'
+      ){
+        await loadFromCloud();
+      }
     }catch(e){
       console.error('Auth state sync mislukt:', e);
     }
