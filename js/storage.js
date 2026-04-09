@@ -666,6 +666,14 @@ async function signOutFromCloud(){
   setCloudStatus('Uitloggen...');
 
   try{
+    const supabase = getSupabaseClient();
+    const { error } = await supabase.auth.signOut({ scope:'local' });
+    if(error) throw error;
+
+    try{
+      window.localStorage.removeItem('budget-veenstra-auth');
+    }catch(e){}
+
     state.cloudUserEmail = '';
     state.cloudHouseholdKey = '';
     state.cloudThemePreference = 'midnight';
@@ -685,10 +693,6 @@ async function signOutFromCloud(){
     }else if(typeof rerenderAll === 'function'){
       rerenderAll();
     }
-
-    const supabase = getSupabaseClient();
-    const { error } = await supabase.auth.signOut();
-    if(error) throw error;
 
     setCloudStatus('Uitgelogd');
 
