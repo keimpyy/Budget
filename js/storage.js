@@ -34,10 +34,16 @@ function getSupabaseClient(){
 
 async function getCloudUser(){
   const supabase = getSupabaseClient();
-  const { data, error } = await supabase.auth.getUser();
-  if(error) throw error;
+  const sessionResult = await supabase.auth.getSession();
+  if(sessionResult.error) throw sessionResult.error;
 
-  const user = data?.user || null;
+  let user = sessionResult.data?.session?.user || null;
+  if(!user){
+    const { data, error } = await supabase.auth.getUser();
+    if(error) throw error;
+    user = data?.user || null;
+  }
+
   state.cloudUserEmail = user?.email || '';
   return user;
 }
@@ -289,7 +295,11 @@ function applyCloudData(data){
 
   normalizeData();
   persistLocal();
-  rerenderAll();
+  if(typeof rerenderCurrentView === 'function'){
+    rerenderCurrentView();
+  }else{
+    rerenderAll();
+  }
 }
 
 async function fetchCloudState(){
@@ -482,7 +492,11 @@ function persistAndSync(renderMode = 'all'){
   }else if(renderMode === 'none'){
     // no-op
   }else{
-    rerenderAll();
+    if(typeof rerenderCurrentView === 'function'){
+      rerenderCurrentView();
+    }else{
+      rerenderAll();
+    }
   }
 
   queueCloudSync();
@@ -594,7 +608,9 @@ function finalizeCloudLogin(email){
 
   showToast('Ingelogd');
 
-  if(typeof rerenderAll === 'function'){
+  if(typeof rerenderCurrentView === 'function'){
+    rerenderCurrentView();
+  }else if(typeof rerenderAll === 'function'){
     rerenderAll();
   }
 
@@ -627,7 +643,9 @@ async function signOutFromCloud(){
     if(typeof renderHeaderActions === 'function'){
       renderHeaderActions();
     }
-    if(typeof rerenderAll === 'function'){
+    if(typeof rerenderCurrentView === 'function'){
+      rerenderCurrentView();
+    }else if(typeof rerenderAll === 'function'){
       rerenderAll();
     }
 

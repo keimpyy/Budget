@@ -10,6 +10,16 @@ function rerenderAll(){
   if(typeof renderHeaderActions === 'function') renderHeaderActions();
 }
 
+function rerenderCurrentView(){
+  const current = state.currentView || 'dashboard';
+
+  if(current === 'dashboard' && typeof renderDashboard === 'function') renderDashboard();
+  if(current === 'budget' && typeof renderBudget === 'function') renderBudget();
+  if(current === 'leningen' && typeof renderLeningen === 'function') renderLeningen();
+  if(current === 'instellingen' && typeof renderInstellingen === 'function') renderInstellingen();
+  if(typeof renderHeaderActions === 'function') renderHeaderActions();
+}
+
 function appSwipeStart(e){
   const t = e.changedTouches[0];
   appSwipe.startX = t.clientX;

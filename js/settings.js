@@ -254,7 +254,9 @@ async function submitLoginModal(){
     if(typeof finalizeCloudLogin === 'function'){
       finalizeCloudLogin(result.email || email);
     }
-    if(typeof rerenderAll === 'function'){
+    if(typeof rerenderCurrentView === 'function'){
+      rerenderCurrentView();
+    }else if(typeof rerenderAll === 'function'){
       rerenderAll();
     }else if(typeof renderHeaderActions === 'function'){
       renderHeaderActions();

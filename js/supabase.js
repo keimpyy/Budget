@@ -1,4 +1,11 @@
-window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true,
+    storageKey: 'budget-veenstra-auth'
+  }
+});
 
 window.supabaseClient.auth.onAuthStateChange(async (_event, session) => {
   state.cloudUserEmail = session?.user?.email || '';

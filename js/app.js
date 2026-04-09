@@ -5,8 +5,6 @@ async function init(){
     normalizeData();
   }
 
-  rerenderAll();
-
   try{
     if(typeof syncCloudSession === 'function'){
       await syncCloudSession();
@@ -21,6 +19,12 @@ async function init(){
     }
   }catch(e){
     console.error('Init cloud sync mislukt:', e);
+  }
+
+  if(typeof rerenderCurrentView === 'function'){
+    rerenderCurrentView();
+  }else{
+    rerenderAll();
   }
 
   const startupOverlay = document.getElementById('startup-overlay');
