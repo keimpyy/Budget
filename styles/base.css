@@ -253,3 +253,318 @@ body{min-height:100vh;overflow-x:hidden}
     padding:18px 24px 34px;
   }
 }
+
+.title{font-size:20px;font-weight:800;letter-spacing:-0.5px}
+.title span{color:var(--accent)}
+
+.badge-btn{
+  font-size:11px;
+  color:var(--muted);
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:6px 10px;
+  font-family:monospace;
+  cursor:pointer;
+}
+
+.card.dragging{opacity:.45;transform:scale(.985)}
+
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.input{font-size:16px!important;width:100%;outline:none;font-family:inherit}
+.input.small{width:110px;text-align:right;font-family:monospace}
+
+.btn{
+  font-family:inherit;
+  font-size:15px;
+  font-weight:700;
+}
+.btn.ghost{
+  background:transparent;
+  color:var(--accent);
+  border:1px solid rgba(124,106,247,.35);
+}
+.btn.danger{
+  background:rgba(255,107,107,.14);
+  color:var(--red);
+  border:1px solid rgba(255,107,107,.25);
+}
+.btn.sm{padding:8px 10px;border-radius:10px;font-size:12px}
+
+.stack{display:flex;flex-direction:column;gap:8px}
+.inline{display:flex;gap:8px;align-items:center}
+.note{font-size:12px;color:var(--muted);line-height:1.6}
+
+.icon-btn{
+  width:38px;
+  height:38px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background:var(--surface2);
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+
+.pill-btn{
+  height:38px;
+  padding:0 12px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background:var(--surface2);
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-weight:700;
+  font-size:12px;
+}
+
+.collapse-btn{
+  width:40px;
+  height:40px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background:var(--surface2);
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-size:18px;
+  flex-shrink:0;
+}
+
+/* post/swipe basis */
+.post-row{
+  position:relative;
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:10px 12px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-top:8px;
+  transition:transform .2s ease;
+}
+.post-row.swiping{transition:none}
+.post-row-content{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  width:100%;
+  z-index:2;
+}
+.swipe-delete-bg{
+  position:absolute;
+  inset:0;
+  border-radius:12px;
+  background:linear-gradient(135deg,rgba(255,107,107,.16),rgba(255,107,107,.08));
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  padding-right:16px;
+  color:var(--red);
+  font-size:12px;
+  font-weight:800;
+  opacity:0;
+  transition:opacity .15s ease;
+  z-index:1;
+}
+.post-row.reveal-delete .swipe-delete-bg{opacity:1}
+
+/* leningen */
+.loan-hero{
+  background:linear-gradient(135deg,#0b0b0b,#101010,#171717);
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:22px;
+  padding:18px 16px 16px;
+  margin-bottom:12px;
+  box-shadow:var(--shadow);
+}
+
+.loan-hero-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:14px;
+}
+
+.loan-hero-title{
+  font-size:18px;
+  font-weight:800;
+  letter-spacing:-.3px;
+}
+
+.loan-hero-pct{
+  font-size:28px;
+  font-weight:900;
+  line-height:1;
+  background:linear-gradient(90deg,#ff3cac,#2b86ff,#00ffa3);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+
+.loan-stats{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:8px;
+  margin-top:14px;
+}
+
+.loan-stat{
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:10px 12px;
+}
+
+.loan-stat-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+}
+
+.loan-stat-label{
+  font-size:10px;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  color:var(--muted);
+  margin-bottom:6px;
+}
+
+.loan-stat-val{
+  font-size:18px;
+  font-weight:900;
+  line-height:1;
+  white-space:nowrap;
+}
+
+.loan-actions{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin-top:14px;
+}
+
+.loan-addpay{
+  background:linear-gradient(135deg,#ff3cac,#2b86ff);
+  color:#fff;
+  border:none;
+  border-radius:14px;
+  padding:14px 16px;
+  font-weight:800;
+  cursor:pointer;
+  width:100%;
+}
+
+.loan-save{
+  background:var(--surface2);
+  color:var(--text);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:14px 16px;
+  font-weight:800;
+  cursor:pointer;
+  width:100%;
+}
+
+.loan-inputs{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  width:100%;
+}
+
+.loan-metric{
+  width:100%;
+  min-width:0;
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:12px;
+}
+
+.loan-metric .input{
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  box-sizing:border-box;
+  display:block;
+}
+
+.loan-metric .inline{
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  gap:10px;
+}
+
+.loan-progress-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+}
+
+.loan-name-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.loan-name-display{
+  font-size:18px;
+  font-weight:800;
+  letter-spacing:-.2px;
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.loan-edit-btn{
+  height:38px;
+  padding:0 12px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background:var(--surface2);
+  color:var(--text);
+  font-weight:700;
+  cursor:pointer;
+  flex-shrink:0;
+}
+
+.loan-name-edit{margin-top:10px}
+
+.loan-percent-badge{
+  margin-left:12px;
+  font-size:28px;
+  font-weight:900;
+  line-height:1;
+  background:linear-gradient(90deg,#ff3cac,#2b86ff,#00ffa3);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  flex-shrink:0;
+}
+
+@media(min-width:420px){
+  .loan-stats{grid-template-columns:1fr 1fr 1fr}
+}
+
+#confetti-layer{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:2000;
+}
