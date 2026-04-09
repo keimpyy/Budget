@@ -61,63 +61,49 @@
 /* Sakura blossom layer */
 
 #sakura-layer{
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  overflow:hidden;
-  z-index:0;
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
 }
 
 .sakura-petal{
-  position:fixed;
-  top:-10vh;
-  width:14px;
-  height:10px;
-  border-radius:14px 10px 14px 10px;
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 14px;
+  height: 10px;
+  border-radius: 14px 10px 14px 10px;
   background:
     radial-gradient(circle at 30% 30%, rgba(255,255,255,.9) 0 16%, transparent 17%),
     linear-gradient(135deg, rgba(255,210,226,.98), rgba(255,121,176,.92) 68%, rgba(255,182,212,.98));
   box-shadow:
     0 0 10px rgba(255,121,176,.18),
     0 2px 8px rgba(0,0,0,.18);
-  opacity:.9;
-  transform-origin:center;
-  animation-name:sakuraFall, sakuraSpin;
-  animation-timing-function:linear, ease-in-out;
-  animation-iteration-count:infinite, infinite;
-}
-
-body[data-theme="sakura"] .header{
-  background:linear-gradient(180deg, rgba(11,8,13,.92) 82%, rgba(11,8,13,0));
-}
-
-body[data-theme="sakura"] .hero::before{
-  background:radial-gradient(circle, rgba(255,121,176,.16) 0%, transparent 70%);
+  transform-origin: center;
+  animation-name: sakuraFall, sakuraSpin;
+  animation-timing-function: linear, ease-in-out;
+  animation-iteration-count: infinite, infinite;
+  will-change: transform, opacity;
 }
 
 @keyframes sakuraFall{
   0%{
-    transform:translate3d(0,-8vh,0) rotate(0deg) scale(.9);
-    opacity:0;
+    transform: translate3d(0, var(--start-y, -20px), 0) scale(.9);
+    opacity: 0;
   }
-  10%{
-    opacity:.95;
+  8%{
+    opacity: .9;
   }
   100%{
-    transform:translate3d(var(--drift, 0px), 115vh, 0) rotate(18deg) scale(1);
-    opacity:.15;
+    transform: translate3d(var(--drift, 0px), calc(var(--start-y, -20px) + 120vh), 0) scale(1);
+    opacity: .12;
   }
 }
 
 @keyframes sakuraSpin{
-  0%{ rotate:0deg; }
-  50%{ rotate:140deg; }
-  100%{ rotate:320deg; }
-}
-
-.shell,
-.content,
-.view{
-  position:relative;
-  z-index:1;
+  0%{ rotate: 0deg; }
+  50%{ rotate: 140deg; }
+  100%{ rotate: 320deg; }
 }

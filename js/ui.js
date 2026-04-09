@@ -124,15 +124,40 @@ function syncSakuraPetals(){
   layer.innerHTML = '';
   if(!isSakura) return;
 
-  const count = Math.min(18, Math.max(10, Math.floor(window.innerWidth / 28)));
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+
+  let count;
+  if(w >= 1400) count = 42;
+  else if(w >= 1100) count = 34;
+  else if(w >= 768) count = 26;
+  else count = 18;
+
   for(let i = 0; i < count; i++){
     const petal = document.createElement('span');
     petal.className = 'sakura-petal';
+
     petal.style.left = `${Math.random() * 100}%`;
-    petal.style.animationDuration = `${8 + Math.random() * 8}s`;
-    petal.style.animationDelay = `${-Math.random() * 10}s`;
-    petal.style.setProperty('--drift', `${-60 + Math.random() * 120}px`);
-    petal.style.transform = `scale(${0.75 + Math.random() * 0.8})`;
+
+    // verspreid petals over de hele animatie, niet alleen bovenin
+    petal.style.animationDelay = `${-Math.random() * 18}s`;
+
+    // iets langere en variabele valduur
+    petal.style.animationDuration = `${10 + Math.random() * 10}s`;
+
+    // horizontale drift
+    petal.style.setProperty('--drift', `${-120 + Math.random() * 240}px`);
+
+    // startspread over schermhoogte
+    petal.style.setProperty('--start-y', `${-20 + Math.random() * (h + 120)}px`);
+
+    // maatvariatie
+    const scale = 0.65 + Math.random() * 0.95;
+    petal.style.transform = `translate3d(0,0,0) scale(${scale})`;
+
+    // kleine opacity-variatie
+    petal.style.opacity = `${0.55 + Math.random() * 0.4}`;
+
     layer.appendChild(petal);
   }
 }
