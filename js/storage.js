@@ -24,6 +24,31 @@ function setCloudThemePreference(theme){
   state.cloudThemePreference = theme || 'midnight';
 }
 
+function clearCloudAuthState(){
+  state.cloudUserEmail = '';
+  state.cloudHouseholdKey = '';
+  state.cloudThemePreference = 'midnight';
+  state.accountMenuOpen = false;
+  state.cloudLoading = false;
+}
+
+function clearCloudAuthStorage(){
+  try{
+    window.localStorage.removeItem('budget-veenstra-auth');
+  }catch(e){}
+
+  try{
+    const keysToRemove = [];
+    for(let i = 0; i < window.localStorage.length; i += 1){
+      const key = window.localStorage.key(i);
+      if(key && (key.startsWith('sb-') || key.startsWith('supabase.auth.'))){
+        keysToRemove.push(key);
+      }
+    }
+    keysToRemove.forEach(key => window.localStorage.removeItem(key));
+  }catch(e){}
+}
+
 let cloudSyncTimer = null;
 let cloudSyncInFlight = false;
 
@@ -536,6 +561,7 @@ function renderInlineSyncStatus(){
 async function loadFromCloud(){
   if(state.cloudLoading) return;
   state.cloudLoading = true;
+  console.info('loadFromCloud:start');
   setCloudStatus('Ophalen...');
   if(typeof setStartupProgress === 'function'){
     setStartupProgress(52, 'Verbinding maken met Supabase...');
@@ -677,25 +703,14 @@ function finalizeCloudLogin(email){
 }
 
 async function signOutFromCloud(){
+  if(state.cloudSigningOut) return;
+  state.cloudSigningOut = true;
   setCloudStatus('Uitloggen...');
 
   try{
-    const supabase = getSupabaseClient();
-    let signOutResult = await supabase.auth.signOut({ scope:'local' });
-    if(signOutResult.error){
-      signOutResult = await supabase.auth.signOut();
-    }
-    if(signOutResult.error) throw signOutResult.error;
-
-    try{
-      window.localStorage.removeItem('budget-veenstra-auth');
-    }catch(e){}
-
-    state.cloudUserEmail = '';
-    state.cloudHouseholdKey = '';
-    state.cloudThemePreference = 'midnight';
-    state.accountMenuOpen = false;
+    clearCloudAuthState();
     closeAppModal();
+    clearCloudAuthStorage();
     if(typeof applyTheme === 'function'){
       applyTheme('midnight', { persist:false, skipCloudPersist:true });
     }
@@ -711,12 +726,32 @@ async function signOutFromCloud(){
       rerenderAll();
     }
 
+    const supabase = getSupabaseClient();
+    try{
+      let signOutResult = await Promise.race([
+        supabase.auth.signOut({ scope:'local' }),
+        new Promise(resolve => setTimeout(() => resolve({ error:null, timedOut:true }), 2500))
+      ]);
+
+      if(signOutResult?.error){
+        signOutResult = await supabase.auth.signOut();
+      }
+      if(signOutResult?.error) throw signOutResult.error;
+    }catch(e){
+      console.error('Supabase signOut achtergrondfout:', e);
+    }
+
     setCloudStatus('Uitgelogd');
 
     showToast('Uitgelogd');
   }catch(e){
     setCloudStatus(e.message || 'Uitloggen mislukt');
     showToast('Uitloggen mislukt');
+  }finally{
+    state.cloudSigningOut = false;
+    if(typeof renderHeaderActions === 'function'){
+      renderHeaderActions();
+    }
   }
 }
 

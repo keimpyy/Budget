@@ -188,9 +188,9 @@ ${cats.length
     ${incomeView ? incomeHtml : categoriesHtml}
   `;
 
-  if(!incomeView && state.budgetSelectedCategoryId){
+  if(!incomeView && state.budgetFocusCategoryId){
     requestAnimationFrame(() => {
-      const target = document.querySelector(`[data-category-id="${state.budgetSelectedCategoryId}"]`);
+      const target = document.querySelector(`[data-category-id="${state.budgetFocusCategoryId}"]`);
       if(target) target.scrollIntoView({ behavior:'smooth', block:'start' });
       state.budgetFocusCategoryId = null;
     });
