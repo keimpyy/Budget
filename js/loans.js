@@ -107,6 +107,7 @@ function renderLeningen(){
       </div>
     </div>
   `;
+  renderAppModal();
 }
 
 function toggleLoanEdit(id){ state.editingLoanId = state.editingLoanId === id ? null : id; renderLeningen(); }
