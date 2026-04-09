@@ -1,9 +1,30 @@
+const appStorage = {
+  getItem(key){
+    try{
+      return window.localStorage.getItem(key);
+    }catch(e){
+      return null;
+    }
+  },
+  setItem(key, value){
+    try{
+      window.localStorage.setItem(key, value);
+    }catch(e){}
+  },
+  removeItem(key){
+    try{
+      window.localStorage.removeItem(key);
+    }catch(e){}
+  }
+};
+
 window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
-    detectSessionInUrl: true,
-    storageKey: 'budget-veenstra-auth'
+    detectSessionInUrl: false,
+    storageKey: 'budget-veenstra-auth',
+    storage: appStorage
   }
 });
 
