@@ -1,24 +1,10 @@
 function persistLocal(){
-  const cache = {
-    inkomsten: state.inkomsten,
-    categorieen: state.categorieen,
-    budget: state.budget,
-    leningen: state.leningen
-  };
-  localStorage.setItem('bv_budget_state_v3', JSON.stringify(cache));
+  // App data now lives in Supabase only.
 }
 
 function restoreLocal(){
   try{
-    const raw = localStorage.getItem('bv_budget_state_v3');
-    if(!raw) return;
-
-    const parsed = JSON.parse(raw);
-
-    if(parsed.inkomsten) state.inkomsten = parsed.inkomsten;
-    if(parsed.categorieen) state.categorieen = parsed.categorieen;
-    if(parsed.budget) state.budget = parsed.budget;
-    if(parsed.leningen) state.leningen = parsed.leningen;
+    localStorage.removeItem('bv_budget_state_v3');
   }catch(e){}
 }
 
@@ -32,6 +18,10 @@ function setCloudStatus(message){
 
 function setCloudHouseholdKey(householdKey){
   state.cloudHouseholdKey = householdKey || '';
+}
+
+function setCloudThemePreference(theme){
+  state.cloudThemePreference = theme || 'midnight';
 }
 
 let cloudSyncTimer = null;
@@ -52,9 +42,7 @@ async function getCloudUser(){
   return user;
 }
 
-async function getCloudHouseholdKey(){
-  if(state.cloudHouseholdKey) return state.cloudHouseholdKey;
-
+async function getCloudMemberRecord(){
   const user = await getCloudUser();
   if(!user){
     throw new Error('Log eerst in op Supabase');
@@ -63,30 +51,69 @@ async function getCloudHouseholdKey(){
   const supabase = getSupabaseClient();
   const { data, error } = await supabase
     .from('household_members')
-    .select('household_key')
+    .select('household_key, theme_preference')
     .eq('user_id', user.id)
     .maybeSingle();
 
-  if(error){
-    throw error;
-  }
+  if(error) throw error;
+  return data || null;
+}
 
-  const householdKey = data?.household_key || '';
+async function getCloudHouseholdKey(){
+  if(state.cloudHouseholdKey) return state.cloudHouseholdKey;
+
+  const member = await getCloudMemberRecord();
+  const householdKey = member?.household_key || '';
   if(!householdKey){
     throw new Error('Geen huishouden gekoppeld aan deze gebruiker');
   }
 
   setCloudHouseholdKey(householdKey);
+  setCloudThemePreference(member?.theme_preference || 'midnight');
   return householdKey;
+}
+
+async function saveThemePreference(theme){
+  const resolved = ALLOWED_THEMES.has(theme) ? theme : 'midnight';
+  const user = await getCloudUser();
+  if(!user) return { ok:false, error:'Log eerst in om je theme op te slaan' };
+
+  const householdKey = await getCloudHouseholdKey();
+  const supabase = getSupabaseClient();
+  const { error } = await supabase
+    .from('household_members')
+    .update({ theme_preference: resolved })
+    .eq('user_id', user.id)
+    .eq('household_key', householdKey);
+
+  if(error){
+    return { ok:false, error:error.message || 'Theme opslaan mislukt' };
+  }
+
+  setCloudThemePreference(resolved);
+  return { ok:true };
 }
 
 async function syncCloudSession(){
   try{
     await getCloudUser();
     await getCloudHouseholdKey();
+    if(typeof applyTheme === 'function'){
+      applyTheme(state.cloudThemePreference || 'midnight', {
+        persist:false,
+        skipCloudPersist:true
+      });
+    }
   }catch(e){
     state.cloudUserEmail = '';
     state.cloudHouseholdKey = '';
+    state.cloudThemePreference = 'midnight';
+    if(typeof applyTheme === 'function'){
+      applyTheme('midnight', {
+        persist:false,
+        skipCloudPersist:true
+      });
+    }
   }
 
   if(typeof renderInstellingen === 'function' && state.currentView === 'instellingen'){
@@ -510,7 +537,7 @@ async function signInToCloud(emailArg, passwordArg){
 
     state.cloudUserEmail = data?.user?.email || email.trim();
     setCloudHouseholdKey('');
-    await getCloudHouseholdKey();
+    await syncCloudSession();
     setCloudStatus(`Ingelogd als ${state.cloudUserEmail}`);
 
     if(typeof renderInstellingen === 'function'){
@@ -543,7 +570,11 @@ async function signOutFromCloud(){
 
     state.cloudUserEmail = '';
     state.cloudHouseholdKey = '';
+    state.cloudThemePreference = 'midnight';
     state.accountMenuOpen = false;
+    if(typeof applyTheme === 'function'){
+      applyTheme('midnight', { persist:false, skipCloudPersist:true });
+    }
     setCloudStatus('Uitgelogd');
 
     if(typeof renderInstellingen === 'function'){

@@ -5,6 +5,7 @@ const state = {
   cloudStatus: '',
   cloudHouseholdKey: '',
   cloudUserEmail: '',
+  cloudThemePreference: 'midnight',
   accountMenuOpen:false,
   inkomsten: [
     { naam:'KT', bedrag:2950 },

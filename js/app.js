@@ -1,7 +1,5 @@
 async function init(){
-  if(typeof restoreLocal === 'function'){
-    restoreLocal();
-  }
+  if(typeof restoreLocal === 'function') restoreLocal();
 
   if(typeof normalizeData === 'function'){
     normalizeData();
@@ -40,12 +38,6 @@ if(typeof renderHeaderActions === 'function'){
 if(typeof syncSakuraPetals === 'function'){
   window.addEventListener('resize', syncSakuraPetals);
 }
-
-window.addEventListener('storage', (e) => {
-  if(e.key === THEME_KEY || e.key === LEGACY_THEME_KEY){
-    loadTheme();
-  }
-});
 
 window.addEventListener('click', (e) => {
   const target = e.target;

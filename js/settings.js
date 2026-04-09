@@ -1,6 +1,3 @@
-const THEME_KEY = 'bv_theme_pref_v2';
-const LEGACY_THEME_KEY = 'bv_theme';
-
 const THEME_COLORS = {
   midnight: '#0a0a0f',
   sakura: '#140d15',
@@ -12,20 +9,6 @@ const ALLOWED_THEMES = new Set(['midnight', 'sakura', 'neon']);
 function updateThemeMeta(theme){
   const meta = document.querySelector('meta[name="theme-color"]');
   if(meta) meta.setAttribute('content', THEME_COLORS[theme] || THEME_COLORS.midnight);
-}
-
-function getStoredTheme(){
-  try{
-    const stored = localStorage.getItem(THEME_KEY);
-    const legacy = localStorage.getItem(LEGACY_THEME_KEY);
-    const resolved = stored || legacy || 'midnight';
-
-    if(ALLOWED_THEMES.has(resolved)){
-      if(!stored) localStorage.setItem(THEME_KEY, resolved);
-      return resolved;
-    }
-  }catch(e){}
-  return 'midnight';
 }
 
 function getThemeLabel(theme){
@@ -60,13 +43,7 @@ function applyTheme(theme, options = {}){
   document.body.setAttribute('data-theme', resolved);
   document.documentElement.style.colorScheme = 'dark';
   updateThemeMeta(resolved);
-
-  if(shouldPersist){
-    try{
-      localStorage.setItem(THEME_KEY, resolved);
-      localStorage.setItem(LEGACY_THEME_KEY, resolved);
-    }catch(e){}
-  }
+  state.cloudThemePreference = resolved;
 
   if(typeof syncSakuraPetals === 'function'){
     syncSakuraPetals();
@@ -77,10 +54,22 @@ function applyTheme(theme, options = {}){
   if(typeof renderHeaderActions === 'function'){
     renderHeaderActions();
   }
+
+  if(shouldPersist && !options.skipCloudPersist && typeof saveThemePreference === 'function' && typeof isCloudSignedIn === 'function' && isCloudSignedIn()){
+    saveThemePreference(resolved).then(result => {
+      if(!result?.ok){
+        console.error('Theme voorkeur opslaan mislukt:', result?.error || result);
+        setCloudStatus(result?.error || 'Theme voorkeur opslaan mislukt');
+      }
+    }).catch(error => {
+      console.error('Theme voorkeur opslaan crash:', error);
+      setCloudStatus(error.message || 'Theme voorkeur opslaan mislukt');
+    });
+  }
 }
 
 function loadTheme(){
-  applyTheme(getStoredTheme(), { persist:false });
+  applyTheme('midnight', { persist:false, skipCloudPersist:true });
 }
 
 function renderInstellingen(){
@@ -147,7 +136,7 @@ function renderInstellingen(){
         <div class="settings-row static compact">
           <span class="settings-row-main">
             <span class="settings-row-label">Theme opslag</span>
-            <span class="settings-row-note">Lokaal op dit apparaat, niet via browser cache.</span>
+            <span class="settings-row-note">Per account opgeslagen in Supabase en overal hetzelfde na inloggen.</span>
           </span>
           <span class="settings-value">Actief</span>
         </div>
