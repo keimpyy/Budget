@@ -2,12 +2,12 @@ const THEME_KEY = 'bv_theme_pref_v2';
 const LEGACY_THEME_KEY = 'bv_theme';
 
 const THEME_COLORS = {
-  midnight:'#0a0a0f',
-  sakura:'#140d15',
-  neon:'#0a0f14'
+  midnight: '#0a0a0f',
+  sakura: '#140d15',
+  neon: '#0a0f14'
 };
 
-const ALLOWED_THEMES = new Set(['midnight','sakura','neon']);
+const ALLOWED_THEMES = new Set(['midnight', 'sakura', 'neon']);
 
 function updateThemeMeta(theme){
   const meta = document.querySelector('meta[name="theme-color"]');
@@ -19,6 +19,7 @@ function getStoredTheme(){
     const stored = localStorage.getItem(THEME_KEY);
     const legacy = localStorage.getItem(LEGACY_THEME_KEY);
     const resolved = stored || legacy || 'midnight';
+
     if(ALLOWED_THEMES.has(resolved)){
       if(!stored) localStorage.setItem(THEME_KEY, resolved);
       return resolved;
@@ -27,11 +28,17 @@ function getStoredTheme(){
   return 'midnight';
 }
 
+function getThemeLabel(theme){
+  if(theme === 'midnight') return 'Midnight RGB';
+  if(theme === 'neon') return 'Neon Core';
+  return 'Sakura v2';
+}
+
 function syncThemeSelection(theme){
   const root = document.getElementById('v-instellingen');
   if(!root || !root.children.length) return;
 
-  const themeLabel = theme === 'midnight' ? 'Midnight RGB' : theme === 'carbon' ? 'Carbon' : 'Sakura v2';
+  const themeLabel = getThemeLabel(theme);
   const badge = root.querySelector('.settings-badge');
   const value = root.querySelector('.current-theme-value');
 
@@ -74,10 +81,7 @@ function loadTheme(){
 
 function renderInstellingen(){
   const currentTheme = document.body.getAttribute('data-theme') || 'midnight';
-  const themeLabel =
-    theme === 'midnight' ? 'Midnight' :
-    theme === 'neon' ? 'Neon Core' :
-    'Sakura';
+  const themeLabel = getThemeLabel(currentTheme);
 
   document.getElementById('v-instellingen').innerHTML = `
     <div class="settings-panel">
@@ -92,6 +96,7 @@ function renderInstellingen(){
 
       <div class="settings-group card">
         <div class="settings-group-title">Weergave</div>
+
         <button class="settings-row settings-row-button" onclick="cycleTheme()">
           <span class="settings-row-main">
             <span class="settings-row-label">Actief theme</span>
@@ -112,14 +117,16 @@ function renderInstellingen(){
             </span>
             <span class="theme-check">✓</span>
           </button>
-          <button class="theme-tile ${currentTheme==='carbon'?'active':''}" data-theme="carbon" onclick="applyTheme('carbon')" aria-selected="${currentTheme==='carbon'}">
-            <span class="theme-swatch theme-swatch-carbon"></span>
+
+          <button class="theme-tile ${currentTheme==='neon'?'active':''}" data-theme="neon" onclick="applyTheme('neon')" aria-selected="${currentTheme==='neon'}">
+            <span class="theme-swatch theme-swatch-neon"></span>
             <span class="theme-copy">
-              <span class="theme-name">Carbon</span>
-              <span class="theme-note">Rustig, staal, zakelijk</span>
+              <span class="theme-name">Neon Core</span>
+              <span class="theme-note">Tech, fris, modern dark</span>
             </span>
             <span class="theme-check">✓</span>
           </button>
+
           <button class="theme-tile ${currentTheme==='sakura'?'active':''}" data-theme="sakura" onclick="applyTheme('sakura')" aria-selected="${currentTheme==='sakura'}">
             <span class="theme-swatch theme-swatch-sakura"></span>
             <span class="theme-copy">
@@ -162,7 +169,7 @@ function renderInstellingen(){
 }
 
 function cycleTheme(){
-  const order = ['midnight','carbon','sakura'];
+  const order = ['midnight', 'neon', 'sakura'];
   const current = document.body.getAttribute('data-theme') || 'midnight';
   const idx = order.indexOf(current);
   applyTheme(order[(idx + 1) % order.length]);
