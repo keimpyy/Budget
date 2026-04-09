@@ -146,7 +146,7 @@ function renderInstellingen(){
         <div class="settings-row static">
           <span class="settings-row-main">
             <span class="settings-row-label">Supabase koppeling</span>
-            <span class="settings-row-note">Log in met jouw account en sync daarna handmatig wanneer jij wilt.</span>
+            <span class="settings-row-note">Wijzigingen syncen automatisch op de achtergrond. Gebruik ophalen om een ander apparaat direct te verversen.</span>
           </span>
         </div>
         <div class="settings-endpoint mono">${escapeHtml(cloudUserEmail)}</div>

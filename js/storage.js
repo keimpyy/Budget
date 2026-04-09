@@ -26,11 +26,16 @@ function setCloudStatus(message){
   state.cloudStatus = message || '';
   const status = document.getElementById('save-status');
   if(status) status.textContent = state.cloudStatus;
+  const inlineStatus = document.getElementById('inline-sync-status');
+  if(inlineStatus) inlineStatus.textContent = state.cloudStatus;
 }
 
 function setCloudHouseholdKey(householdKey){
   state.cloudHouseholdKey = householdKey || '';
 }
+
+let cloudSyncTimer = null;
+let cloudSyncInFlight = false;
 
 function getSupabaseClient(){
   if(window.supabaseClient) return window.supabaseClient;
@@ -387,6 +392,58 @@ async function saveCloudState(data){
   return { ok:true };
 }
 
+function queueCloudSync(){
+  if(!isCloudSignedIn()) return;
+
+  if(cloudSyncTimer){
+    clearTimeout(cloudSyncTimer);
+  }
+
+  cloudSyncTimer = setTimeout(async () => {
+    if(cloudSyncInFlight) return;
+
+    cloudSyncInFlight = true;
+    setCloudStatus('Wijzigingen syncen...');
+
+    try{
+      const result = await saveCloudState(toRows());
+      if(result?.ok){
+        setCloudStatus('Automatisch gesynchroniseerd');
+      }else{
+        setCloudStatus(result?.error || 'Automatisch syncen mislukt');
+        console.error('Auto-sync fout:', result);
+      }
+    }catch(e){
+      setCloudStatus(e.message || 'Automatisch syncen mislukt');
+      console.error('Auto-sync crash:', e);
+    }finally{
+      cloudSyncInFlight = false;
+    }
+  }, 350);
+}
+
+function persistAndSync(renderMode = 'all'){
+  persistLocal();
+
+  if(renderMode === 'budget' && typeof renderBudget === 'function'){
+    renderBudget();
+  }else if(renderMode === 'loans' && typeof renderLeningen === 'function'){
+    renderLeningen();
+  }else if(renderMode === 'none'){
+    // no-op
+  }else{
+    rerenderAll();
+  }
+
+  queueCloudSync();
+}
+
+function renderInlineSyncStatus(){
+  if(!isCloudSignedIn()) return '';
+  const text = escapeHtml(state.cloudStatus || 'Klaar om te synchroniseren');
+  return `<div class="inline-sync-status" id="inline-sync-status">${text}</div>`;
+}
+
 async function loadFromCloud(){
   setCloudStatus('Ophalen...');
 
@@ -497,7 +554,3 @@ function isCloudSignedIn(){
 function getCloudUserEmail(){
   return state.cloudUserEmail || 'Niet ingelogd';
 }
-
-async function loadFromSheets(){ return loadFromCloud(); }
-async function saveToSheets(){ return saveToCloud(); }
-function applySheets(data){ return applyCloudData(data); }

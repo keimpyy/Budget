@@ -39,6 +39,7 @@ function renderLeningen(){
 
     <div class="card">
       <div class="sec" style="margin-top:0">Leningen</div>
+      ${renderInlineSyncStatus()}
 
       ${state.leningen.map((l, idx)=>{
         const restant = Number(l.totaal||0) - Number(l.betaald||0);
@@ -103,7 +104,7 @@ function renderLeningen(){
 
       <div class="loan-actions">
         <button class="loan-save" onclick="addLoan()">+ Lening toevoegen</button>
-        <button class="loan-addpay" onclick="saveToSheets()">☁️ Leningen opslaan</button>
+        <button class="loan-addpay" onclick="loadFromCloud()">Leningen ophalen</button>
       </div>
     </div>
   `;
@@ -112,11 +113,11 @@ function renderLeningen(){
 
 function toggleLoanEdit(id){ state.editingLoanId = state.editingLoanId === id ? null : id; renderLeningen(); }
 
-function updateLoanName(idx, value){ state.leningen[idx].naam = value.trim(); persistLocal(); renderLeningen(); }
+function updateLoanName(idx, value){ state.leningen[idx].naam = value.trim(); persistAndSync('loans'); }
 
-function updateLoanTotal(idx, value){ state.leningen[idx].totaal = Number(value||0); persistLocal(); renderLeningen(); }
+function updateLoanTotal(idx, value){ state.leningen[idx].totaal = Number(value||0); persistAndSync('loans'); }
 
-function updateLoanPaid(idx, value){ state.leningen[idx].betaald = Number(value||0); persistLocal(); renderLeningen(); }
+function updateLoanPaid(idx, value){ state.leningen[idx].betaald = Number(value||0); persistAndSync('loans'); }
 
 function addLoan(){
   state.leningen.push({
@@ -126,8 +127,7 @@ function addLoan(){
     betaald: 0,
     kleur: ''
   });
-  persistLocal();
-  renderLeningen();
+  persistAndSync('loans');
 }
 
 function addLoanPayment(idx){
@@ -148,8 +148,7 @@ function addLoanPayment(idx){
     Number(loan.betaald || 0) + amount
   );
 
-  persistLocal();
-  renderLeningen();
+  persistAndSync('loans');
   showToast('Aflossing toegevoegd');
 }
 
@@ -171,8 +170,7 @@ function confirmLoanPayment(idx){
     Number(loan.betaald || 0) + amount
   );
 
-  persistLocal();
-  renderLeningen();
+  persistAndSync('loans');
   closeAppModal();
   showToast('Aflossing toegevoegd');
 }

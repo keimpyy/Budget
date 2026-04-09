@@ -37,6 +37,16 @@
   color:var(--muted);font-size:11px;word-break:break-all;line-height:1.5;
 }
 .settings-actions-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.inline-sync-status{
+  margin-top:10px;
+  padding:10px 12px;
+  border-radius:14px;
+  border:1px solid var(--border);
+  background:linear-gradient(180deg,var(--surface2),var(--surface));
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.4;
+}
 .settings-back-btn{width:100%;margin-top:10px}
 .theme-picker{display:grid;grid-template-columns:1fr;gap:10px;margin-top:10px}
 .theme-tile{

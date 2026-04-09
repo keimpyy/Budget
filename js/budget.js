@@ -23,6 +23,7 @@ function renderBudget() {
               <button class="btn" onclick="addIncomeRow()">+ Inkomst</button>
             </div>
           </section>
+          ${renderInlineSyncStatus()}
 
           <section class="budget-list">
             ${state.inkomsten.map((r, idx) => `
@@ -80,9 +81,10 @@ function renderBudget() {
             </div>
               <div class="budget-hero__actions">
                 <button class="btn" onclick="openBudgetComposer('category')">+ Categorie</button>
-                <button class="btn secondary" onclick="loadFromSheets()">↻ Refresh</button>
+                <button class="btn secondary" onclick="loadFromCloud()">Ophalen</button>
               </div>
           </section>
+          ${renderInlineSyncStatus()}
 
 ${cats.length
   ? `<section class="budget-category-list">
@@ -201,18 +203,18 @@ ${cats.length
 function updateIncomeName(idx, value){
   if(!state.inkomsten[idx]) return;
   state.inkomsten[idx].naam = value.trim() || 'Inkomsten';
-  persistLocal(); rerenderAll();
+  persistAndSync();
 }
 
 function updateIncomeAmount(idx, value){
   if(!state.inkomsten[idx]) return;
   state.inkomsten[idx].bedrag = Number(value||0);
-  persistLocal(); rerenderAll();
+  persistAndSync();
 }
 
 function addIncomeRow(){
   state.inkomsten.push({ naam:'Nieuwe inkomsten', bedrag:0 });
-  persistLocal(); rerenderAll();
+  persistAndSync();
 }
 
 function removeIncomeRow(idx){
@@ -228,8 +230,7 @@ function removeIncomeRow(idx){
     text:'Inkomstenregel verwijderen?',
     onConfirm: () => {
       state.inkomsten.splice(idx,1);
-      persistLocal();
-      rerenderAll();
+      persistAndSync();
     }
   });
 }
@@ -399,12 +400,12 @@ function saveBudgetComposer(){
   }
 
   normalizeData();
-    for (const cat of state.categorieen){
+  for (const cat of state.categorieen){
     if(typeof state.openCats[cat.id] !== 'boolean'){
       state.openCats[cat.id] = false;
     }
   }
-  persistLocal();
+  persistAndSync('none');
   closeBudgetComposer();
   rerenderAll();
 }
@@ -413,7 +414,7 @@ function addCategory(){ openBudgetComposer('category'); }
 
 function renameCategory(catId, value){
   const cat = state.categorieen.find(c=>c.id===catId); if(!cat) return;
-  cat.naam = value.trim() || 'Nieuwe categorie'; persistLocal(); rerenderAll();
+  cat.naam = value.trim() || 'Nieuwe categorie'; persistAndSync();
 }
 
 function removeCategory(catId){
@@ -424,7 +425,7 @@ function removeCategory(catId){
   state.categorieen = state.categorieen.filter(c=>c.id!==catId);
   state.budget = state.budget.filter(r=>r.categorieId!==catId);
 
-  persistLocal(); rerenderAll();
+  persistAndSync();
 }
 
 function toggleCategory(catId){ selectBudgetCategory(catId); }
@@ -437,19 +438,19 @@ function addBudgetPost(catId){ openBudgetComposer('post', null, catId); }
 
 function renameBudgetPost(id, value){
   const row = state.budget.find(r=>r.id===id); if(!row) return;
-  row.post = value.trim() || 'Nieuwe post'; persistLocal(); rerenderAll();
+  row.post = value.trim() || 'Nieuwe post'; persistAndSync();
 }
 
 function updateBudgetAmount(id, value){
   const row = state.budget.find(r=>r.id===id); if(!row) return;
-  row.budget = Number(value||0); persistLocal(); rerenderAll();
+  row.budget = Number(value||0); persistAndSync();
 }
 
 function quickAdjustBudget(id, delta){
   const row = state.budget.find(r => r.id === id);
   if(!row) return;
   row.budget = Math.max(0, Number(row.budget || 0) + Number(delta || 0));
-  persistLocal(); rerenderAll();
+  persistAndSync();
 }
 
 function removeBudgetPost(id){
@@ -463,7 +464,7 @@ function removeBudgetPost(id){
   const rows = itemsForCategory(catId);
   rows.forEach((item, idx)=> item.volgorde = idx + 1);
 
-  persistLocal(); rerenderAll();
+  persistAndSync();
 }
 
 function moveCategoryUp(catId){
@@ -472,8 +473,7 @@ function moveCategoryUp(catId){
   if(idx <= 0) return;
   [cats[idx-1], cats[idx]] = [cats[idx], cats[idx-1]];
   state.categorieen = cats.map((c, i) => ({...c, volgorde:i+1}));
-  persistLocal();
-  renderBudget();
+  persistAndSync('budget');
 }
 
 function moveCategoryDown(catId){
@@ -482,8 +482,7 @@ function moveCategoryDown(catId){
   if(idx < 0 || idx >= cats.length - 1) return;
   [cats[idx], cats[idx+1]] = [cats[idx+1], cats[idx]];
   state.categorieen = cats.map((c, i) => ({...c, volgorde:i+1}));
-  persistLocal();
-  renderBudget();
+  persistAndSync('budget');
 }
 
 function toggleCategoryActions(id){}
