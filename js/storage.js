@@ -24,21 +24,47 @@ function restoreLocal(){
 
 async function safeJson(res){
   const text = await res.text();
+
+  let parsed;
   try{
-    return JSON.parse(text);
+    parsed = JSON.parse(text);
   }catch(e){
-    return { ok:false, error:'Parse fout', raw:text.slice(0,200) };
+    return {
+      ok:false,
+      error:`Geen geldige JSON (${res.status})`,
+      raw:text.slice(0,300)
+    };
   }
+
+  if(!res.ok){
+    return {
+      ok:false,
+      error: parsed?.error || `HTTP fout ${res.status}`,
+      raw:text.slice(0,300)
+    };
+  }
+
+  return parsed;
 }
 
 async function sheetsGet(){
-  const res = await fetch(state.sheetsUrl + '?action=getAll', {
+  if(!state.sheetsUrl) {
+    return { ok:false, error:'Geen sheetsUrl ingesteld' };
+  }
+
+  const res = await fetch(`${state.sheetsUrl}?action=getAll`, {
+    method:'GET',
     redirect:'follow'
   });
+
   return await safeJson(res);
 }
 
 async function sheetsPost(data){
+  if(!state.sheetsUrl) {
+    return { ok:false, error:'Geen sheetsUrl ingesteld' };
+  }
+
   const res = await fetch(state.sheetsUrl, {
     method:'POST',
     redirect:'follow',
@@ -47,6 +73,7 @@ async function sheetsPost(data){
     },
     body: JSON.stringify(data)
   });
+
   return await safeJson(res);
 }
 
@@ -158,6 +185,7 @@ async function loadFromSheets(){
 
   try{
     const result = await sheetsGet();
+    console.log('Sheets GET result:', result);
 
     if(result?.ok){
       applySheets(result);
@@ -165,11 +193,13 @@ async function loadFromSheets(){
       if(saveStatus) saveStatus.textContent = 'Vers geladen uit Sheets';
     }else{
       showToast(result?.error || 'Ophalen mislukt');
-      if(saveStatus) saveStatus.textContent = 'Ophalen mislukt';
+      if(saveStatus) saveStatus.textContent = result?.error || 'Ophalen mislukt';
+      console.error('Sheets fout:', result);
     }
   }catch(e){
+    console.error('loadFromSheets crash:', e);
     showToast('Ophalen mislukt');
-    if(saveStatus) saveStatus.textContent = 'Ophalen mislukt';
+    if(saveStatus) saveStatus.textContent = e.message || 'Ophalen mislukt';
   }
 }
 
