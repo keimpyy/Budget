@@ -11,6 +11,13 @@ function setStartupProgress(progress, status){
   if(value) value.textContent = `${Math.round(state.startupProgress)}%`;
 }
 
+function withTimeout(promise, timeoutMs, fallbackValue){
+  return Promise.race([
+    promise,
+    new Promise(resolve => setTimeout(() => resolve(fallbackValue), timeoutMs))
+  ]);
+}
+
 async function init(){
   if(typeof restoreLocal === 'function') restoreLocal();
   setStartupProgress(12, 'App voorbereiden...');
@@ -21,16 +28,28 @@ async function init(){
 
   try{
     let hasSession = false;
+    let sessionTimedOut = false;
+
     if(typeof syncCloudSession === 'function'){
       setStartupProgress(32, 'Sessie controleren...');
-      hasSession = await syncCloudSession();
+      const sessionResult = await withTimeout(
+        syncCloudSession().then(result => ({ timedOut:false, result })),
+        2200,
+        { timedOut:true, result:false }
+      );
+      sessionTimedOut = sessionResult.timedOut;
+      hasSession = sessionResult.result;
     }
 
-    if(hasSession && typeof loadFromCloud === 'function'){
+    if(sessionTimedOut){
+      setStartupProgress(48, 'Verder laden op achtergrond...');
+    }
+
+    if(hasSession && typeof loadFromCloud === 'function' && !sessionTimedOut){
       setStartupProgress(58, 'Huishoudgegevens ophalen...');
       await loadFromCloud();
       setStartupProgress(100, 'Gegevens bijgewerkt');
-    }else{
+    }else if(!sessionTimedOut){
       setStartupProgress(100, 'Klaar om te beginnen');
     }
   }catch(e){
@@ -50,6 +69,20 @@ async function init(){
       startupOverlay.style.display = 'none';
     }, 220);
   }
+
+  setTimeout(async () => {
+    try{
+      const hasSession = typeof syncCloudSession === 'function'
+        ? await syncCloudSession()
+        : false;
+
+      if(hasSession && typeof loadFromCloud === 'function'){
+        await loadFromCloud();
+      }
+    }catch(e){
+      console.error('Achtergrond startup sync mislukt:', e);
+    }
+  }, 0);
 }
 
 loadTheme();
