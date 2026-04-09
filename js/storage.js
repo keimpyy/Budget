@@ -61,19 +61,11 @@ async function sheetsGet(){
 }
 
 async function sheetsPost(data){
-  if(!state.sheetsUrl) {
-    return { ok:false, error:'Geen sheetsUrl ingesteld' };
-  }
-
   const res = await fetch(state.sheetsUrl, {
     method:'POST',
     redirect:'follow',
-    headers:{
-      'Content-Type':'application/json'
-    },
     body: JSON.stringify(data)
   });
-
   return await safeJson(res);
 }
 
