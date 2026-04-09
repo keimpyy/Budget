@@ -94,7 +94,7 @@ function renderLeningen(){
 
               <div class="loan-metric loan-metric--action">
                 <div class="loan-metric-label">Snelle aflossing</div>
-                <button class="loan-addpay" onclick="addLoanPayment(${idx})">+ Aflossing toevoegen</button>
+                <button class="loan-addpay" onclick="openAppModal('loan-payment',{ idx:${idx} })">+ Aflossing toevoegen</button>
               </div>
             </div>
           </div>
@@ -149,5 +149,29 @@ function addLoanPayment(idx){
 
   persistLocal();
   renderLeningen();
+  showToast('Aflossing toegevoegd');
+}
+
+function confirmLoanPayment(idx){
+  const input = document.getElementById('loan-payment-input');
+  if(!input) return;
+
+  const amount = Number(input.value || 0);
+  if(amount <= 0){
+    showToast('Voer een bedrag in');
+    return;
+  }
+
+  const loan = state.leningen[idx];
+  if(!loan) return;
+
+  loan.betaald = Math.min(
+    Number(loan.totaal || 0),
+    Number(loan.betaald || 0) + amount
+  );
+
+  persistLocal();
+  renderLeningen();
+  closeAppModal();
   showToast('Aflossing toegevoegd');
 }

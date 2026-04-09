@@ -21,6 +21,10 @@ const state = {
   budgetComposerMode:'category',
   budgetComposerTargetId:null,
   budgetComposerCategoryId:null,
+  appModalOpen:false,
+  appModalType:null,
+  appModalPayload:null,
+  appModalOnConfirm:null
 };
 
 function uid(prefix){ return `${prefix}_${Date.now()}_${Math.floor(Math.random()*100000)}`; }

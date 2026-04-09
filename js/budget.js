@@ -217,13 +217,21 @@ function addIncomeRow(){
 
 function removeIncomeRow(idx){
   if(!state.inkomsten[idx]) return;
+
   if(state.inkomsten.length <= 1){
     showToast('Laat minimaal één inkomstenregel staan');
     return;
   }
-  if(!confirm('Inkomstenregel verwijderen?')) return;
-  state.inkomsten.splice(idx,1);
-  persistLocal(); rerenderAll();
+
+  openAppModal('confirm',{
+    title:'Verwijderen?',
+    text:'Inkomstenregel verwijderen?',
+    onConfirm: () => {
+      state.inkomsten.splice(idx,1);
+      persistLocal();
+      rerenderAll();
+    }
+  });
 }
 
 function selectBudgetCategory(catId){

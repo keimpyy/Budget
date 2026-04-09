@@ -318,3 +318,89 @@ function swipeEnd(e, id){
 
   delete swipeState[id];
 }
+
+function openAppModal(type, payload = null, onConfirm = null){
+  state.appModalOpen = true;
+  state.appModalType = type;
+  state.appModalPayload = payload;
+  state.appModalOnConfirm = onConfirm;
+  renderAppModal();
+}
+
+function closeAppModal(){
+  state.appModalOpen = false;
+  state.appModalType = null;
+  state.appModalPayload = null;
+  state.appModalOnConfirm = null;
+  renderAppModal();
+}
+
+function renderAppModal(){
+  const root = document.getElementById('app-modal-root');
+  if(!root) return;
+
+  if(!state.appModalOpen){
+    root.innerHTML = '';
+    return;
+  }
+
+  let content = '';
+
+  // 🔹 CONFIRM MODAL
+if(state.appModalType === 'confirm'){
+  const { title, text } = state.appModalPayload || {};
+
+  content = `
+    <div class="budget-modal-backdrop" onclick="closeAppModal()">
+      <div class="budget-modal-sheet" onclick="event.stopPropagation()">
+        <div class="budget-modal-handle"></div>
+
+        <div class="budget-modal-title">${title || 'Bevestigen'}</div>
+        <div class="budget-modal-copy">${text || ''}</div>
+
+        <div class="budget-modal-actions">
+          <button class="btn secondary" onclick="closeAppModal()">Annuleren</button>
+          <button class="btn" onclick="confirmAppModal()">Doorgaan</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+  // 🔹 LOAN PAYMENT MODAL
+  if(state.appModalType === 'loan-payment'){
+    const { idx } = state.appModalPayload || {};
+    const loan = state.leningen[idx];
+
+    content = `
+      <div class="budget-modal-backdrop" onclick="closeAppModal()">
+        <div class="budget-modal-sheet" onclick="event.stopPropagation()">
+          <div class="budget-modal-handle"></div>
+
+          <div class="budget-modal-title">Aflossing toevoegen</div>
+          <div class="budget-modal-copy">${escapeHtml(loan?.naam || '')}</div>
+
+          <input
+            id="loan-payment-input"
+            class="input composer-amount-input"
+            type="number"
+            placeholder="Bedrag"
+          >
+
+          <div class="budget-modal-actions">
+            <button class="btn secondary" onclick="closeAppModal()">Annuleren</button>
+            <button class="btn" onclick="confirmLoanPayment(${idx})">Opslaan</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  root.innerHTML = content;
+}
+
+function confirmAppModal(){
+  const fn = state.appModalOnConfirm;
+  closeAppModal();
+  if(typeof fn === 'function') fn();
+}
