@@ -33,6 +33,10 @@ async function init(){
 
 loadTheme();
 
+if(typeof renderHeaderActions === 'function'){
+  renderHeaderActions();
+}
+
 if(typeof syncSakuraPetals === 'function'){
   window.addEventListener('resize', syncSakuraPetals);
 }
@@ -41,6 +45,12 @@ window.addEventListener('storage', (e) => {
   if(e.key === THEME_KEY || e.key === LEGACY_THEME_KEY){
     loadTheme();
   }
+});
+
+window.addEventListener('click', (e) => {
+  const target = e.target;
+  if(target instanceof Element && target.closest('.account-menu-wrap, #app-modal-root')) return;
+  if(typeof closeAccountMenu === 'function') closeAccountMenu();
 });
 
 init();

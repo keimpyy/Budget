@@ -73,6 +73,10 @@ function applyTheme(theme, options = {}){
   }
 
   syncThemeSelection(resolved);
+
+  if(typeof renderHeaderActions === 'function'){
+    renderHeaderActions();
+  }
 }
 
 function loadTheme(){
@@ -82,9 +86,6 @@ function loadTheme(){
 function renderInstellingen(){
   const currentTheme = document.body.getAttribute('data-theme') || 'midnight';
   const themeLabel = getThemeLabel(currentTheme);
-  const cloudUserEmail = typeof getCloudUserEmail === 'function' ? getCloudUserEmail() : 'Niet ingelogd';
-  const cloudSignedIn = typeof isCloudSignedIn === 'function' ? isCloudSignedIn() : false;
-  const cloudStatus = escapeHtml(state.cloudStatus || (cloudSignedIn ? `Ingelogd als ${cloudUserEmail}` : 'Nog niet verbonden'));
 
   document.getElementById('v-instellingen').innerHTML = `
     <div class="settings-panel">
@@ -92,7 +93,7 @@ function renderInstellingen(){
         <div>
           <div class="settings-kicker">Instellingen</div>
           <div class="settings-title">App voorkeuren</div>
-          <div class="settings-subtitle">Alles wordt lokaal per apparaat opgeslagen en blijft staan totdat jij het zelf wijzigt.</div>
+          <div class="settings-subtitle">Pas de look van de app aan en houd de ervaring per apparaat netjes afgestemd.</div>
         </div>
         <div class="settings-badge">${themeLabel}</div>
       </div>
@@ -142,24 +143,6 @@ function renderInstellingen(){
       </div>
 
       <div class="settings-group card">
-        <div class="settings-group-title">Synchronisatie</div>
-        <div class="settings-row static">
-          <span class="settings-row-main">
-            <span class="settings-row-label">Supabase koppeling</span>
-            <span class="settings-row-note">Wijzigingen syncen automatisch op de achtergrond. Gebruik ophalen om een ander apparaat direct te verversen.</span>
-          </span>
-        </div>
-        <div class="settings-endpoint mono">${escapeHtml(cloudUserEmail)}</div>
-        <div class="settings-row-note" id="save-status">${cloudStatus}</div>
-        <div class="settings-actions-grid">
-          <button class="btn secondary" onclick="signInToCloud()">${cloudSignedIn ? 'Opnieuw inloggen' : 'Inloggen'}</button>
-          <button class="btn secondary" onclick="loadFromCloud()">Ophalen</button>
-          <button class="btn" onclick="saveToCloud()">Opslaan</button>
-          <button class="btn secondary" onclick="signOutFromCloud()">Uitloggen</button>
-        </div>
-      </div>
-
-      <div class="settings-group card">
         <div class="settings-group-title">Info</div>
         <div class="settings-row static compact">
           <span class="settings-row-main">
@@ -183,6 +166,103 @@ function cycleTheme(){
 
 function renderSettings(){
   renderInstellingen();
+}
+
+function getAccountInitial(){
+  const email = state.cloudUserEmail || '';
+  const source = email.split('@')[0] || 'V';
+  return source.trim().charAt(0).toUpperCase() || 'V';
+}
+
+function ensureHeaderActionsHost(){
+  let host = document.getElementById('header-actions');
+  if(host) return host;
+
+  const headerTop = document.querySelector('.header-top');
+  if(!headerTop) return null;
+
+  const oldButton = headerTop.querySelector('.badge-btn');
+  if(oldButton) oldButton.remove();
+
+  host = document.createElement('div');
+  host.id = 'header-actions';
+  host.className = 'header-actions';
+  headerTop.appendChild(host);
+  return host;
+}
+
+function renderHeaderActions(){
+  const root = ensureHeaderActionsHost();
+  if(!root) return;
+
+  const signedIn = typeof isCloudSignedIn === 'function' ? isCloudSignedIn() : false;
+  const currentTheme = document.body.getAttribute('data-theme') || 'midnight';
+
+  root.innerHTML = `
+    <div class="header-actions-inner">
+      ${signedIn ? `
+        <div class="account-menu-wrap">
+          <button class="account-avatar-btn" onclick="toggleAccountMenu()" aria-expanded="${state.accountMenuOpen ? 'true' : 'false'}" title="${escapeHtml(state.cloudUserEmail || '')}">
+            ${escapeHtml(getAccountInitial())}
+          </button>
+          ${state.accountMenuOpen ? `
+            <div class="account-menu-panel">
+              <div class="account-menu-head">
+                <div class="account-menu-kicker">Account</div>
+                <div class="account-menu-email mono">${escapeHtml(state.cloudUserEmail || '')}</div>
+              </div>
+              <div class="account-menu-group">
+                <div class="account-menu-label">Theme</div>
+                <div class="account-theme-row">
+                  <button class="account-theme-chip ${currentTheme==='midnight'?'active':''}" onclick="setAccountTheme('midnight')">Midnight</button>
+                  <button class="account-theme-chip ${currentTheme==='neon'?'active':''}" onclick="setAccountTheme('neon')">Neon</button>
+                  <button class="account-theme-chip ${currentTheme==='sakura'?'active':''}" onclick="setAccountTheme('sakura')">Sakura</button>
+                </div>
+              </div>
+              <div class="account-menu-actions">
+                <button class="btn secondary btn.sm" onclick="loadFromCloud()">Ophalen</button>
+                <button class="btn secondary btn.sm" onclick="signOutFromCloud()">Uitloggen</button>
+              </div>
+            </div>
+          ` : ''}
+        </div>
+      ` : `
+        <button class="badge-btn" onclick="openLoginModal()">Inloggen</button>
+      `}
+      <button class="badge-btn" onclick="openSettings()">Instellingen</button>
+    </div>
+  `;
+}
+
+function toggleAccountMenu(){
+  state.accountMenuOpen = !state.accountMenuOpen;
+  renderHeaderActions();
+}
+
+function closeAccountMenu(){
+  if(!state.accountMenuOpen) return;
+  state.accountMenuOpen = false;
+  renderHeaderActions();
+}
+
+function setAccountTheme(theme){
+  applyTheme(theme);
+  renderHeaderActions();
+}
+
+function openLoginModal(){
+  state.accountMenuOpen = false;
+  renderHeaderActions();
+  openAppModal('cloud-login');
+}
+
+async function submitLoginModal(){
+  const email = document.getElementById('cloud-login-email')?.value || '';
+  const password = document.getElementById('cloud-login-password')?.value || '';
+  const result = await signInToCloud(email, password);
+  if(result?.ok){
+    closeAppModal();
+  }
 }
 
 function closeSettings(){

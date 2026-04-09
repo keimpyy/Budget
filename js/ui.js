@@ -7,6 +7,7 @@ function rerenderAll(){
   if(typeof renderBudget === 'function') renderBudget();
   if(typeof renderLeningen === 'function') renderLeningen();
   if(typeof renderInstellingen === 'function') renderInstellingen();
+  if(typeof renderHeaderActions === 'function') renderHeaderActions();
 }
 
 function appSwipeStart(e){
@@ -99,6 +100,7 @@ function go(name, btn){
 }
 
 function openSettings(){
+  if(typeof closeAccountMenu === 'function') closeAccountMenu();
   const btn = document.getElementById('settings-tab-btn');
   if(btn) go('instellingen', btn);
 }
@@ -307,8 +309,9 @@ function swipeEnd(e, id){
   if(dx <= -SWIPE_DELETE_THRESHOLD){
     openSwipeRow(row);
     setTimeout(() => {
-      if(confirm('Post verwijderen?')) removeBudgetPost(id);
-      else closeSwipeRow(row);
+      openConfirmModal('Post verwijderen?', 'Weet je zeker dat je deze post wilt verwijderen?', () => {
+        removeBudgetPost(id);
+      });
     }, 70);
   }else if(dx <= -SWIPE_REVEAL){
     openSwipeRow(row);
@@ -325,6 +328,10 @@ function openAppModal(type, payload = null, onConfirm = null){
   state.appModalPayload = payload;
   state.appModalOnConfirm = onConfirm;
   renderAppModal();
+}
+
+function openConfirmModal(title, text, onConfirm){
+  openAppModal('confirm', { title, text }, onConfirm);
 }
 
 function closeAppModal(){
@@ -411,11 +418,59 @@ function renderAppModal(){
     `;
   }
 
+  if(state.appModalType === 'cloud-login'){
+    content = `
+      <div class="budget-modal-backdrop" onclick="closeAppModal()">
+        <div class="budget-modal-sheet" onclick="event.stopPropagation()">
+          <div class="budget-modal-handle"></div>
+
+          <div class="budget-modal-title">Inloggen</div>
+          <div class="budget-modal-copy">Log in met jullie account om meteen te synchroniseren tussen apparaten.</div>
+
+          <div class="stack">
+            <div>
+              <div class="budget-inline-label">E-mail</div>
+              <input
+                id="cloud-login-email"
+                class="input"
+                type="email"
+                autocomplete="email"
+                placeholder="naam@email.com"
+              >
+            </div>
+            <div>
+              <div class="budget-inline-label">Wachtwoord</div>
+              <input
+                id="cloud-login-password"
+                class="input"
+                type="password"
+                autocomplete="current-password"
+                placeholder="Wachtwoord"
+              >
+            </div>
+          </div>
+
+          <div class="budget-modal-actions">
+            <button class="btn secondary" onclick="closeAppModal()">Annuleren</button>
+            <button class="btn" onclick="submitLoginModal()">Inloggen</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
   root.innerHTML = content;
 
   if(state.appModalType === 'loan-payment'){
     setTimeout(() => {
       const el = document.getElementById('loan-payment-input');
+      if(el) el.focus();
+    }, 30);
+  }
+
+  if(state.appModalType === 'cloud-login'){
+    setTimeout(() => {
+      const el = document.getElementById('cloud-login-email');
       if(el) el.focus();
     }, 30);
   }

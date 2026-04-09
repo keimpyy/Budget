@@ -133,23 +133,7 @@ function addLoan(){
 function addLoanPayment(idx){
   const loan = state.leningen[idx];
   if(!loan) return;
-
-  const raw = prompt(`Extra aflossing voor "${loan.naam}"`, '0');
-  if(raw === null) return;
-
-  const amount = Number(String(raw).replace(',', '.'));
-  if(!Number.isFinite(amount) || amount <= 0){
-    showToast('Voer een geldig bedrag in');
-    return;
-  }
-
-  loan.betaald = Math.min(
-    Number(loan.totaal || 0),
-    Number(loan.betaald || 0) + amount
-  );
-
-  persistAndSync('loans');
-  showToast('Aflossing toegevoegd');
+  openAppModal('loan-payment', { idx });
 }
 
 function confirmLoanPayment(idx){

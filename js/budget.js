@@ -225,13 +225,9 @@ function removeIncomeRow(idx){
     return;
   }
 
-  openAppModal('confirm',{
-    title:'Verwijderen?',
-    text:'Inkomstenregel verwijderen?',
-    onConfirm: () => {
-      state.inkomsten.splice(idx,1);
-      persistAndSync();
-    }
+  openConfirmModal('Verwijderen?', 'Inkomstenregel verwijderen?', () => {
+    state.inkomsten.splice(idx,1);
+    persistAndSync();
   });
 }
 
@@ -420,12 +416,11 @@ function renameCategory(catId, value){
 function removeCategory(catId){
   const cat = state.categorieen.find(c => c.id === catId);
   if(!cat) return;
-  if(!confirm(`Categorie "${cat.naam}" verwijderen inclusief alle posten?`)) return;
-
-  state.categorieen = state.categorieen.filter(c=>c.id!==catId);
-  state.budget = state.budget.filter(r=>r.categorieId!==catId);
-
-  persistAndSync();
+  openConfirmModal('Categorie verwijderen?', `Categorie "${cat.naam}" verwijderen inclusief alle posten?`, () => {
+    state.categorieen = state.categorieen.filter(c=>c.id!==catId);
+    state.budget = state.budget.filter(r=>r.categorieId!==catId);
+    persistAndSync();
+  });
 }
 
 function toggleCategory(catId){ selectBudgetCategory(catId); }
@@ -456,15 +451,15 @@ function quickAdjustBudget(id, delta){
 function removeBudgetPost(id){
   const row = state.budget.find(r=>r.id===id);
   if(!row) return;
-  if(!confirm(`Post "${row.post}" verwijderen?`)) return;
+  openConfirmModal('Post verwijderen?', `Post "${row.post}" verwijderen?`, () => {
+    const catId = row.categorieId;
+    state.budget = state.budget.filter(r=>r.id!==id);
 
-  const catId = row.categorieId;
-  state.budget = state.budget.filter(r=>r.id!==id);
+    const rows = itemsForCategory(catId);
+    rows.forEach((item, idx)=> item.volgorde = idx + 1);
 
-  const rows = itemsForCategory(catId);
-  rows.forEach((item, idx)=> item.volgorde = idx + 1);
-
-  persistAndSync();
+    persistAndSync();
+  });
 }
 
 function moveCategoryUp(catId){

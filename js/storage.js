@@ -487,12 +487,15 @@ async function saveToCloud(){
   }
 }
 
-async function signInToCloud(){
-  const email = prompt('Supabase e-mailadres');
-  if(email === null) return;
+async function signInToCloud(emailArg, passwordArg){
+  const email = String(emailArg || '').trim();
+  const password = String(passwordArg || '');
 
-  const password = prompt('Supabase wachtwoord');
-  if(password === null) return;
+  if(!email || !password){
+    setCloudStatus('Vul e-mail en wachtwoord in');
+    showToast('Vul e-mail en wachtwoord in');
+    return { ok:false, error:'Vul e-mail en wachtwoord in' };
+  }
 
   setCloudStatus('Inloggen...');
 
@@ -514,13 +517,19 @@ async function signInToCloud(){
       renderInstellingen();
     }
 
+    if(typeof renderHeaderActions === 'function'){
+      renderHeaderActions();
+    }
+
     showToast('Ingelogd');
     await loadFromCloud();
+    return { ok:true };
   }catch(e){
     state.cloudUserEmail = '';
     state.cloudHouseholdKey = '';
     setCloudStatus(e.message || 'Inloggen mislukt');
     showToast('Inloggen mislukt');
+    return { ok:false, error:e.message || 'Inloggen mislukt' };
   }
 }
 
@@ -534,10 +543,15 @@ async function signOutFromCloud(){
 
     state.cloudUserEmail = '';
     state.cloudHouseholdKey = '';
+    state.accountMenuOpen = false;
     setCloudStatus('Uitgelogd');
 
     if(typeof renderInstellingen === 'function'){
       renderInstellingen();
+    }
+
+    if(typeof renderHeaderActions === 'function'){
+      renderHeaderActions();
     }
 
     showToast('Uitgelogd');
