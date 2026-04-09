@@ -3,6 +3,7 @@ function renderBudget() {
   const cats = orderedCats();
   const remaining = budgetRemaining();
   const incomeView = state.budgetSubtab === 'inkomsten';
+  const cloudLoadLabel = state.cloudLoading ? 'Ophalen...' : 'Ophalen';
 
   const incomeHtml = `
     <section class="budget-page">
@@ -81,7 +82,7 @@ function renderBudget() {
             </div>
               <div class="budget-hero__actions">
                 <button class="btn" onclick="openBudgetComposer('category')">+ Categorie</button>
-                <button class="btn secondary" onclick="loadFromCloud()">Ophalen</button>
+                <button class="btn secondary" onclick="loadFromCloud()" ${state.cloudLoading ? 'disabled' : ''}>${cloudLoadLabel}</button>
               </div>
           </section>
           ${renderInlineSyncStatus()}

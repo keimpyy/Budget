@@ -2,6 +2,7 @@ function renderLeningen(){
   const totaalRestant = state.leningen.reduce((s,l)=>s+(Number(l.totaal||0)-Number(l.betaald||0)),0);
   const totaalLening = state.leningen.reduce((s,l)=>s+Number(l.totaal||0),0);
   const totaalBetaald = state.leningen.reduce((s,l)=>s+Number(l.betaald||0),0);
+  const cloudLoadLabel = state.cloudLoading ? 'Ophalen...' : 'Leningen ophalen';
 
   document.getElementById('v-leningen').innerHTML = `
     <section class="loan-page">
@@ -106,7 +107,7 @@ function renderLeningen(){
 
           <div class="loan-actions">
             <button class="btn loan-save" onclick="addLoan()">+ Lening toevoegen</button>
-            <button class="btn secondary loan-addpay" onclick="loadFromCloud()">Leningen ophalen</button>
+            <button class="btn secondary loan-addpay" onclick="loadFromCloud()" ${state.cloudLoading ? 'disabled' : ''}>${cloudLoadLabel}</button>
           </div>
         </div>
       </div>

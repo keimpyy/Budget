@@ -186,6 +186,7 @@ function renderHeaderActions(){
 
   const signedIn = typeof isCloudSignedIn === 'function' ? isCloudSignedIn() : false;
   const currentTheme = document.body.getAttribute('data-theme') || 'midnight';
+  const loadLabel = state.cloudLoading ? 'Ophalen...' : 'Ophalen';
 
   root.innerHTML = `
     <div class="header-actions-inner">
@@ -209,7 +210,7 @@ function renderHeaderActions(){
                 </div>
               </div>
               <div class="account-menu-actions">
-                <button class="btn secondary btn.sm" onclick="loadFromCloud()">Ophalen</button>
+                <button class="btn secondary btn.sm" onclick="loadFromCloud()" ${state.cloudLoading ? 'disabled' : ''}>${loadLabel}</button>
                 <button class="btn secondary btn.sm" onclick="signOutFromCloud()">Uitloggen</button>
               </div>
             </div>

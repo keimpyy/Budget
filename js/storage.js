@@ -534,9 +534,16 @@ function renderInlineSyncStatus(){
 }
 
 async function loadFromCloud(){
+  if(state.cloudLoading) return;
+  state.cloudLoading = true;
   setCloudStatus('Ophalen...');
   if(typeof setStartupProgress === 'function'){
     setStartupProgress(52, 'Verbinding maken met Supabase...');
+  }
+  if(typeof rerenderCurrentView === 'function'){
+    rerenderCurrentView();
+  }else if(typeof renderHeaderActions === 'function'){
+    renderHeaderActions();
   }
 
   try{
@@ -563,6 +570,13 @@ async function loadFromCloud(){
     setCloudStatus(e.message || 'Ophalen mislukt');
     if(typeof setStartupProgress === 'function'){
       setStartupProgress(100, e.message || 'Ophalen mislukt');
+    }
+  }finally{
+    state.cloudLoading = false;
+    if(typeof rerenderCurrentView === 'function'){
+      rerenderCurrentView();
+    }else if(typeof renderHeaderActions === 'function'){
+      renderHeaderActions();
     }
   }
 }
@@ -667,8 +681,11 @@ async function signOutFromCloud(){
 
   try{
     const supabase = getSupabaseClient();
-    const { error } = await supabase.auth.signOut({ scope:'local' });
-    if(error) throw error;
+    let signOutResult = await supabase.auth.signOut({ scope:'local' });
+    if(signOutResult.error){
+      signOutResult = await supabase.auth.signOut();
+    }
+    if(signOutResult.error) throw signOutResult.error;
 
     try{
       window.localStorage.removeItem('budget-veenstra-auth');
