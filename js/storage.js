@@ -558,57 +558,84 @@ async function signInToCloud(emailArg, passwordArg){
 
     if(error) throw error;
 
-    state.cloudUserEmail = data?.user?.email || email.trim();
-    state.accountMenuOpen = false;
-    setCloudHouseholdKey('');
-    await syncCloudSession();
-    setCloudStatus(`Ingelogd als ${state.cloudUserEmail}`);
-
-    if(typeof renderInstellingen === 'function'){
-      renderInstellingen();
-    }
-
-    if(typeof renderHeaderActions === 'function'){
-      renderHeaderActions();
-    }
-
-    showToast('Ingelogd');
-    await loadFromCloud();
-    return { ok:true };
+    return {
+      ok:true,
+      email:data?.user?.email || email.trim()
+    };
   }catch(e){
     state.cloudUserEmail = '';
     state.cloudHouseholdKey = '';
+    state.cloudThemePreference = 'midnight';
     setCloudStatus(e.message || 'Inloggen mislukt');
     showToast('Inloggen mislukt');
     return { ok:false, error:e.message || 'Inloggen mislukt' };
   }
 }
 
+function finalizeCloudLogin(email){
+  state.cloudUserEmail = email || '';
+  state.accountMenuOpen = false;
+  setCloudHouseholdKey('');
+  setCloudThemePreference('midnight');
+
+  if(typeof applyTheme === 'function'){
+    applyTheme('midnight', { persist:false, skipCloudPersist:true });
+  }
+
+  setCloudStatus(`Ingelogd als ${state.cloudUserEmail}`);
+
+  if(typeof renderInstellingen === 'function'){
+    renderInstellingen();
+  }
+
+  if(typeof renderHeaderActions === 'function'){
+    renderHeaderActions();
+  }
+
+  showToast('Ingelogd');
+
+  if(typeof rerenderAll === 'function'){
+    rerenderAll();
+  }
+
+  setTimeout(async () => {
+    try{
+      await syncCloudSession();
+      await loadFromCloud();
+    }catch(e){
+      console.error('Achtergrond laden na login mislukt:', e);
+      setCloudStatus(e.message || 'Achtergrond laden mislukt');
+    }
+  }, 0);
+}
+
 async function signOutFromCloud(){
   setCloudStatus('Uitloggen...');
 
   try{
-    const supabase = getSupabaseClient();
-    const { error } = await supabase.auth.signOut();
-    if(error) throw error;
-
     state.cloudUserEmail = '';
     state.cloudHouseholdKey = '';
     state.cloudThemePreference = 'midnight';
     state.accountMenuOpen = false;
+    closeAppModal();
     if(typeof applyTheme === 'function'){
       applyTheme('midnight', { persist:false, skipCloudPersist:true });
     }
-    closeAppModal();
-    setCloudStatus('Uitgelogd');
-
     if(typeof renderInstellingen === 'function'){
       renderInstellingen();
     }
-
     if(typeof renderHeaderActions === 'function'){
       renderHeaderActions();
     }
+    if(typeof rerenderAll === 'function'){
+      rerenderAll();
+    }
+
+    const supabase = getSupabaseClient();
+    const { error } = await supabase.auth.signOut();
+    if(error) throw error;
+
+    setCloudStatus('Uitgelogd');
 
     showToast('Uitgelogd');
   }catch(e){

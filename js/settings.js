@@ -251,6 +251,14 @@ async function submitLoginModal(){
   const result = await signInToCloud(email, password);
   if(result?.ok){
     closeAppModal();
+    if(typeof finalizeCloudLogin === 'function'){
+      finalizeCloudLogin(result.email || email);
+    }
+    if(typeof rerenderAll === 'function'){
+      rerenderAll();
+    }else if(typeof renderHeaderActions === 'function'){
+      renderHeaderActions();
+    }
   }
 }
 

@@ -6,6 +6,10 @@ window.supabaseClient.auth.onAuthStateChange(async (_event, session) => {
   state.cloudThemePreference = 'midnight';
   state.accountMenuOpen = false;
 
+  if(session?.user && state.appModalOpen && state.appModalType === 'cloud-login' && typeof closeAppModal === 'function'){
+    closeAppModal();
+  }
+
   if(session?.user && typeof syncCloudSession === 'function'){
     try{
       await syncCloudSession();
