@@ -93,6 +93,7 @@ function renderLeningen(){
               </div>
 
               <div class="loan-metric loan-metric--action">
+                <div class="loan-metric-label">Snelle aflossing</div>
                 <button class="loan-addpay" onclick="addLoanPayment(${idx})">+ Aflossing toevoegen</button>
               </div>
             </div>

@@ -233,3 +233,26 @@
   bottom:calc(env(safe-area-inset-bottom,0px) + 12px);
   z-index:20;
 }
+
+.budget-category-card__toggle{
+  flex:1;
+  min-width:0;
+  border:none;
+  background:transparent;
+  color:inherit;
+  text-align:left;
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  padding:0;
+  cursor:pointer;
+}
+
+.budget-category-card__chevron{
+  flex-shrink:0;
+  font-size:18px;
+  line-height:1;
+  color:var(--muted);
+  padding-top:2px;
+}
