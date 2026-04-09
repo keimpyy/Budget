@@ -335,6 +335,12 @@ function closeAppModal(){
   renderAppModal();
 }
 
+function confirmAppModal(){
+  const fn = state.appModalOnConfirm;
+  closeAppModal();
+  if(typeof fn === 'function') fn();
+}
+
 function renderAppModal(){
   const root = document.getElementById('app-modal-root');
   if(!root) return;
@@ -346,31 +352,34 @@ function renderAppModal(){
 
   let content = '';
 
-  // 🔹 CONFIRM MODAL
-if(state.appModalType === 'confirm'){
-  const { title, text } = state.appModalPayload || {};
+  if(state.appModalType === 'confirm'){
+    const { title, text } = state.appModalPayload || {};
 
-  content = `
-    <div class="budget-modal-backdrop" onclick="closeAppModal()">
-      <div class="budget-modal-sheet" onclick="event.stopPropagation()">
-        <div class="budget-modal-handle"></div>
+    content = `
+      <div class="budget-modal-backdrop" onclick="closeAppModal()">
+        <div class="budget-modal-sheet" onclick="event.stopPropagation()">
+          <div class="budget-modal-handle"></div>
 
-        <div class="budget-modal-title">${title || 'Bevestigen'}</div>
-        <div class="budget-modal-copy">${text || ''}</div>
+          <div class="budget-modal-title">${title || 'Bevestigen'}</div>
+          <div class="budget-modal-copy">${text || ''}</div>
 
-        <div class="budget-modal-actions">
-          <button class="btn secondary" onclick="closeAppModal()">Annuleren</button>
-          <button class="btn" onclick="confirmAppModal()">Doorgaan</button>
+          <div class="budget-modal-actions">
+            <button class="btn secondary" onclick="closeAppModal()">Annuleren</button>
+            <button class="btn" onclick="confirmAppModal()">Doorgaan</button>
+          </div>
         </div>
       </div>
-    </div>
-  `;
-}
+    `;
+  }
 
-  // 🔹 LOAN PAYMENT MODAL
   if(state.appModalType === 'loan-payment'){
     const { idx } = state.appModalPayload || {};
     const loan = state.leningen[idx];
+
+    if(!loan){
+      root.innerHTML = '';
+      return;
+    }
 
     content = `
       <div class="budget-modal-backdrop" onclick="closeAppModal()">
@@ -378,14 +387,20 @@ if(state.appModalType === 'confirm'){
           <div class="budget-modal-handle"></div>
 
           <div class="budget-modal-title">Aflossing toevoegen</div>
-          <div class="budget-modal-copy">${escapeHtml(loan?.naam || '')}</div>
+          <div class="budget-modal-copy">${escapeHtml(loan.naam || '')}</div>
 
-          <input
-            id="loan-payment-input"
-            class="input composer-amount-input"
-            type="number"
-            placeholder="Bedrag"
-          >
+          <div class="stack">
+            <div>
+              <div class="budget-inline-label">Bedrag</div>
+              <input
+                id="loan-payment-input"
+                class="input composer-amount-input"
+                type="number"
+                inputmode="decimal"
+                placeholder="0"
+              >
+            </div>
+          </div>
 
           <div class="budget-modal-actions">
             <button class="btn secondary" onclick="closeAppModal()">Annuleren</button>
@@ -397,10 +412,11 @@ if(state.appModalType === 'confirm'){
   }
 
   root.innerHTML = content;
-}
 
-function confirmAppModal(){
-  const fn = state.appModalOnConfirm;
-  closeAppModal();
-  if(typeof fn === 'function') fn();
+  if(state.appModalType === 'loan-payment'){
+    setTimeout(() => {
+      const el = document.getElementById('loan-payment-input');
+      if(el) el.focus();
+    }, 30);
+  }
 }
