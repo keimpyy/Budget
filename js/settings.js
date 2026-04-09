@@ -174,10 +174,10 @@ function renderSettings(){
 }
 
 function closeSettings(){
-  const budgetBtn = document.querySelector('.tabs .tab:nth-child(2)');
-  if(budgetBtn){
-    go('budget', budgetBtn);
-  }else{
-    go('budget');
-  }
+  const target = state.lastNonSettingsView || 'dashboard';
+  const btn = [...document.querySelectorAll('.tab')].find(
+    b => b.textContent.trim().toLowerCase() === target
+  ) || document.querySelector('.tab');
+
+  if(btn) go(target, btn);
 }
