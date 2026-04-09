@@ -1,2 +1,113 @@
-/* Opgesplitste plek voor extra styles. De app werkt al volledig via base.css.
-   Je kunt later selectors vanuit base.css hierheen verplaatsen per onderdeel. */
+/* Leningen finetuning */
+
+.loan-card{
+  background:linear-gradient(180deg,var(--surface),var(--surface2));
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:16px;
+  margin-top:12px;
+  box-shadow:var(--shadow);
+}
+
+.loan-top{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:14px;
+}
+
+.loan-name-wrap{
+  flex:1;
+  min-width:0;
+}
+
+.loan-progress-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-top:14px;
+  margin-bottom:10px;
+}
+
+.loan-progress-label{
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+
+.loan-percent-badge{
+  margin-left:0;
+  font-size:22px;
+  font-weight:900;
+  line-height:1;
+}
+
+.loan-track{
+  margin-bottom:12px;
+}
+
+.loan-progress-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin-bottom:14px;
+}
+
+.loan-inputs{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:12px;
+}
+
+.loan-metric{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.loan-metric-label{
+  font-size:12px;
+  font-weight:700;
+  color:var(--muted);
+}
+
+.loan-metric--action{
+  padding-top:2px;
+}
+
+.loan-addpay,
+.loan-save{
+  width:100%;
+  min-height:44px;
+}
+
+.loan-actions{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:10px;
+  margin-top:14px;
+}
+
+@media (min-width: 720px){
+  .loan-inputs{
+    grid-template-columns:1fr 1fr auto;
+    align-items:end;
+  }
+
+  .loan-metric--action{
+    align-self:end;
+  }
+
+  .loan-addpay{
+    width:auto;
+    min-width:220px;
+  }
+
+  .loan-actions{
+    grid-template-columns:1fr 1fr;
+  }
+}
