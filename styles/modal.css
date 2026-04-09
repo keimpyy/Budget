@@ -1,0 +1,27 @@
+/* Root van alle modals */
+#app-modal-root{
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  pointer-events: none;
+}
+
+/* Backdrop (donkere achtergrond) */
+#app-modal-root .budget-modal-backdrop{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.45);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 16px;
+  pointer-events: auto;
+}
+
+/* Modal zelf */
+#app-modal-root .budget-modal-sheet{
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  z-index: 100000;
+}
