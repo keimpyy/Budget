@@ -1,5 +1,6 @@
-/* Import order */
-@import url("layout.css");
+/* app.css */
+/* vervang layout.css door base.css */
+@import url("base.css");
 @import url("components.css");
 @import url("dashboard.css");
 @import url("budget.css");

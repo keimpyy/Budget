@@ -168,7 +168,7 @@ function applySheets(data){
 
   normalizeData();
   persistLocal();
-  renderAll();
+  rerenderAll();
 }
 
 async function loadFromSheets(){
