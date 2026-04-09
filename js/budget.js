@@ -58,9 +58,7 @@ function renderBudget() {
           </section>
         </div>
 
-        <aside class="budget-sidebar">
-          ${renderBudgetSummaryCard(total, remaining)}
-        </aside>
+        <aside class="budget-sidebar"></aside>
       </div>
     </section>
   `;
@@ -81,9 +79,10 @@ function renderBudget() {
                 </span>
               </div>
             </div>
-            <div class="budget-hero__actions">
-              <button class="btn" onclick="openBudgetComposer('category')">+ Categorie</button>
-            </div>
+              <div class="budget-hero__actions">
+                <button class="btn" onclick="openBudgetComposer('category')">+ Categorie</button>
+                <button class="btn secondary" onclick="loadFromSheets()">↻ Refresh</button>
+              </div>
           </section>
 
 ${cats.length
@@ -201,29 +200,6 @@ ${cats.length
   `;
 
   renderBudgetComposer();
-}
-
-function renderBudgetSummaryCard(total, remaining) {
-  return `
-    <section class="card budget-summary-card">
-      <div class="budget-summary-card__row">
-        <span class="budget-summary-card__label">Totaal budget</span>
-        <strong class="mono budget-summary-card__value budget-summary-card__value--accent">${fmt(total)}</strong>
-      </div>
-
-      <div class="budget-summary-card__row">
-        <span class="budget-summary-card__label muted">Overschot</span>
-        <strong class="mono budget-summary-card__value ${remaining >= 0 ? 'is-positive' : 'is-negative'}">${fmt(remaining)}</strong>
-      </div>
-
-      <div class="budget-summary-card__actions">
-        <button class="btn" onclick="saveToSheets()">☁️ Opslaan in Sheets</button>
-        <button class="btn secondary" onclick="loadFromSheets()">↻ Opnieuw ophalen</button>
-      </div>
-
-      <div id="save-status" class="note budget-summary-card__note"></div>
-    </section>
-  `;
 }
 
 function updateIncomeName(idx, value){
