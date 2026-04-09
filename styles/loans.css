@@ -140,3 +140,8 @@
     grid-template-columns:1fr 1fr 1fr;
   }
 }
+
+.loan-track .fill{
+  background:linear-gradient(90deg,var(--accent),var(--accent2),var(--green));
+}
+

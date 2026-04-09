@@ -125,7 +125,7 @@ function toRows(){
       naam: r.naam || '',
       totaal: Number(r.totaal || 0),
       betaald: Number(r.betaald || 0),
-      kleur: r.kleur || '#7c6af7'
+      kleur: String(r.kleur || '')
     }))
   };
 }
@@ -162,7 +162,7 @@ function applySheets(data){
       naam: String(r.naam || ''),
       totaal: Number(r.totaal || 0),
       betaald: Number(r.betaald || 0),
-      kleur: String(r.kleur || '#7c6af7')
+      kleur: String(r.kleur || '')
     }));
   }
 

@@ -73,7 +73,7 @@ function renderLeningen(){
             </div>
 
             <div class="track loan-track">
-              <div class="fill" style="width:${pct}%;background:${l.kleur||'#7c6af7'}"></div>
+              <div class="fill" style="width:${pct}%"></div>
             </div>
 
             <div class="loan-progress-row">
@@ -117,4 +117,37 @@ function updateLoanTotal(idx, value){ state.leningen[idx].totaal = Number(value|
 
 function updateLoanPaid(idx, value){ state.leningen[idx].betaald = Number(value||0); persistLocal(); renderLeningen(); }
 
-function addLoan(){ state.leningen.push({ id:uid('ln'), naam:'Nieuwe lening', totaal:0, betaald:0, kleur:'#7c6af7' }); persistLocal(); renderLeningen(); }
+function addLoan(){
+  state.leningen.push({
+    id: uid('ln'),
+    naam: 'Nieuwe lening',
+    totaal: 0,
+    betaald: 0,
+    kleur: ''
+  });
+  persistLocal();
+  renderLeningen();
+}
+
+function addLoanPayment(idx){
+  const loan = state.leningen[idx];
+  if(!loan) return;
+
+  const raw = prompt(`Extra aflossing voor "${loan.naam}"`, '0');
+  if(raw === null) return;
+
+  const amount = Number(String(raw).replace(',', '.'));
+  if(!Number.isFinite(amount) || amount <= 0){
+    showToast('Voer een geldig bedrag in');
+    return;
+  }
+
+  loan.betaald = Math.min(
+    Number(loan.totaal || 0),
+    Number(loan.betaald || 0) + amount
+  );
+
+  persistLocal();
+  renderLeningen();
+  showToast('Aflossing toegevoegd');
+}
