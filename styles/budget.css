@@ -168,3 +168,68 @@
   .budget-modal-backdrop{align-items:center}
   .budget-modal-sheet{padding-bottom:18px}
 }
+
+#budget-modal-root{
+  position:fixed;
+  inset:0;
+  z-index:1400;
+  pointer-events:none;
+}
+
+#budget-modal-root:empty{
+  display:none;
+}
+
+#budget-modal-root > *{
+  pointer-events:auto;
+}
+
+.budget-category-card,
+.budget-post-card,
+.budget-post-card__content,
+.budget-post-card__right,
+.budget-category-card__actions{
+  position:relative;
+}
+
+.budget-post-card__content,
+.budget-category-card__actions,
+.budget-post-card__right{
+  z-index:3;
+}
+
+.budget-post-card__main,
+.budget-post-card__amount,
+.budget-chip,
+.budget-category-card .pill-btn,
+.budget-category-card .icon-btn,
+.budget-mobile-bar .btn{
+  position:relative;
+  z-index:4;
+  pointer-events:auto;
+}
+
+.budget-post-card__main{
+  appearance:none;
+  -webkit-appearance:none;
+  border:none;
+  background:transparent;
+  color:inherit;
+  text-align:left;
+  width:100%;
+}
+
+.budget-post-card__amount{
+  appearance:none;
+  -webkit-appearance:none;
+}
+
+.swipe-delete-bg{
+  pointer-events:none;
+}
+
+.budget-mobile-bar{
+  position:sticky;
+  bottom:calc(env(safe-area-inset-bottom,0px) + 12px);
+  z-index:20;
+}
