@@ -146,3 +146,29 @@ border:1px solid var(--border);
 /* helpers */
 .muted{color:var(--muted)}
 .mono{font-family:monospace}
+
+.view{display:none}
+.view.active{display:block}
+
+/* animaties (optioneel maar had je ook) */
+.view.anim-enter-right{display:block;animation:slideEnterRight .26s ease both}
+.view.anim-enter-left{display:block;animation:slideEnterLeft .26s ease both}
+.view.anim-exit-left{display:block;animation:slideExitLeft .26s ease both}
+.view.anim-exit-right{display:block;animation:slideExitRight .26s ease both}
+
+@keyframes slideEnterRight{
+  from{opacity:.6;transform:translateX(26px)}
+  to{opacity:1;transform:translateX(0)}
+}
+@keyframes slideEnterLeft{
+  from{opacity:.6;transform:translateX(-26px)}
+  to{opacity:1;transform:translateX(0)}
+}
+@keyframes slideExitLeft{
+  from{opacity:1;transform:translateX(0)}
+  to{opacity:.4;transform:translateX(-26px)}
+}
+@keyframes slideExitRight{
+  from{opacity:1;transform:translateX(0)}
+  to{opacity:.4;transform:translateX(26px)}
+}
