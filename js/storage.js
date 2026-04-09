@@ -22,6 +22,39 @@ function restoreLocal(){
   }catch(e){}
 }
 
+function setCloudStatus(message){
+  state.cloudStatus = message || '';
+  const status = document.getElementById('save-status');
+  if(status) status.textContent = state.cloudStatus;
+}
+
+function getSupabaseClient(){
+  if(window.supabaseClient) return window.supabaseClient;
+  throw new Error('Supabase client niet geladen');
+}
+
+async function getCloudUser(){
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase.auth.getUser();
+  if(error) throw error;
+
+  const user = data?.user || null;
+  state.cloudUserEmail = user?.email || '';
+  return user;
+}
+
+async function syncCloudSession(){
+  try{
+    await getCloudUser();
+  }catch(e){
+    state.cloudUserEmail = '';
+  }
+
+  if(typeof renderInstellingen === 'function' && state.currentView === 'instellingen'){
+    renderInstellingen();
+  }
+}
+
 async function safeJson(res){
   const text = await res.text();
 
@@ -45,28 +78,6 @@ async function safeJson(res){
   }
 
   return parsed;
-}
-
-async function sheetsGet(){
-  if(!state.sheetsUrl) {
-    return { ok:false, error:'Geen sheetsUrl ingesteld' };
-  }
-
-  const res = await fetch(`${state.sheetsUrl}?action=getAll`, {
-    method:'GET',
-    redirect:'follow'
-  });
-
-  return await safeJson(res);
-}
-
-async function sheetsPost(data){
-  const res = await fetch(state.sheetsUrl, {
-    method:'POST',
-    redirect:'follow',
-    body: JSON.stringify(data)
-  });
-  return await safeJson(res);
 }
 
 function normalizeData(){
@@ -130,7 +141,7 @@ function toRows(){
   };
 }
 
-function applySheets(data){
+function applyCloudData(data){
   if(data.inkomsten){
     state.inkomsten = data.inkomsten.map(r => ({
       naam: String(r.naam || ''),
@@ -171,48 +182,164 @@ function applySheets(data){
   rerenderAll();
 }
 
-async function loadFromSheets(){
-  const saveStatus = document.getElementById('save-status');
-  if(saveStatus) saveStatus.textContent = 'Ophalen...';
+async function fetchCloudState(){
+  const user = await getCloudUser();
+  if(!user){
+    return { ok:false, error:'Log eerst in op Supabase' };
+  }
+
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase
+    .from('app_state')
+    .select('inkomsten,categorieen,budget,leningen')
+    .eq('owner_user_id', user.id)
+    .maybeSingle();
+
+  if(error){
+    return { ok:false, error:error.message || 'Ophalen mislukt' };
+  }
+
+  if(!data){
+    return { ok:true, inkomsten:[], categorieen:[], budget:[], leningen:[] };
+  }
+
+  return { ok:true, ...data };
+}
+
+async function saveCloudState(data){
+  const user = await getCloudUser();
+  if(!user){
+    return { ok:false, error:'Log eerst in op Supabase' };
+  }
+
+  const supabase = getSupabaseClient();
+  const payload = {
+    owner_user_id: user.id,
+    inkomsten: data.inkomsten || [],
+    categorieen: data.categorieen || [],
+    budget: data.budget || [],
+    leningen: data.leningen || [],
+    updated_at: new Date().toISOString()
+  };
+
+  const { error } = await supabase
+    .from('app_state')
+    .upsert(payload, { onConflict:'owner_user_id' });
+
+  if(error){
+    return { ok:false, error:error.message || 'Opslaan mislukt' };
+  }
+
+  return { ok:true };
+}
+
+async function loadFromCloud(){
+  setCloudStatus('Ophalen...');
 
   try{
-    const result = await sheetsGet();
-    console.log('Sheets GET result:', result);
+    const result = await fetchCloudState();
 
     if(result?.ok){
-      applySheets(result);
+      applyCloudData(result);
       showToast('Data opgehaald');
-      if(saveStatus) saveStatus.textContent = 'Vers geladen uit Sheets';
+      setCloudStatus('Vers geladen uit Supabase');
     }else{
       showToast(result?.error || 'Ophalen mislukt');
-      if(saveStatus) saveStatus.textContent = result?.error || 'Ophalen mislukt';
-      console.error('Sheets fout:', result);
+      setCloudStatus(result?.error || 'Ophalen mislukt');
+      console.error('Supabase fout:', result);
     }
   }catch(e){
-    console.error('loadFromSheets crash:', e);
+    console.error('loadFromCloud crash:', e);
     showToast('Ophalen mislukt');
-    if(saveStatus) saveStatus.textContent = e.message || 'Ophalen mislukt';
+    setCloudStatus(e.message || 'Ophalen mislukt');
   }
 }
 
-async function saveToSheets(){
-  const status = document.getElementById('save-status');
-  if(status) status.textContent = 'Opslaan...';
+async function saveToCloud(){
+  setCloudStatus('Opslaan...');
 
   try{
     const rows = toRows();
-    const result = await sheetsPost(rows);
+    const result = await saveCloudState(rows);
 
     if(result?.ok){
       persistLocal();
-      if(status) status.textContent = 'Opgeslagen in Sheets';
+      setCloudStatus('Opgeslagen in Supabase');
       showToast('Opgeslagen');
     }else{
-      if(status) status.textContent = result?.error || 'Opslaan mislukt';
+      setCloudStatus(result?.error || 'Opslaan mislukt');
       showToast(result?.error || 'Opslaan mislukt');
     }
   }catch(e){
-    if(status) status.textContent = 'Opslaan mislukt';
+    setCloudStatus(e.message || 'Opslaan mislukt');
     showToast('Opslaan mislukt');
   }
 }
+
+async function signInToCloud(){
+  const email = prompt('Supabase e-mailadres');
+  if(email === null) return;
+
+  const password = prompt('Supabase wachtwoord');
+  if(password === null) return;
+
+  setCloudStatus('Inloggen...');
+
+  try{
+    const supabase = getSupabaseClient();
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email.trim(),
+      password
+    });
+
+    if(error) throw error;
+
+    state.cloudUserEmail = data?.user?.email || email.trim();
+    setCloudStatus(`Ingelogd als ${state.cloudUserEmail}`);
+
+    if(typeof renderInstellingen === 'function'){
+      renderInstellingen();
+    }
+
+    showToast('Ingelogd');
+    await loadFromCloud();
+  }catch(e){
+    state.cloudUserEmail = '';
+    setCloudStatus(e.message || 'Inloggen mislukt');
+    showToast('Inloggen mislukt');
+  }
+}
+
+async function signOutFromCloud(){
+  setCloudStatus('Uitloggen...');
+
+  try{
+    const supabase = getSupabaseClient();
+    const { error } = await supabase.auth.signOut();
+    if(error) throw error;
+
+    state.cloudUserEmail = '';
+    setCloudStatus('Uitgelogd');
+
+    if(typeof renderInstellingen === 'function'){
+      renderInstellingen();
+    }
+
+    showToast('Uitgelogd');
+  }catch(e){
+    setCloudStatus(e.message || 'Uitloggen mislukt');
+    showToast('Uitloggen mislukt');
+  }
+}
+
+function isCloudSignedIn(){
+  return Boolean(state.cloudUserEmail);
+}
+
+function getCloudUserEmail(){
+  return state.cloudUserEmail || 'Niet ingelogd';
+}
+
+async function loadFromSheets(){ return loadFromCloud(); }
+async function saveToSheets(){ return saveToCloud(); }
+function applySheets(data){ return applyCloudData(data); }

@@ -1,7 +1,9 @@
-const DEFAULT_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxa-f-tmhNbPXRDgMc9VSU7nAxKtoV8hCd2twIim1Ikq58uExIrXWgnyEF0DwbMJPpmVA/exec';
+const SUPABASE_URL = 'https://jxihwwdnowvwgzpgviab.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_2dWE27Su68lB3zFIVZRs_A_mFMd7haz';
 
 const state = {
-  sheetsUrl: DEFAULT_SHEETS_URL,
+  cloudStatus: '',
+  cloudUserEmail: '',
   inkomsten: [
     { naam:'KT', bedrag:2950 },
     { naam:'Ryanne', bedrag:1581.89 },

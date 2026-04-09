@@ -1,8 +1,9 @@
 /* app.css */
-/* vervang layout.css door base.css */
+@import url("theme.css");
 @import url("base.css");
 @import url("components.css");
 @import url("dashboard.css");
 @import url("budget.css");
 @import url("loans.css");
 @import url("settings.css");
+@import url("modal.css");

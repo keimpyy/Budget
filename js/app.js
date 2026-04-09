@@ -10,14 +10,19 @@ async function init(){
   rerenderAll();
 
   try{
-    if(typeof sheetsGet === 'function' && typeof applySheets === 'function'){
-      const result = await sheetsGet();
+    if(typeof syncCloudSession === 'function'){
+      await syncCloudSession();
+    }
+
+    if(typeof fetchCloudState === 'function' && typeof applyCloudData === 'function' && typeof isCloudSignedIn === 'function' && isCloudSignedIn()){
+      const result = await fetchCloudState();
       if(result?.ok){
-        applySheets(result);
+        applyCloudData(result);
+        setCloudStatus('Vers geladen uit Supabase');
       }
     }
   }catch(e){
-    console.error('Init sheets sync mislukt:', e);
+    console.error('Init cloud sync mislukt:', e);
   }
 
   const startupOverlay = document.getElementById('startup-overlay');

@@ -13,14 +13,7 @@
 
   <title>Budget </title>
 
-<link rel="stylesheet" href="styles/theme.css"/>
-<link rel="stylesheet" href="styles/base.css"/>
-<link rel="stylesheet" href="styles/components.css"/>
-<link rel="stylesheet" href="styles/budget.css"/>
-<link rel="stylesheet" href="styles/dashboard.css"/>
-<link rel="stylesheet" href="styles/loans.css"/>
-<link rel="stylesheet" href="styles/settings.css"/>
-<link rel="stylesheet" href="styles/modal.css"/>
+<link rel="stylesheet" href="styles/app.css"/>
 </head>
 <body data-theme="midnight">
   <div id="sakura-layer"></div>
@@ -35,7 +28,7 @@
     <div class="header">
       <div class="header-top">
         <div class="title">Budget <span>·</span> Veenstra</div>
-        <button class="badge-btn" onclick="openSettings()">⚙ Sheets</button>
+        <button class="badge-btn" onclick="openSettings()">⚙ Sync</button>
       </div>
 
       <div class="tabs">
@@ -88,7 +81,9 @@
 
   <canvas id="confetti-layer"></canvas>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/state.js"></script>
+  <script src="js/supabase.js"></script>
   <script src="js/storage.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/dashboard.js"></script>

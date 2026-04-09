@@ -82,6 +82,9 @@ function loadTheme(){
 function renderInstellingen(){
   const currentTheme = document.body.getAttribute('data-theme') || 'midnight';
   const themeLabel = getThemeLabel(currentTheme);
+  const cloudUserEmail = typeof getCloudUserEmail === 'function' ? getCloudUserEmail() : 'Niet ingelogd';
+  const cloudSignedIn = typeof isCloudSignedIn === 'function' ? isCloudSignedIn() : false;
+  const cloudStatus = escapeHtml(state.cloudStatus || (cloudSignedIn ? `Ingelogd als ${cloudUserEmail}` : 'Nog niet verbonden'));
 
   document.getElementById('v-instellingen').innerHTML = `
     <div class="settings-panel">
@@ -142,14 +145,17 @@ function renderInstellingen(){
         <div class="settings-group-title">Synchronisatie</div>
         <div class="settings-row static">
           <span class="settings-row-main">
-            <span class="settings-row-label">Google Sheets koppeling</span>
-            <span class="settings-row-note">Gebruik ophalen of opslaan wanneer jij zelf wilt syncen.</span>
+            <span class="settings-row-label">Supabase koppeling</span>
+            <span class="settings-row-note">Log in met jouw account en sync daarna handmatig wanneer jij wilt.</span>
           </span>
         </div>
-        <div class="settings-endpoint mono">${typeof escapeHtml === 'function' ? escapeHtml(state.sheetsUrl || '') : (state.sheetsUrl || '')}</div>
+        <div class="settings-endpoint mono">${escapeHtml(cloudUserEmail)}</div>
+        <div class="settings-row-note" id="save-status">${cloudStatus}</div>
         <div class="settings-actions-grid">
-          <button class="btn secondary" onclick="loadFromSheets()">Ophalen</button>
-          <button class="btn" onclick="saveToSheets()">Opslaan</button>
+          <button class="btn secondary" onclick="signInToCloud()">${cloudSignedIn ? 'Opnieuw inloggen' : 'Inloggen'}</button>
+          <button class="btn secondary" onclick="loadFromCloud()">Ophalen</button>
+          <button class="btn" onclick="saveToCloud()">Opslaan</button>
+          <button class="btn secondary" onclick="signOutFromCloud()">Uitloggen</button>
         </div>
       </div>
 

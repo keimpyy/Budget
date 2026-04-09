@@ -61,12 +61,15 @@
   display:grid;
   grid-template-columns:1fr;
   gap:12px;
+  align-items:stretch;
 }
 
 .loan-metric{
   display:flex;
   flex-direction:column;
   gap:8px;
+  height:100%;
+  min-width:0;
 }
 
 .loan-metric-label{
@@ -77,6 +80,7 @@
 
 .loan-metric--action{
   padding-top:2px;
+  justify-content:flex-end;
 }
 
 .loan-addpay,
@@ -94,7 +98,7 @@
 
 @media (min-width: 720px){
   .loan-inputs{
-    grid-template-columns:1fr 1fr auto;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr) fit-content(100%);
     align-items:end;
   }
 
@@ -102,9 +106,10 @@
     align-self:end;
   }
 
-  .loan-addpay{
+  .loan-metric--action .loan-addpay{
     width:auto;
-    min-width:220px;
+    min-width:0;
+    max-width:100%;
   }
 
   .loan-actions{
@@ -112,33 +117,9 @@
   }
 }
 
-.loan-inputs{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:12px;
-  align-items:stretch;
-}
-
-.loan-metric{
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-  height:100%;
-}
-
-.loan-metric--action{
-  justify-content:flex-end;
-}
-
 .loan-metric--action .loan-addpay{
   margin-top:auto;
   width:100%;
-}
-
-@media (min-width: 720px){
-  .loan-inputs{
-    grid-template-columns:1fr 1fr 1fr;
-  }
 }
 
 .loan-track .fill{
