@@ -42,6 +42,9 @@ async function sheetsPost(data){
   const res = await fetch(state.sheetsUrl, {
     method:'POST',
     redirect:'follow',
+    headers:{
+      'Content-Type':'application/json'
+    },
     body: JSON.stringify(data)
   });
   return await safeJson(res);
