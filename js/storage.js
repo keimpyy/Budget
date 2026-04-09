@@ -120,16 +120,8 @@ async function saveThemePreference(theme){
 }
 
 async function syncCloudSession(){
-  try{
-    await getCloudUser();
-    await getCloudHouseholdKey();
-    if(typeof applyTheme === 'function'){
-      applyTheme(state.cloudThemePreference || 'midnight', {
-        persist:false,
-        skipCloudPersist:true
-      });
-    }
-  }catch(e){
+  const user = await getCloudUser();
+  if(!user){
     state.cloudUserEmail = '';
     state.cloudHouseholdKey = '';
     state.cloudThemePreference = 'midnight';
@@ -139,6 +131,30 @@ async function syncCloudSession(){
         skipCloudPersist:true
       });
     }
+
+    if(typeof renderInstellingen === 'function' && state.currentView === 'instellingen'){
+      renderInstellingen();
+    }
+
+    if(typeof renderHeaderActions === 'function'){
+      renderHeaderActions();
+    }
+    return false;
+  }
+
+  try{
+    await getCloudHouseholdKey();
+    if(typeof applyTheme === 'function'){
+      applyTheme(state.cloudThemePreference || 'midnight', {
+        persist:false,
+        skipCloudPersist:true
+      });
+    }
+  }catch(e){
+    state.cloudHouseholdKey = '';
+    state.cloudThemePreference = 'midnight';
+    setCloudStatus(e.message || 'Cloud koppeling niet beschikbaar');
+    console.error('Cloud sessie koppelen mislukt:', e);
   }
 
   if(typeof renderInstellingen === 'function' && state.currentView === 'instellingen'){
@@ -148,6 +164,8 @@ async function syncCloudSession(){
   if(typeof renderHeaderActions === 'function'){
     renderHeaderActions();
   }
+
+  return true;
 }
 
 async function safeJson(res){

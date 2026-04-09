@@ -6,16 +6,13 @@ async function init(){
   }
 
   try{
+    let hasSession = false;
     if(typeof syncCloudSession === 'function'){
-      await syncCloudSession();
+      hasSession = await syncCloudSession();
     }
 
-    if(typeof fetchCloudState === 'function' && typeof applyCloudData === 'function' && typeof isCloudSignedIn === 'function' && isCloudSignedIn()){
-      const result = await fetchCloudState();
-      if(result?.ok){
-        applyCloudData(result);
-        setCloudStatus('Vers geladen uit Supabase');
-      }
+    if(hasSession && typeof loadFromCloud === 'function'){
+      await loadFromCloud();
     }
   }catch(e){
     console.error('Init cloud sync mislukt:', e);

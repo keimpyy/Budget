@@ -4,109 +4,113 @@ function renderLeningen(){
   const totaalBetaald = state.leningen.reduce((s,l)=>s+Number(l.betaald||0),0);
 
   document.getElementById('v-leningen').innerHTML = `
-    <div class="loan-hero">
-      <div class="loan-hero-top">
-        <div>
-          <div class="hero-label">LENINGEN OVERZICHT</div>
-          <div class="loan-hero-title">${state.leningen.length} actieve leningen</div>
-        </div>
-        <div class="loan-hero-pct">${fmtShort(totaalRestant)}</div>
-      </div>
+    <section class="loan-page">
+      <div class="loan-shell">
+        <div class="loan-hero">
+          <div class="loan-hero-top">
+            <div>
+              <div class="hero-label">LENINGEN OVERZICHT</div>
+              <div class="loan-hero-title">${state.leningen.length} actieve leningen</div>
+            </div>
+            <div class="loan-hero-pct">${fmtShort(totaalRestant)}</div>
+          </div>
 
-      <div class="loan-stats">
-        <div class="loan-stat">
-          <div class="loan-stat-label">Restant</div>
-          <div class="loan-stat-row">
-            <div class="loan-stat-val mono">${fmt(totaalRestant)}</div>
+          <div class="loan-stats">
+            <div class="loan-stat">
+              <div class="loan-stat-label">Restant</div>
+              <div class="loan-stat-row">
+                <div class="loan-stat-val mono">${fmt(totaalRestant)}</div>
+              </div>
+            </div>
+
+            <div class="loan-stat">
+              <div class="loan-stat-label">Totaal</div>
+              <div class="loan-stat-row">
+                <div class="loan-stat-val mono">${fmt(totaalLening)}</div>
+              </div>
+            </div>
+
+            <div class="loan-stat">
+              <div class="loan-stat-label">Betaald</div>
+              <div class="loan-stat-row">
+                <div class="loan-stat-val mono">${fmt(totaalBetaald)}</div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="loan-stat">
-          <div class="loan-stat-label">Totaal</div>
-          <div class="loan-stat-row">
-            <div class="loan-stat-val mono">${fmt(totaalLening)}</div>
-          </div>
-        </div>
+        <div class="card loan-panel">
+          <div class="sec" style="margin-top:0">Leningen</div>
+          ${renderInlineSyncStatus()}
 
-        <div class="loan-stat">
-          <div class="loan-stat-label">Betaald</div>
-          <div class="loan-stat-row">
-            <div class="loan-stat-val mono">${fmt(totaalBetaald)}</div>
-          </div>
-        </div>
-      </div>
-    </div>
+          ${state.leningen.map((l, idx)=>{
+            const restant = Number(l.totaal||0) - Number(l.betaald||0);
+            const pct = Number(l.totaal||0)
+              ? Math.min(100, (Number(l.betaald||0) / Number(l.totaal||0)) * 100)
+              : 0;
 
-    <div class="card">
-      <div class="sec" style="margin-top:0">Leningen</div>
-      ${renderInlineSyncStatus()}
+            const isEditing = state.editingLoanId === l.id;
 
-      ${state.leningen.map((l, idx)=>{
-        const restant = Number(l.totaal||0) - Number(l.betaald||0);
-        const pct = Number(l.totaal||0)
-          ? Math.min(100, (Number(l.betaald||0) / Number(l.totaal||0)) * 100)
-          : 0;
+            return `
+              <div class="loan-card">
+                <div class="loan-top">
+                  <div class="loan-name-wrap">
+                    <div class="loan-name-header">
+                      <div class="loan-name-display">${escapeHtml(l.naam)}</div>
+                      <button class="loan-edit-btn" onclick="toggleLoanEdit('${l.id}')">
+                        ${isEditing ? 'Klaar' : 'Wijzig'}
+                      </button>
+                    </div>
 
-        const isEditing = state.editingLoanId === l.id;
-
-        return `
-          <div class="loan-card">
-            <div class="loan-top">
-              <div class="loan-name-wrap">
-                <div class="loan-name-header">
-                  <div class="loan-name-display">${escapeHtml(l.naam)}</div>
-                  <button class="loan-edit-btn" onclick="toggleLoanEdit('${l.id}')">
-                    ${isEditing ? 'Klaar' : 'Wijzig'}
-                  </button>
+                    ${isEditing ? `
+                      <div class="loan-name-edit">
+                        <input class="input" value="${escapeHtml(l.naam)}" onchange="updateLoanName(${idx}, this.value)">
+                      </div>
+                    ` : ``}
+                  </div>
                 </div>
 
-                ${isEditing ? `
-                  <div class="loan-name-edit">
-                    <input class="input" value="${escapeHtml(l.naam)}" onchange="updateLoanName(${idx}, this.value)">
+                <div class="loan-progress-head">
+                  <div class="loan-progress-label">Voortgang</div>
+                  <div class="loan-percent-badge">${pct.toFixed(0)}%</div>
+                </div>
+
+                <div class="track loan-track">
+                  <div class="fill" style="width:${pct}%"></div>
+                </div>
+
+                <div class="loan-progress-row">
+                  <div class="note">Restant: ${fmt(restant)}</div>
+                  <div class="note">Betaald: ${fmt(Number(l.betaald||0))}</div>
+                </div>
+
+                <div class="loan-inputs">
+                  <div class="loan-metric">
+                    <div class="loan-metric-label">Totaal lening</div>
+                    <input class="input" type="number" value="${Number(l.totaal||0)}" onchange="updateLoanTotal(${idx}, this.value)">
                   </div>
-                ` : ``}
+
+                  <div class="loan-metric">
+                    <div class="loan-metric-label">Al betaald</div>
+                    <input class="input" type="number" value="${Number(l.betaald||0)}" onchange="updateLoanPaid(${idx}, this.value)">
+                  </div>
+
+                  <div class="loan-metric loan-metric--action">
+                    <div class="loan-metric-label">Snelle aflossing</div>
+                    <button class="btn loan-addpay" onclick="openAppModal('loan-payment',{ idx:${idx} })">+ Aflossing toevoegen</button>
+                  </div>
+                </div>
               </div>
-            </div>
+            `;
+          }).join('')}
 
-            <div class="loan-progress-head">
-              <div class="loan-progress-label">Voortgang</div>
-              <div class="loan-percent-badge">${pct.toFixed(0)}%</div>
-            </div>
-
-            <div class="track loan-track">
-              <div class="fill" style="width:${pct}%"></div>
-            </div>
-
-            <div class="loan-progress-row">
-              <div class="note">Restant: ${fmt(restant)}</div>
-              <div class="note">Betaald: ${fmt(Number(l.betaald||0))}</div>
-            </div>
-
-            <div class="loan-inputs">
-              <div class="loan-metric">
-                <div class="loan-metric-label">Totaal lening</div>
-                <input class="input" type="number" value="${Number(l.totaal||0)}" onchange="updateLoanTotal(${idx}, this.value)">
-              </div>
-
-              <div class="loan-metric">
-                <div class="loan-metric-label">Al betaald</div>
-                <input class="input" type="number" value="${Number(l.betaald||0)}" onchange="updateLoanPaid(${idx}, this.value)">
-              </div>
-
-              <div class="loan-metric loan-metric--action">
-                <div class="loan-metric-label">Snelle aflossing</div>
-                <button class="loan-addpay" onclick="openAppModal('loan-payment',{ idx:${idx} })">+ Aflossing toevoegen</button>
-              </div>
-            </div>
+          <div class="loan-actions">
+            <button class="btn loan-save" onclick="addLoan()">+ Lening toevoegen</button>
+            <button class="btn secondary loan-addpay" onclick="loadFromCloud()">Leningen ophalen</button>
           </div>
-        `;
-      }).join('')}
-
-      <div class="loan-actions">
-        <button class="loan-save" onclick="addLoan()">+ Lening toevoegen</button>
-        <button class="loan-addpay" onclick="loadFromCloud()">Leningen ophalen</button>
+        </div>
       </div>
-    </div>
+    </section>
   `;
   renderAppModal();
 }
