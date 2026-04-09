@@ -326,6 +326,9 @@ async function fetchCloudState(){
     return { ok:false, error:'Log eerst in op Supabase' };
   }
   const householdKey = await getCloudHouseholdKey();
+  if(typeof setStartupProgress === 'function'){
+    setStartupProgress(66, 'Financiële gegevens ophalen...');
+  }
 
   const supabase = getSupabaseClient();
   const [
@@ -359,6 +362,10 @@ async function fetchCloudState(){
   const error = incomeResult.error || categoryResult.error || budgetResult.error || loanResult.error;
   if(error){
     return { ok:false, error:error.message || 'Ophalen mislukt' };
+  }
+
+  if(typeof setStartupProgress === 'function'){
+    setStartupProgress(88, 'Gegevens verwerken...');
   }
 
   return {
@@ -528,6 +535,9 @@ function renderInlineSyncStatus(){
 
 async function loadFromCloud(){
   setCloudStatus('Ophalen...');
+  if(typeof setStartupProgress === 'function'){
+    setStartupProgress(52, 'Verbinding maken met Supabase...');
+  }
 
   try{
     const result = await fetchCloudState();
@@ -536,15 +546,24 @@ async function loadFromCloud(){
       applyCloudData(result);
       showToast('Data opgehaald');
       setCloudStatus('Vers geladen uit Supabase');
+      if(typeof setStartupProgress === 'function'){
+        setStartupProgress(100, 'Gegevens bijgewerkt');
+      }
     }else{
       showToast(result?.error || 'Ophalen mislukt');
       setCloudStatus(result?.error || 'Ophalen mislukt');
       console.error('Supabase fout:', result);
+      if(typeof setStartupProgress === 'function'){
+        setStartupProgress(100, result?.error || 'Ophalen mislukt');
+      }
     }
   }catch(e){
     console.error('loadFromCloud crash:', e);
     showToast('Ophalen mislukt');
     setCloudStatus(e.message || 'Ophalen mislukt');
+    if(typeof setStartupProgress === 'function'){
+      setStartupProgress(100, e.message || 'Ophalen mislukt');
+    }
   }
 }
 

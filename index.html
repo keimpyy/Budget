@@ -50,31 +50,17 @@
   <div id="app-modal-root"></div>
 
   <div id="startup-overlay">
-    <svg width="0" height="0" style="position:absolute">
-      <filter id="goo">
-        <feGaussianBlur in="SourceGraphic" result="blur" stdDeviation="8"></feGaussianBlur>
-        <feColorMatrix
-          in="blur"
-          mode="matrix"
-          result="goo"
-          values="1 0 0 0 0
-                  0 1 0 0 0
-                  0 0 1 0 0
-                  0 0 0 18 -7"
-        ></feColorMatrix>
-        <feBlend in="SourceGraphic" in2="goo"></feBlend>
-      </filter>
-    </svg>
-
     <div class="loader-wrap">
-      <div class="liquid-loader">
-        <span class="blob"></span>
-        <span class="blob"></span>
-        <span class="blob"></span>
-        <span class="blob"></span>
-        <div class="liquid-core"></div>
+      <div class="startup-kicker">Budget</div>
+      <div class="startup-title">Gegevens laden</div>
+      <div class="startup-copy" id="startup-status-text">App starten...</div>
+      <div class="startup-progress" aria-hidden="true">
+        <div class="startup-progress-fill" id="startup-progress-fill" style="width:8%"></div>
       </div>
-      <div class="muted" style="text-align:center">Budget laden...</div>
+      <div class="startup-progress-meta">
+        <span>Synchroniseren met Supabase</span>
+        <span id="startup-progress-value">8%</span>
+      </div>
     </div>
   </div>
 

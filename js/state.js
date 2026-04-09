@@ -6,6 +6,8 @@ const state = {
   cloudHouseholdKey: '',
   cloudUserEmail: '',
   cloudThemePreference: 'midnight',
+  startupProgress: 8,
+  startupStatus: 'App starten...',
   accountMenuOpen:false,
   inkomsten: [
     { naam:'KT', bedrag:2950 },

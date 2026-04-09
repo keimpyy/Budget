@@ -1,9 +1,5 @@
 /* Leningen page */
 
-#v-leningen{
-  display:block;
-}
-
 .loan-page{
   display:grid;
   gap:14px;
