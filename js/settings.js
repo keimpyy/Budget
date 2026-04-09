@@ -3,11 +3,11 @@ const LEGACY_THEME_KEY = 'bv_theme';
 
 const THEME_COLORS = {
   midnight:'#0a0a0f',
-  carbon:'#101214',
-  sakura:'#140d15'
+  sakura:'#140d15',
+  neon:'#0a0f14'
 };
 
-const ALLOWED_THEMES = new Set(['midnight','carbon','sakura']);
+const ALLOWED_THEMES = new Set(['midnight','sakura','neon']);
 
 function updateThemeMeta(theme){
   const meta = document.querySelector('meta[name="theme-color"]');
@@ -74,11 +74,10 @@ function loadTheme(){
 
 function renderInstellingen(){
   const currentTheme = document.body.getAttribute('data-theme') || 'midnight';
-  const themeLabel = currentTheme === 'midnight'
-    ? 'Midnight RGB'
-    : currentTheme === 'carbon'
-      ? 'Carbon'
-      : 'Sakura v2';
+  const themeLabel =
+    theme === 'midnight' ? 'Midnight' :
+    theme === 'neon' ? 'Neon Core' :
+    'Sakura';
 
   document.getElementById('v-instellingen').innerHTML = `
     <div class="settings-panel">
