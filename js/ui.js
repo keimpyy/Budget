@@ -208,32 +208,19 @@ function syncSakuraPetals(){
   }
 
   if(theme === 'neon'){
-    const smokeCount = w >= 1100 ? 9 : 6;
-    const ashCount = w >= 1100 ? 24 : 16;
+    const mistCount = w >= 1100 ? 8 : 5;
 
-    for(let i = 0; i < smokeCount; i++){
-      const smoke = document.createElement('span');
-      smoke.className = 'theme-particle theme-particle-ronin-smoke';
-      smoke.style.left = `${-8 + Math.random() * 116}%`;
-      smoke.style.top = `${54 + Math.random() * 46}%`;
-      smoke.style.animationDelay = `${-Math.random() * 18}s`;
-      smoke.style.animationDuration = `${14 + Math.random() * 10}s`;
-      smoke.style.setProperty('--drift', `${-80 + Math.random() * 160}px`);
-      smoke.style.setProperty('--rise', `${-120 - Math.random() * 180}px`);
-      smoke.style.setProperty('--scale', 0.75 + Math.random() * 1.2);
-      layer.appendChild(smoke);
-    }
-
-    for(let i = 0; i < ashCount; i++){
-      const ash = document.createElement('span');
-      ash.className = 'theme-particle theme-particle-ronin-ash';
-      ash.style.left = `${Math.random() * 100}%`;
-      ash.style.animationDelay = `${-Math.random() * 18}s`;
-      ash.style.animationDuration = `${9 + Math.random() * 10}s`;
-      ash.style.setProperty('--drift', `${-140 + Math.random() * 280}px`);
-      ash.style.setProperty('--start-y', `${-20 + Math.random() * (h + 120)}px`);
-      ash.style.setProperty('--scale', 0.55 + Math.random() * 0.85);
-      layer.appendChild(ash);
+    for(let i = 0; i < mistCount; i++){
+      const mist = document.createElement('span');
+      mist.className = 'theme-particle theme-particle-ronin-mist';
+      mist.style.left = `${-26 + Math.random() * 120}%`;
+      mist.style.top = `${58 + Math.random() * 34}%`;
+      mist.style.animationDelay = `${-Math.random() * 22}s`;
+      mist.style.animationDuration = `${18 + Math.random() * 12}s`;
+      mist.style.setProperty('--drift', `${80 + Math.random() * 180}px`);
+      mist.style.setProperty('--lift', `${-16 + Math.random() * 32}px`);
+      mist.style.setProperty('--scale', 0.8 + Math.random() * 1.25);
+      layer.appendChild(mist);
     }
     return;
   }
