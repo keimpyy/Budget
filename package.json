@@ -1,0 +1,8 @@
+{
+  "name": "budget-app",
+  "private": true,
+  "scripts": {
+    "start": "\"C:\\Program Files\\nodejs\\node.exe\" server.js",
+    "check": "\"C:\\Program Files\\nodejs\\node.exe\" --check js/storage.js && \"C:\\Program Files\\nodejs\\node.exe\" --check js/app.js && \"C:\\Program Files\\nodejs\\node.exe\" --check js/supabase.js && \"C:\\Program Files\\nodejs\\node.exe\" --check server.js"
+  }
+}

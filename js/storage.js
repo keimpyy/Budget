@@ -51,6 +51,19 @@ function clearCloudAuthStorage(){
 
 let cloudSyncTimer = null;
 let cloudSyncInFlight = false;
+let cloudLoadPromise = null;
+const CLOUD_REQUEST_TIMEOUT_MS = 12000;
+
+function withCloudTimeout(promise, timeoutMs, label){
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => {
+      setTimeout(() => {
+        reject(new Error(label || 'Supabase request duurde te lang'));
+      }, timeoutMs);
+    })
+  ]);
+}
 
 function getSupabaseClient(){
   if(window.supabaseClient) return window.supabaseClient;
@@ -59,15 +72,14 @@ function getSupabaseClient(){
 
 async function getCloudUser(){
   const supabase = getSupabaseClient();
-  const sessionResult = await supabase.auth.getSession();
+  const sessionResult = await withCloudTimeout(
+    supabase.auth.getSession(),
+    CLOUD_REQUEST_TIMEOUT_MS,
+    'Sessie ophalen duurde te lang'
+  );
   if(sessionResult.error) throw sessionResult.error;
 
-  let user = sessionResult.data?.session?.user || null;
-  if(!user){
-    const { data, error } = await supabase.auth.getUser();
-    if(error) throw error;
-    user = data?.user || null;
-  }
+  const user = sessionResult.data?.session?.user || null;
 
   state.cloudUserEmail = user?.email || '';
   return user;
@@ -80,18 +92,26 @@ async function getCloudMemberRecord(){
   }
 
   const supabase = getSupabaseClient();
-  let { data, error } = await supabase
-    .from('household_members')
-    .select('household_key, theme_preference')
-    .eq('user_id', user.id)
-    .maybeSingle();
+  let { data, error } = await withCloudTimeout(
+    supabase
+      .from('household_members')
+      .select('household_key, theme_preference')
+      .eq('user_id', user.id)
+      .maybeSingle(),
+    CLOUD_REQUEST_TIMEOUT_MS,
+    'Huishouden ophalen duurde te lang'
+  );
 
   if(error && /theme_preference/i.test(error.message || '')){
-    const fallback = await supabase
-      .from('household_members')
-      .select('household_key')
-      .eq('user_id', user.id)
-      .maybeSingle();
+    const fallback = await withCloudTimeout(
+      supabase
+        .from('household_members')
+        .select('household_key')
+        .eq('user_id', user.id)
+        .maybeSingle(),
+      CLOUD_REQUEST_TIMEOUT_MS,
+      'Huishouden ophalen duurde te lang'
+    );
 
     data = fallback.data ? {
       household_key: fallback.data.household_key,
@@ -361,28 +381,32 @@ async function fetchCloudState(){
     categoryResult,
     budgetResult,
     loanResult
-  ] = await Promise.all([
-    supabase
-      .from('income_items')
-      .select('id,name,amount,sort_order')
-      .eq('household_key', householdKey)
-      .order('sort_order', { ascending:true }),
-    supabase
-      .from('categories')
-      .select('id,name,sort_order')
-      .eq('household_key', householdKey)
-      .order('sort_order', { ascending:true }),
-    supabase
-      .from('budget_items')
-      .select('id,category_id,name,amount,sort_order')
-      .eq('household_key', householdKey)
-      .order('sort_order', { ascending:true }),
-    supabase
-      .from('loans')
-      .select('id,name,total,paid,color,sort_order')
-      .eq('household_key', householdKey)
-      .order('sort_order', { ascending:true })
-  ]);
+  ] = await withCloudTimeout(
+    Promise.all([
+      supabase
+        .from('income_items')
+        .select('id,name,amount,sort_order')
+        .eq('household_key', householdKey)
+        .order('sort_order', { ascending:true }),
+      supabase
+        .from('categories')
+        .select('id,name,sort_order')
+        .eq('household_key', householdKey)
+        .order('sort_order', { ascending:true }),
+      supabase
+        .from('budget_items')
+        .select('id,category_id,name,amount,sort_order')
+        .eq('household_key', householdKey)
+        .order('sort_order', { ascending:true }),
+      supabase
+        .from('loans')
+        .select('id,name,total,paid,color,sort_order')
+        .eq('household_key', householdKey)
+        .order('sort_order', { ascending:true })
+    ]),
+    CLOUD_REQUEST_TIMEOUT_MS,
+    'Gegevens ophalen uit Supabase duurde te lang'
+  );
 
   const error = incomeResult.error || categoryResult.error || budgetResult.error || loanResult.error;
   if(error){
@@ -559,52 +583,58 @@ function renderInlineSyncStatus(){
 }
 
 async function loadFromCloud(){
-  if(state.cloudLoading) return;
-  state.cloudLoading = true;
-  console.info('loadFromCloud:start');
-  setCloudStatus('Ophalen...');
-  if(typeof setStartupProgress === 'function'){
-    setStartupProgress(52, 'Verbinding maken met Supabase...');
-  }
-  if(typeof rerenderCurrentView === 'function'){
-    rerenderCurrentView();
-  }else if(typeof renderHeaderActions === 'function'){
-    renderHeaderActions();
-  }
+  if(cloudLoadPromise) return cloudLoadPromise;
 
-  try{
-    const result = await fetchCloudState();
-
-    if(result?.ok){
-      applyCloudData(result);
-      showToast('Data opgehaald');
-      setCloudStatus('Vers geladen uit Supabase');
-      if(typeof setStartupProgress === 'function'){
-        setStartupProgress(100, 'Gegevens bijgewerkt');
-      }
-    }else{
-      showToast(result?.error || 'Ophalen mislukt');
-      setCloudStatus(result?.error || 'Ophalen mislukt');
-      console.error('Supabase fout:', result);
-      if(typeof setStartupProgress === 'function'){
-        setStartupProgress(100, result?.error || 'Ophalen mislukt');
-      }
-    }
-  }catch(e){
-    console.error('loadFromCloud crash:', e);
-    showToast('Ophalen mislukt');
-    setCloudStatus(e.message || 'Ophalen mislukt');
+  cloudLoadPromise = (async () => {
+    state.cloudLoading = true;
+    console.info('loadFromCloud:start');
+    setCloudStatus('Ophalen...');
     if(typeof setStartupProgress === 'function'){
-      setStartupProgress(100, e.message || 'Ophalen mislukt');
+      setStartupProgress(52, 'Verbinding maken met Supabase...');
     }
-  }finally{
-    state.cloudLoading = false;
     if(typeof rerenderCurrentView === 'function'){
       rerenderCurrentView();
     }else if(typeof renderHeaderActions === 'function'){
       renderHeaderActions();
     }
-  }
+
+    try{
+      const result = await fetchCloudState();
+
+      if(result?.ok){
+        applyCloudData(result);
+        showToast('Data opgehaald');
+        setCloudStatus('Vers geladen uit Supabase');
+        if(typeof setStartupProgress === 'function'){
+          setStartupProgress(100, 'Gegevens bijgewerkt');
+        }
+      }else{
+        showToast(result?.error || 'Ophalen mislukt');
+        setCloudStatus(result?.error || 'Ophalen mislukt');
+        console.error('Supabase fout:', result);
+        if(typeof setStartupProgress === 'function'){
+          setStartupProgress(100, result?.error || 'Ophalen mislukt');
+        }
+      }
+    }catch(e){
+      console.error('loadFromCloud crash:', e);
+      showToast('Ophalen mislukt');
+      setCloudStatus(e.message || 'Ophalen mislukt');
+      if(typeof setStartupProgress === 'function'){
+        setStartupProgress(100, e.message || 'Ophalen mislukt');
+      }
+    }finally{
+      state.cloudLoading = false;
+      cloudLoadPromise = null;
+      if(typeof rerenderCurrentView === 'function'){
+        rerenderCurrentView();
+      }else if(typeof renderHeaderActions === 'function'){
+        renderHeaderActions();
+      }
+    }
+  })();
+
+  return cloudLoadPromise;
 }
 
 async function saveToCloud(){
@@ -690,16 +720,6 @@ function finalizeCloudLogin(email){
   }else if(typeof rerenderAll === 'function'){
     rerenderAll();
   }
-
-  setTimeout(async () => {
-    try{
-      await syncCloudSession();
-      await loadFromCloud();
-    }catch(e){
-      console.error('Achtergrond laden na login mislukt:', e);
-      setCloudStatus(e.message || 'Achtergrond laden mislukt');
-    }
-  }, 0);
 }
 
 async function signOutFromCloud(){

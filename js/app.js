@@ -52,6 +52,22 @@ async function init(){
     }else if(!sessionTimedOut){
       setStartupProgress(100, 'Klaar om te beginnen');
     }
+
+    if(sessionTimedOut){
+      setTimeout(async () => {
+        try{
+          const hasSession = typeof syncCloudSession === 'function'
+            ? await syncCloudSession()
+            : false;
+
+          if(hasSession && typeof loadFromCloud === 'function'){
+            await loadFromCloud();
+          }
+        }catch(e){
+          console.error('Achtergrond startup sync mislukt:', e);
+        }
+      }, 0);
+    }
   }catch(e){
     console.error('Init cloud sync mislukt:', e);
     setStartupProgress(100, 'Laden mislukt');
@@ -70,19 +86,6 @@ async function init(){
     }, 220);
   }
 
-  setTimeout(async () => {
-    try{
-      const hasSession = typeof syncCloudSession === 'function'
-        ? await syncCloudSession()
-        : false;
-
-      if(hasSession && typeof loadFromCloud === 'function'){
-        await loadFromCloud();
-      }
-    }catch(e){
-      console.error('Achtergrond startup sync mislukt:', e);
-    }
-  }, 0);
 }
 
 loadTheme();

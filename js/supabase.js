@@ -43,7 +43,7 @@ window.supabaseClient.auth.onAuthStateChange(async (event, session) => {
       const hasSession = await syncCloudSession();
       if(
         hasSession &&
-        (event === 'INITIAL_SESSION' || event === 'SIGNED_IN') &&
+        event === 'SIGNED_IN' &&
         typeof loadFromCloud === 'function'
       ){
         await loadFromCloud();
