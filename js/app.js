@@ -47,7 +47,7 @@ async function init(){
 
     if(hasSession && typeof loadFromCloud === 'function' && !sessionTimedOut){
       setStartupProgress(58, 'Huishoudgegevens ophalen...');
-      await loadFromCloud();
+      await loadFromCloud({ silent:true });
       setStartupProgress(100, 'Gegevens bijgewerkt');
     }else if(!sessionTimedOut){
       setStartupProgress(100, 'Klaar om te beginnen');
@@ -61,7 +61,7 @@ async function init(){
             : false;
 
           if(hasSession && typeof loadFromCloud === 'function'){
-            await loadFromCloud();
+            await loadFromCloud({ silent:true });
           }
         }catch(e){
           console.error('Achtergrond startup sync mislukt:', e);

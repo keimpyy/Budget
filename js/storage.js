@@ -1,10 +1,22 @@
 function persistLocal(){
-  // App data now lives in Supabase only.
+  try{
+    if(!isCloudSignedIn()) return;
+    window.localStorage.setItem(CLOUD_DATA_CACHE_KEY, JSON.stringify(toRows()));
+  }catch(e){}
 }
 
 function restoreLocal(){
   try{
     localStorage.removeItem('bv_budget_state_v3');
+
+    const raw = window.localStorage.getItem(CLOUD_DATA_CACHE_KEY);
+    if(!raw) return;
+
+    const cached = JSON.parse(raw);
+    if(!cached || typeof cached !== 'object') return;
+
+    applyCloudData(cached, { skipLocalPersist:true, skipRender:true });
+    setCloudStatus('Laatste lokale kopie geladen');
   }catch(e){}
 }
 
@@ -55,11 +67,15 @@ function clearCloudAuthState(){
   state.cloudLoading = false;
   setCloudLoadProgress(0, '');
   persistCloudSessionMeta(null);
+  try{
+    window.localStorage.removeItem(CLOUD_DATA_CACHE_KEY);
+  }catch(e){}
 }
 
 function clearCloudAuthStorage(){
   try{
     window.localStorage.removeItem('budget-veenstra-auth');
+    window.localStorage.removeItem(CLOUD_DATA_CACHE_KEY);
   }catch(e){}
 
   try{
@@ -104,6 +120,7 @@ let cloudSyncInFlight = false;
 let cloudLoadPromise = null;
 const CLOUD_REQUEST_TIMEOUT_MS = 12000;
 const CLOUD_AUTH_META_KEY = 'budget-veenstra-auth-meta';
+const CLOUD_DATA_CACHE_KEY = 'budget-veenstra-cloud-data-cache';
 
 function withCloudTimeout(promise, timeoutMs, label){
   return Promise.race([
@@ -381,7 +398,7 @@ function toRows(){
   };
 }
 
-function applyCloudData(data){
+function applyCloudData(data, options = {}){
   if(data.inkomsten){
     state.inkomsten = data.inkomsten.map((r, i) => ({
       id: String(r.id || uid('inc')),
@@ -421,11 +438,15 @@ function applyCloudData(data){
   }
 
   normalizeData();
-  persistLocal();
-  if(typeof rerenderCurrentView === 'function'){
-    rerenderCurrentView();
-  }else{
-    rerenderAll();
+  if(!options.skipLocalPersist){
+    persistLocal();
+  }
+  if(!options.skipRender){
+    if(typeof rerenderCurrentView === 'function'){
+      rerenderCurrentView();
+    }else{
+      rerenderAll();
+    }
   }
 }
 
@@ -666,8 +687,9 @@ function renderInlineSyncStatus(){
   `;
 }
 
-async function loadFromCloud(){
+async function loadFromCloud(options = {}){
   if(cloudLoadPromise) return cloudLoadPromise;
+  const silent = options.silent === true;
 
   cloudLoadPromise = (async () => {
     state.cloudLoading = true;
@@ -690,7 +712,9 @@ async function loadFromCloud(){
       if(result?.ok){
         setCloudLoadProgress(94, 'Gegevens toepassen...');
         applyCloudData(result);
-        showToast('Data opgehaald');
+        if(!silent){
+          showToast('Data opgehaald');
+        }
         setCloudStatus('Vers geladen uit Supabase');
         setCloudLoadProgress(100, 'Klaar');
         if(typeof setStartupProgress === 'function'){

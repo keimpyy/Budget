@@ -73,13 +73,51 @@ function showToast(msg){
   setTimeout(() => t.remove(), 2200);
 }
 
-function go(name, btn){
+function setPageScrollTop(top = 0, behavior = 'auto'){
+  const scrollTop = Math.max(0, Number(top || 0));
+  window.scrollTo({ top:scrollTop, left:0, behavior });
+
+  const scrollingElement = document.scrollingElement || document.documentElement;
+  if(scrollingElement) scrollingElement.scrollTop = scrollTop;
+  if(document.body) document.body.scrollTop = scrollTop;
+}
+
+function scrollToBudgetCategory(catId){
+  const focusId = String(catId || '');
+  if(!focusId){
+    setPageScrollTop(0);
+    return;
+  }
+
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      const escapedFocusId = window.CSS?.escape ? CSS.escape(focusId) : focusId.replaceAll('"', '\\"');
+      const target = document.querySelector(`[data-category-id="${escapedFocusId}"]`);
+
+      if(!target){
+        setPageScrollTop(0);
+        return;
+      }
+
+      const headerHeight = document.querySelector('.header')?.offsetHeight || 0;
+      const targetTop = target.offsetTop - headerHeight - 12;
+      setPageScrollTop(targetTop, 'smooth');
+      state.budgetFocusCategoryId = null;
+    }, 80);
+  });
+}
+
+function go(name, btn, options = {}){
   const currentEl = document.querySelector('.view.active');
   const current = currentEl ? currentEl.id.replace('v-','') : null;
   const oldIdx = Math.max(0, VIEW_ORDER.indexOf(current));
   const newIdx = Math.max(0, VIEW_ORDER.indexOf(name));
   const dir = newIdx >= oldIdx ? 'left' : 'right';
-  const hasBudgetScrollTarget = name === 'budget' && Boolean(state.budgetFocusCategoryId);
+  const budgetScrollTarget = name === 'budget' ? options.focusBudgetCategory : null;
+
+  if(name === 'budget'){
+    state.budgetFocusCategoryId = budgetScrollTarget || null;
+  }
 
   if(name === 'instellingen' && current && current !== 'instellingen') state.lastNonSettingsView = current;
   if(name !== 'instellingen') state.lastNonSettingsView = name;
@@ -109,10 +147,12 @@ function go(name, btn){
   nextEl.classList.add('active', dir === 'left' ? 'anim-enter-right' : 'anim-enter-left');
   setTimeout(() => nextEl.classList.remove('anim-enter-right','anim-enter-left'), 260);
 
-  if(!hasBudgetScrollTarget){
-    requestAnimationFrame(() => {
-      window.scrollTo({ top:0, left:0, behavior:'auto' });
-    });
+  if(budgetScrollTarget){
+    scrollToBudgetCategory(budgetScrollTarget);
+  }else{
+    setPageScrollTop(0);
+    requestAnimationFrame(() => setPageScrollTop(0));
+    setTimeout(() => setPageScrollTop(0), 80);
   }
 }
 

@@ -188,26 +188,6 @@ ${cats.length
     ${incomeView ? incomeHtml : categoriesHtml}
   `;
 
-  if(!incomeView && state.budgetFocusCategoryId){
-    requestAnimationFrame(() => {
-      const focusId = state.budgetFocusCategoryId;
-      const escapedFocusId = window.CSS?.escape ? CSS.escape(focusId) : String(focusId).replaceAll('"', '\\"');
-      const target = document.querySelector(`[data-category-id="${escapedFocusId}"]`);
-      if(target){
-        const headerHeight = document.querySelector('.header')?.offsetHeight || 0;
-        const targetTop = target.getBoundingClientRect().top + window.scrollY - headerHeight - 12;
-        window.scrollTo({
-          top: Math.max(0, targetTop),
-          left: 0,
-          behavior: 'smooth'
-        });
-      }else{
-        window.scrollTo({ top:0, left:0, behavior:'auto' });
-      }
-      state.budgetFocusCategoryId = null;
-    });
-  }
-
   renderBudgetComposer();
 }
 

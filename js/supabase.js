@@ -31,7 +31,6 @@ window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBL
 window.supabaseClient.auth.onAuthStateChange(async (event, session) => {
   state.cloudUserEmail = session?.user?.email || '';
   state.cloudHouseholdKey = '';
-  state.cloudThemePreference = 'midnight';
   state.accountMenuOpen = false;
 
   if(session?.user && state.appModalOpen && state.appModalType === 'cloud-login' && typeof closeAppModal === 'function'){
@@ -46,13 +45,16 @@ window.supabaseClient.auth.onAuthStateChange(async (event, session) => {
         (event === 'INITIAL_SESSION' || event === 'SIGNED_IN') &&
         typeof loadFromCloud === 'function'
       ){
-        await loadFromCloud();
+        await loadFromCloud({ silent:event === 'INITIAL_SESSION' });
       }
     }catch(e){
       console.error('Auth state sync mislukt:', e);
     }
-  }else if(typeof applyTheme === 'function'){
-    applyTheme('midnight', { persist:false, skipCloudPersist:true });
+  }else{
+    state.cloudThemePreference = 'midnight';
+    if(typeof applyTheme === 'function'){
+      applyTheme('midnight', { persist:false, skipCloudPersist:true });
+    }
   }
 
   if(typeof renderInstellingen === 'function' && state.currentView === 'instellingen'){

@@ -69,7 +69,7 @@ function applyTheme(theme, options = {}){
 }
 
 function loadTheme(){
-  applyTheme('midnight', { persist:false, skipCloudPersist:true });
+  applyTheme(state.cloudThemePreference || 'midnight', { persist:false, skipCloudPersist:true });
 }
 
 function renderInstellingen(){

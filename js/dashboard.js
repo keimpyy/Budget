@@ -75,11 +75,19 @@ function openDashboardBudgetCategory(catId){
 
   state.budgetSubtab = 'categorieen';
   state.budgetSelectedCategoryId = catId;
-  state.budgetFocusCategoryId = catId;
+  state.openCats = {};
+  state.openCats[catId] = true;
 
   const budgetTab = [...document.querySelectorAll('.tab')].find(
     btn => btn.textContent.trim().toLowerCase() === 'budget'
   );
 
-  go('budget', budgetTab || null);
+  const categoryIndex = orderedCats().findIndex(cat => cat.id === catId);
+  const shouldScrollToCategory = categoryIndex >= 3;
+
+  go(
+    'budget',
+    budgetTab || null,
+    shouldScrollToCategory ? { focusBudgetCategory: catId } : {}
+  );
 }
