@@ -16,12 +16,35 @@ function setCloudStatus(message){
   if(inlineStatus) inlineStatus.textContent = state.cloudStatus;
 }
 
+function setCloudLoadProgress(progress, step){
+  state.cloudLoadProgress = Math.max(0, Math.min(100, Number(progress || 0)));
+  state.cloudLoadStep = step || '';
+
+  const fill = document.querySelector('.inline-sync-progress__fill');
+  if(fill) fill.style.width = `${state.cloudLoadProgress}%`;
+
+  const menuFill = document.querySelector('.account-menu-sync__fill');
+  if(menuFill) menuFill.style.width = `${state.cloudLoadProgress}%`;
+
+  const labels = document.querySelectorAll('.inline-sync-progress__top span');
+  if(labels[0]) labels[0].textContent = state.cloudLoadStep || 'Bezig met laden...';
+  if(labels[1]) labels[1].textContent = `${Math.round(state.cloudLoadProgress)}%`;
+
+  const menuLabels = document.querySelectorAll('.account-menu-sync__top span');
+  if(menuLabels[0]) menuLabels[0].textContent = state.cloudLoadStep || 'Bezig met laden...';
+  if(menuLabels[1]) menuLabels[1].textContent = `${Math.round(state.cloudLoadProgress)}%`;
+}
+
 function setCloudHouseholdKey(householdKey){
   state.cloudHouseholdKey = householdKey || '';
 }
 
 function setCloudThemePreference(theme){
   state.cloudThemePreference = theme || 'midnight';
+  persistCloudSessionMeta({
+    email: state.cloudUserEmail || '',
+    themePreference: state.cloudThemePreference || 'midnight'
+  });
 }
 
 function clearCloudAuthState(){
@@ -30,6 +53,8 @@ function clearCloudAuthState(){
   state.cloudThemePreference = 'midnight';
   state.accountMenuOpen = false;
   state.cloudLoading = false;
+  setCloudLoadProgress(0, '');
+  persistCloudSessionMeta(null);
 }
 
 function clearCloudAuthStorage(){
@@ -49,10 +74,36 @@ function clearCloudAuthStorage(){
   }catch(e){}
 }
 
+function persistCloudSessionMeta(meta){
+  try{
+    if(!meta){
+      window.localStorage.removeItem(CLOUD_AUTH_META_KEY);
+      return;
+    }
+
+    window.localStorage.setItem(CLOUD_AUTH_META_KEY, JSON.stringify({
+      email: meta.email || '',
+      themePreference: meta.themePreference || 'midnight'
+    }));
+  }catch(e){}
+}
+
+function restoreCloudSessionMeta(){
+  try{
+    const raw = window.localStorage.getItem(CLOUD_AUTH_META_KEY);
+    if(!raw) return;
+
+    const parsed = JSON.parse(raw);
+    state.cloudUserEmail = parsed?.email || '';
+    state.cloudThemePreference = parsed?.themePreference || 'midnight';
+  }catch(e){}
+}
+
 let cloudSyncTimer = null;
 let cloudSyncInFlight = false;
 let cloudLoadPromise = null;
 const CLOUD_REQUEST_TIMEOUT_MS = 12000;
+const CLOUD_AUTH_META_KEY = 'budget-veenstra-auth-meta';
 
 function withCloudTimeout(promise, timeoutMs, label){
   return Promise.race([
@@ -72,6 +123,7 @@ function getSupabaseClient(){
 
 async function getCloudUser(){
   const supabase = getSupabaseClient();
+  setCloudLoadProgress(12, 'Sessie controleren...');
   const sessionResult = await withCloudTimeout(
     supabase.auth.getSession(),
     CLOUD_REQUEST_TIMEOUT_MS,
@@ -82,6 +134,16 @@ async function getCloudUser(){
   const user = sessionResult.data?.session?.user || null;
 
   state.cloudUserEmail = user?.email || '';
+  if(user){
+    persistCloudSessionMeta({
+      email: user.email || '',
+      themePreference: state.cloudThemePreference || 'midnight'
+    });
+    setCloudLoadProgress(24, 'Sessie gevonden');
+  }else{
+    persistCloudSessionMeta(null);
+    setCloudLoadProgress(0, '');
+  }
   return user;
 }
 
@@ -92,6 +154,7 @@ async function getCloudMemberRecord(){
   }
 
   const supabase = getSupabaseClient();
+  setCloudLoadProgress(36, 'Huishouden koppelen...');
   let { data, error } = await withCloudTimeout(
     supabase
       .from('household_members')
@@ -189,6 +252,7 @@ async function syncCloudSession(){
 
   try{
     await getCloudHouseholdKey();
+    setCloudLoadProgress(48, 'Cloud sessie klaar');
     if(typeof applyTheme === 'function'){
       applyTheme(state.cloudThemePreference || 'midnight', {
         persist:false,
@@ -371,6 +435,7 @@ async function fetchCloudState(){
     return { ok:false, error:'Log eerst in op Supabase' };
   }
   const householdKey = await getCloudHouseholdKey();
+  setCloudLoadProgress(60, 'Financiele gegevens ophalen...');
   if(typeof setStartupProgress === 'function'){
     setStartupProgress(66, 'Financiële gegevens ophalen...');
   }
@@ -413,6 +478,7 @@ async function fetchCloudState(){
     return { ok:false, error:error.message || 'Ophalen mislukt' };
   }
 
+  setCloudLoadProgress(84, 'Gegevens verwerken...');
   if(typeof setStartupProgress === 'function'){
     setStartupProgress(88, 'Gegevens verwerken...');
   }
@@ -579,7 +645,25 @@ function persistAndSync(renderMode = 'all'){
 function renderInlineSyncStatus(){
   if(!isCloudSignedIn()) return '';
   const text = escapeHtml(state.cloudStatus || 'Klaar om te synchroniseren');
-  return `<div class="inline-sync-status" id="inline-sync-status">${text}</div>`;
+  const progress = Math.max(0, Math.min(100, Number(state.cloudLoadProgress || 0)));
+  const step = escapeHtml(state.cloudLoadStep || '');
+
+  return `
+    <div class="inline-sync-status-wrap">
+      <div class="inline-sync-status" id="inline-sync-status">${text}</div>
+      ${state.cloudLoading ? `
+        <div class="inline-sync-progress" aria-live="polite">
+          <div class="inline-sync-progress__top">
+            <span>${step || 'Bezig met laden...'}</span>
+            <span>${Math.round(progress)}%</span>
+          </div>
+          <div class="inline-sync-progress__bar" aria-hidden="true">
+            <div class="inline-sync-progress__fill" style="width:${progress}%"></div>
+          </div>
+        </div>
+      ` : ''}
+    </div>
+  `;
 }
 
 async function loadFromCloud(){
@@ -587,6 +671,7 @@ async function loadFromCloud(){
 
   cloudLoadPromise = (async () => {
     state.cloudLoading = true;
+    setCloudLoadProgress(6, 'Voorbereiden...');
     console.info('loadFromCloud:start');
     setCloudStatus('Ophalen...');
     if(typeof setStartupProgress === 'function'){
@@ -599,12 +684,15 @@ async function loadFromCloud(){
     }
 
     try{
+      setCloudLoadProgress(18, 'Sessie valideren...');
       const result = await fetchCloudState();
 
       if(result?.ok){
+        setCloudLoadProgress(94, 'Gegevens toepassen...');
         applyCloudData(result);
         showToast('Data opgehaald');
         setCloudStatus('Vers geladen uit Supabase');
+        setCloudLoadProgress(100, 'Klaar');
         if(typeof setStartupProgress === 'function'){
           setStartupProgress(100, 'Gegevens bijgewerkt');
         }
@@ -626,6 +714,9 @@ async function loadFromCloud(){
     }finally{
       state.cloudLoading = false;
       cloudLoadPromise = null;
+      if(state.cloudStatus !== 'Vers geladen uit Supabase'){
+        setCloudLoadProgress(0, '');
+      }
       if(typeof rerenderCurrentView === 'function'){
         rerenderCurrentView();
       }else if(typeof renderHeaderActions === 'function'){
@@ -782,3 +873,5 @@ function isCloudSignedIn(){
 function getCloudUserEmail(){
   return state.cloudUserEmail || 'Niet ingelogd';
 }
+
+restoreCloudSessionMeta();

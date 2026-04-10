@@ -188,6 +188,8 @@ function renderHeaderActions(){
   const currentTheme = document.body.getAttribute('data-theme') || 'midnight';
   const loadLabel = state.cloudLoading ? 'Ophalen...' : 'Ophalen';
   const signOutLabel = state.cloudSigningOut ? 'Uitloggen...' : 'Uitloggen';
+  const loadProgress = Math.max(0, Math.min(100, Number(state.cloudLoadProgress || 0)));
+  const loadStep = escapeHtml(state.cloudLoadStep || 'Bezig met laden...');
 
   root.innerHTML = `
     <div class="header-actions-inner">
@@ -214,6 +216,17 @@ function renderHeaderActions(){
                 <button class="btn secondary btn.sm" onclick="loadFromCloud()" ${state.cloudLoading ? 'disabled' : ''}>${loadLabel}</button>
                 <button class="btn secondary btn.sm" onclick="signOutFromCloud()" ${state.cloudSigningOut ? 'disabled' : ''}>${signOutLabel}</button>
               </div>
+              ${state.cloudLoading ? `
+                <div class="account-menu-sync">
+                  <div class="account-menu-sync__top">
+                    <span>${loadStep}</span>
+                    <span>${Math.round(loadProgress)}%</span>
+                  </div>
+                  <div class="account-menu-sync__bar">
+                    <div class="account-menu-sync__fill" style="width:${loadProgress}%"></div>
+                  </div>
+                </div>
+              ` : ''}
             </div>
           ` : ''}
         </div>

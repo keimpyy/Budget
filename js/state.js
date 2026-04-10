@@ -4,6 +4,8 @@ const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_2dWE27Su68lB3zFIVZRs_A_mFMd7haz
 const state = {
   cloudStatus: '',
   cloudLoading: false,
+  cloudLoadProgress: 0,
+  cloudLoadStep: '',
   cloudSigningOut: false,
   cloudHouseholdKey: '',
   cloudUserEmail: '',

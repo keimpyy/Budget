@@ -79,6 +79,7 @@ function go(name, btn){
   const oldIdx = Math.max(0, VIEW_ORDER.indexOf(current));
   const newIdx = Math.max(0, VIEW_ORDER.indexOf(name));
   const dir = newIdx >= oldIdx ? 'left' : 'right';
+  const hasBudgetScrollTarget = name === 'budget' && Boolean(state.budgetFocusCategoryId);
 
   if(name === 'instellingen' && current && current !== 'instellingen') state.lastNonSettingsView = current;
   if(name !== 'instellingen') state.lastNonSettingsView = name;
@@ -107,6 +108,12 @@ function go(name, btn){
 
   nextEl.classList.add('active', dir === 'left' ? 'anim-enter-right' : 'anim-enter-left');
   setTimeout(() => nextEl.classList.remove('anim-enter-right','anim-enter-left'), 260);
+
+  if(!hasBudgetScrollTarget){
+    requestAnimationFrame(() => {
+      window.scrollTo({ top:0, left:0, behavior:'auto' });
+    });
+  }
 }
 
 function openSettings(){
