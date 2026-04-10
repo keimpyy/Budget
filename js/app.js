@@ -100,7 +100,7 @@ if(typeof syncSakuraPetals === 'function'){
 
 window.addEventListener('click', (e) => {
   const target = e.target;
-  if(target instanceof Element && target.closest('.account-menu-wrap, #app-modal-root')) return;
+  if(target instanceof Element && target.closest('.account-menu-panel, .account-avatar-btn, #app-modal-root')) return;
   if(typeof closeAccountMenu === 'function') closeAccountMenu();
 });
 

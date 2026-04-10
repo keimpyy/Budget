@@ -199,9 +199,12 @@ function renderHeaderActions(){
             ${escapeHtml(getAccountInitial())}
           </button>
           ${state.accountMenuOpen ? `
-            <div class="account-menu-panel">
+            <div class="account-menu-backdrop" onclick="closeAccountMenu()" aria-hidden="true"></div>
+            <div class="account-menu-panel" role="dialog" aria-modal="true" aria-label="Account menu" onclick="event.stopPropagation()">
+              <button class="account-menu-close" type="button" onclick="closeAccountMenu()" aria-label="Sluit account menu">×</button>
+              <div class="account-menu-handle" aria-hidden="true"></div>
               <div class="account-menu-head">
-                <div class="account-menu-kicker">Account</div>
+                <div class="account-menu-kicker">Ingelogd</div>
                 <div class="account-menu-email mono">${escapeHtml(state.cloudUserEmail || '')}</div>
               </div>
               <div class="account-menu-group">
