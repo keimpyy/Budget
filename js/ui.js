@@ -179,45 +179,92 @@ function syncSakuraPetals(){
   const layer = document.getElementById('sakura-layer');
   if(!layer) return;
 
-  const isSakura = document.body.getAttribute('data-theme') === 'sakura';
+  const theme = document.body.getAttribute('data-theme') || 'midnight';
   layer.innerHTML = '';
-  if(!isSakura) return;
 
   const w = window.innerWidth;
   const h = window.innerHeight;
 
-  let count;
-  if(w >= 1400) count = 42;
-  else if(w >= 1100) count = 34;
-  else if(w >= 768) count = 26;
-  else count = 18;
+  let petalCount;
+  if(w >= 1400) petalCount = 42;
+  else if(w >= 1100) petalCount = 34;
+  else if(w >= 768) petalCount = 26;
+  else petalCount = 18;
 
-  for(let i = 0; i < count; i++){
-    const petal = document.createElement('span');
-    petal.className = 'sakura-petal';
+  if(theme === 'midnight'){
+    const sheenCount = w >= 1100 ? 10 : 7;
+    for(let i = 0; i < sheenCount; i++){
+      const sheen = document.createElement('span');
+      sheen.className = 'theme-particle theme-particle-midnight';
+      sheen.style.left = `${-20 + Math.random() * 120}%`;
+      sheen.style.top = `${Math.random() * 100}%`;
+      sheen.style.animationDelay = `${-Math.random() * 14}s`;
+      sheen.style.animationDuration = `${8 + Math.random() * 7}s`;
+      sheen.style.setProperty('--sheen-travel', `${160 + Math.random() * 220}px`);
+      sheen.style.setProperty('--scale', 0.7 + Math.random() * 0.8);
+      layer.appendChild(sheen);
+    }
+    return;
+  }
 
-    petal.style.left = `${Math.random() * 100}%`;
+  if(theme === 'neon'){
+    const smokeCount = w >= 1100 ? 9 : 6;
+    const ashCount = w >= 1100 ? 24 : 16;
+
+    for(let i = 0; i < smokeCount; i++){
+      const smoke = document.createElement('span');
+      smoke.className = 'theme-particle theme-particle-ronin-smoke';
+      smoke.style.left = `${-8 + Math.random() * 116}%`;
+      smoke.style.top = `${54 + Math.random() * 46}%`;
+      smoke.style.animationDelay = `${-Math.random() * 18}s`;
+      smoke.style.animationDuration = `${14 + Math.random() * 10}s`;
+      smoke.style.setProperty('--drift', `${-80 + Math.random() * 160}px`);
+      smoke.style.setProperty('--rise', `${-120 - Math.random() * 180}px`);
+      smoke.style.setProperty('--scale', 0.75 + Math.random() * 1.2);
+      layer.appendChild(smoke);
+    }
+
+    for(let i = 0; i < ashCount; i++){
+      const ash = document.createElement('span');
+      ash.className = 'theme-particle theme-particle-ronin-ash';
+      ash.style.left = `${Math.random() * 100}%`;
+      ash.style.animationDelay = `${-Math.random() * 18}s`;
+      ash.style.animationDuration = `${9 + Math.random() * 10}s`;
+      ash.style.setProperty('--drift', `${-140 + Math.random() * 280}px`);
+      ash.style.setProperty('--start-y', `${-20 + Math.random() * (h + 120)}px`);
+      ash.style.setProperty('--scale', 0.55 + Math.random() * 0.85);
+      layer.appendChild(ash);
+    }
+    return;
+  }
+
+  for(let i = 0; i < petalCount; i++){
+    const particle = document.createElement('span');
+    particle.className = 'sakura-petal theme-particle';
+
+    particle.style.left = `${Math.random() * 100}%`;
 
     // verspreid petals over de hele animatie, niet alleen bovenin
-    petal.style.animationDelay = `${-Math.random() * 18}s`;
+    particle.style.animationDelay = `${-Math.random() * 18}s`;
 
     // iets langere en variabele valduur
-    petal.style.animationDuration = `${10 + Math.random() * 10}s`;
+    particle.style.animationDuration = `${10 + Math.random() * 10}s`;
 
     // horizontale drift
-    petal.style.setProperty('--drift', `${-120 + Math.random() * 240}px`);
+    particle.style.setProperty('--drift', `${-120 + Math.random() * 240}px`);
 
     // startspread over schermhoogte
-    petal.style.setProperty('--start-y', `${-20 + Math.random() * (h + 120)}px`);
+    particle.style.setProperty('--start-y', `${-20 + Math.random() * (h + 120)}px`);
 
     // maatvariatie
     const scale = 0.65 + Math.random() * 0.95;
-    petal.style.transform = `translate3d(0,0,0) scale(${scale})`;
+    particle.style.setProperty('--scale', scale);
+    particle.style.transform = `translate3d(0,0,0) scale(${scale})`;
 
     // kleine opacity-variatie
-    petal.style.opacity = `${0.55 + Math.random() * 0.4}`;
+    particle.style.opacity = `${0.55 + Math.random() * 0.4}`;
 
-    layer.appendChild(petal);
+    layer.appendChild(particle);
   }
 }
 

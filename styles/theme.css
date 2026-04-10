@@ -35,39 +35,43 @@ body[data-theme="sakura"]{
     0 0 18px rgba(255,121,176,.08);
 }
 
-/* Theme 2: Neon */
+/* Theme 2: Ronin Ember */
 body[data-theme="neon"]{
-  --bg:#0a0f14;
-  --surface:#111827;
-  --surface2:#17202a;
-  --surface3:#1f2a36;
-  --border:rgba(255,255,255,0.06);
-  --text:#f1f5f9;
-  --muted:#94a3b8;
-  --accent:#22c55e;
-  --accent2:#3b82f6;
-  --green:#22c55e;
-  --red:#ef4444;
-  --amber:#facc15;
-  --shadow:0 12px 24px rgba(0,0,0,.2);
+  --bg:#0a0706;
+  --surface:#15110f;
+  --surface2:#1d1612;
+  --surface3:#281b15;
+  --border:rgba(255,198,126,0.12);
+  --text:#fff7ec;
+  --muted:#c8aa91;
+  --accent:#d9412e;
+  --accent2:#f3b256;
+  --green:#5fe0a2;
+  --red:#ff5a45;
+  --amber:#f3b256;
+  --shadow:
+    0 14px 30px rgba(0,0,0,.28),
+    0 0 20px rgba(217,65,46,.08);
 }
 
-/* Fallback default */
+/* Theme 3: Kuro Steel */
 body:not([data-theme]),
 body[data-theme="midnight"]{
-  --bg:#050505;
-  --surface:#0b0b0b;
-  --surface2:#121212;
-  --surface3:#1a1a1a;
-  --border:rgba(255,255,255,0.06);
-  --text:#f5f5f5;
-  --muted:#9aa0a6;
-  --accent:#ff3cac;
-  --accent2:#2b86ff;
-  --green:#00ffa3;
-  --red:#ff4d4f;
-  --amber:#ffc857;
-  --shadow:0 10px 22px rgba(0,0,0,.18);
+  --bg:#050606;
+  --surface:#0d0f0e;
+  --surface2:#151816;
+  --surface3:#20251f;
+  --border:rgba(218,233,225,0.1);
+  --text:#f4f7f2;
+  --muted:#9aa69e;
+  --accent:#c7d7cf;
+  --accent2:#a5101b;
+  --green:#49d391;
+  --red:#e1464f;
+  --amber:#e6c56f;
+  --shadow:
+    0 12px 28px rgba(0,0,0,.26),
+    0 0 18px rgba(165,16,27,.07);
 }
 
 /* Theme-specific UI polish */
@@ -78,8 +82,17 @@ body[data-theme="sakura"] .btn{
 
 body[data-theme="sakura"] .fill,
 body[data-theme="sakura"] .budget-progress__fill,
-body[data-theme="sakura"] .prog-fill{
+body[data-theme="sakura"] .prog-fill,
+body[data-theme="sakura"] .alloc-fill{
   background:linear-gradient(90deg,#ff6fa5,#ff9ec3,#ffc1da);
+}
+
+body[data-theme="sakura"] .hero-amount.pos,
+body[data-theme="sakura"] .hero-amount.neg{
+  background:linear-gradient(90deg,#ff6fa5,#ff9ec3,#ffc1da);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
 }
 
 body[data-theme="sakura"] .loan-hero-pct,
@@ -97,24 +110,76 @@ body[data-theme="sakura"] .card{
 }
 
 body[data-theme="neon"] .btn{
-  background:linear-gradient(135deg,#22c55e,#3b82f6);
+  background:linear-gradient(135deg,#a5101b,#d9412e 56%,#f3b256);
+  box-shadow:0 5px 20px rgba(217,65,46,.28);
 }
 
 body[data-theme="neon"] .fill,
 body[data-theme="neon"] .budget-progress__fill,
-body[data-theme="neon"] .prog-fill{
-  background:linear-gradient(90deg,#22c55e,#3b82f6,#06b6d4);
+body[data-theme="neon"] .prog-fill,
+body[data-theme="neon"] .alloc-fill{
+  background:linear-gradient(90deg,#a5101b,#d9412e,#f3b256);
+}
+
+body[data-theme="neon"] .hero-amount.pos,
+body[data-theme="neon"] .hero-amount.neg{
+  background:none;
+  -webkit-background-clip:initial;
+  background-clip:initial;
+  color:#f3b256;
+  text-shadow:0 0 18px rgba(217,65,46,.2);
+}
+
+body[data-theme="neon"] .hero-amount.neg{
+  color:#ff5a45;
 }
 
 body[data-theme="neon"] .loan-hero-pct,
 body[data-theme="neon"] .loan-percent-badge{
-  background:linear-gradient(90deg,#22c55e,#3b82f6,#06b6d4);
+  background:linear-gradient(90deg,#a5101b,#d9412e,#f3b256);
   -webkit-background-clip:text;
   background-clip:text;
   color:transparent;
 }
 
-/* Sakura petals */
+body[data-theme="midnight"] .btn,
+body:not([data-theme]) .btn{
+  background:linear-gradient(135deg,#f4f7f2,#a5101b);
+  box-shadow:0 5px 20px rgba(165,16,27,.22);
+}
+
+body[data-theme="midnight"] .fill,
+body[data-theme="midnight"] .budget-progress__fill,
+body[data-theme="midnight"] .prog-fill,
+body[data-theme="midnight"] .alloc-fill,
+body:not([data-theme]) .fill,
+body:not([data-theme]) .budget-progress__fill,
+body:not([data-theme]) .prog-fill,
+body:not([data-theme]) .alloc-fill{
+  background:linear-gradient(90deg,#f4f7f2,#c7d7cf,#a5101b);
+}
+
+body[data-theme="midnight"] .hero-amount.pos,
+body[data-theme="midnight"] .hero-amount.neg,
+body:not([data-theme]) .hero-amount.pos,
+body:not([data-theme]) .hero-amount.neg{
+  background:linear-gradient(90deg,#f4f7f2,#c7d7cf,#a5101b);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+
+body[data-theme="midnight"] .loan-hero-pct,
+body[data-theme="midnight"] .loan-percent-badge,
+body:not([data-theme]) .loan-hero-pct,
+body:not([data-theme]) .loan-percent-badge{
+  background:linear-gradient(90deg,#f4f7f2,#c7d7cf,#a5101b);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+
+/* Theme atmosphere */
 #sakura-layer{
   position:fixed;
   inset:0;
@@ -123,10 +188,16 @@ body[data-theme="neon"] .loan-percent-badge{
   z-index:0;
 }
 
+.theme-particle,
 .sakura-petal{
   position:fixed;
   left:0;
   top:0;
+  transform-origin:center;
+  will-change:transform, opacity;
+}
+
+.sakura-petal{
   width:14px;
   height:10px;
   border-radius:14px 10px 14px 10px;
@@ -136,11 +207,48 @@ body[data-theme="neon"] .loan-percent-badge{
   box-shadow:
     0 0 10px rgba(255,121,176,.18),
     0 2px 8px rgba(0,0,0,.18);
-  transform-origin:center;
   animation-name:sakuraFall, sakuraSpin;
   animation-timing-function:linear, ease-in-out;
   animation-iteration-count:infinite, infinite;
-  will-change:transform, opacity;
+}
+
+.theme-particle-midnight{
+  width:190px;
+  height:1px;
+  border-radius:999px;
+  background:linear-gradient(90deg, transparent, rgba(244,247,242,.88), rgba(165,16,27,.52), transparent);
+  box-shadow:
+    0 0 12px rgba(244,247,242,.16),
+    0 0 24px rgba(165,16,27,.12);
+  opacity:.34;
+  animation-name:katanaSheen, bladeFlicker;
+  animation-timing-function:linear, ease-in-out;
+  animation-iteration-count:infinite, infinite;
+}
+
+.theme-particle-ronin-smoke{
+  width:140px;
+  height:140px;
+  border-radius:50%;
+  background:
+    radial-gradient(circle at 44% 54%, rgba(255,247,236,.12) 0 8%, rgba(217,65,46,.08) 9% 24%, rgba(18,13,11,.1) 25% 48%, transparent 70%);
+  filter:blur(14px);
+  opacity:.28;
+  animation:roninSmoke linear infinite;
+}
+
+.theme-particle-ronin-ash{
+  width:5px;
+  height:5px;
+  border-radius:50%;
+  background:rgba(243,178,86,.72);
+  box-shadow:
+    0 0 9px rgba(217,65,46,.26),
+    0 0 16px rgba(243,178,86,.14);
+  opacity:.46;
+  animation-name:fallingAsh, ashPulse;
+  animation-timing-function:linear, ease-in-out;
+  animation-iteration-count:infinite, infinite;
 }
 
 .shell,
@@ -173,4 +281,64 @@ body[data-theme="neon"] .loan-percent-badge{
   0%{ rotate:0deg; }
   50%{ rotate:140deg; }
   100%{ rotate:320deg; }
+}
+
+@keyframes katanaSheen{
+  0%{
+    transform:translate3d(calc(var(--sheen-travel, 180px) * -1), 0, 0) rotate(-18deg) scaleX(var(--scale, 1));
+    opacity:0;
+  }
+  16%{
+    opacity:.42;
+  }
+  38%{
+    opacity:.08;
+  }
+  100%{
+    transform:translate3d(var(--sheen-travel, 180px), -44px, 0) rotate(-18deg) scaleX(var(--scale, 1));
+    opacity:0;
+  }
+}
+
+@keyframes bladeFlicker{
+  0%, 100%{ filter:brightness(.85); }
+  45%{ filter:brightness(1.25); }
+  52%{ filter:brightness(.7); }
+}
+
+@keyframes roninSmoke{
+  0%{
+    transform:translate3d(0, 0, 0) rotate(0deg) scale(calc(var(--scale, 1) * .78));
+    opacity:0;
+  }
+  20%{
+    opacity:.24;
+  }
+  70%{
+    opacity:.16;
+  }
+  100%{
+    transform:translate3d(var(--drift, 0px), var(--rise, -180px), 0) rotate(22deg) scale(var(--scale, 1));
+    opacity:0;
+  }
+}
+
+@keyframes fallingAsh{
+  0%{
+    transform:translate3d(0, var(--start-y, -20px), 0) scale(var(--scale, 1));
+    opacity:0;
+  }
+  12%{
+    opacity:.48;
+  }
+  100%{
+    transform:translate3d(var(--drift, 0px), calc(var(--start-y, -20px) + 105vh), 0) scale(var(--scale, 1));
+    opacity:.06;
+  }
+}
+
+@keyframes ashPulse{
+  0%{ filter:brightness(.9); }
+  45%{ filter:brightness(1.4); }
+  100%{ filter:brightness(.8); }
 }

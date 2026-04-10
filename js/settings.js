@@ -1,7 +1,7 @@
 const THEME_COLORS = {
-  midnight: '#0a0a0f',
+  midnight: '#050606',
   sakura: '#140d15',
-  neon: '#0a0f14'
+  neon: '#0a0706'
 };
 
 const ALLOWED_THEMES = new Set(['midnight', 'sakura', 'neon']);
@@ -12,8 +12,8 @@ function updateThemeMeta(theme){
 }
 
 function getThemeLabel(theme){
-  if(theme === 'midnight') return 'Midnight RGB';
-  if(theme === 'neon') return 'Neon Core';
+  if(theme === 'midnight') return 'Kuro Steel';
+  if(theme === 'neon') return 'Ronin Ember';
   return 'Sakura v2';
 }
 
@@ -105,8 +105,8 @@ function renderInstellingen(){
           <button class="theme-tile ${currentTheme==='midnight'?'active':''}" data-theme="midnight" onclick="applyTheme('midnight')" aria-selected="${currentTheme==='midnight'}">
             <span class="theme-swatch theme-swatch-midnight"></span>
             <span class="theme-copy">
-              <span class="theme-name">Midnight RGB</span>
-              <span class="theme-note">Neon, contrast, premium</span>
+              <span class="theme-name">Kuro Steel</span>
+              <span class="theme-note">Black steel, blade rain, red edge</span>
             </span>
             <span class="theme-check">✓</span>
           </button>
@@ -114,8 +114,8 @@ function renderInstellingen(){
           <button class="theme-tile ${currentTheme==='neon'?'active':''}" data-theme="neon" onclick="applyTheme('neon')" aria-selected="${currentTheme==='neon'}">
             <span class="theme-swatch theme-swatch-neon"></span>
             <span class="theme-copy">
-              <span class="theme-name">Neon Core</span>
-              <span class="theme-note">Tech, fris, modern dark</span>
+              <span class="theme-name">Ronin Ember</span>
+              <span class="theme-note">Crimson, ember drift, battle heat</span>
             </span>
             <span class="theme-check">✓</span>
           </button>
@@ -210,8 +210,8 @@ function renderHeaderActions(){
               <div class="account-menu-group">
                 <div class="account-menu-label">Theme</div>
                 <div class="account-theme-row">
-                  <button class="account-theme-chip ${currentTheme==='midnight'?'active':''}" onclick="setAccountTheme('midnight')">Midnight</button>
-                  <button class="account-theme-chip ${currentTheme==='neon'?'active':''}" onclick="setAccountTheme('neon')">Neon</button>
+                  <button class="account-theme-chip ${currentTheme==='midnight'?'active':''}" onclick="setAccountTheme('midnight')">Kuro</button>
+                  <button class="account-theme-chip ${currentTheme==='neon'?'active':''}" onclick="setAccountTheme('neon')">Ronin</button>
                   <button class="account-theme-chip ${currentTheme==='sakura'?'active':''}" onclick="setAccountTheme('sakura')">Sakura</button>
                 </div>
               </div>
