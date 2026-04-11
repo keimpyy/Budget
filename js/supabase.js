@@ -37,6 +37,13 @@ window.supabaseClient.auth.onAuthStateChange(async (event, session) => {
     closeAppModal();
   }
 
+  if(session?.user && state.cloudCreatingAccount){
+    if(typeof renderHeaderActions === 'function'){
+      renderHeaderActions();
+    }
+    return;
+  }
+
   if(session?.user && typeof syncCloudSession === 'function'){
     try{
       const hasSession = await syncCloudSession();

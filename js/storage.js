@@ -162,6 +162,29 @@ function getSignupHouseholdKey(user){
   return meta.household_key || buildHouseholdKey(meta.last_name || '', user?.id || '');
 }
 
+function cloudIdPrefix(householdKey){
+  return `${String(householdKey || '').trim()}__`;
+}
+
+function toCloudRowId(householdKey, id){
+  const resolvedId = String(id || '').trim();
+  if(!resolvedId) return resolvedId;
+
+  const prefix = cloudIdPrefix(householdKey);
+  if(!prefix.trim() || resolvedId.startsWith(prefix)) return resolvedId;
+
+  return `${prefix}${resolvedId}`;
+}
+
+function fromCloudRowId(householdKey, id){
+  const resolvedId = String(id || '');
+  const prefix = cloudIdPrefix(householdKey);
+
+  return prefix.trim() && resolvedId.startsWith(prefix)
+    ? resolvedId.slice(prefix.length)
+    : resolvedId;
+}
+
 async function ensureCloudHouseholdRecord(householdKey, householdName){
   const resolvedHouseholdKey = String(householdKey || '').trim();
   if(!resolvedHouseholdKey) throw new Error('Geen huishoudsleutel gevonden');
@@ -674,25 +697,25 @@ async function fetchCloudState(){
   return {
     ok:true,
     inkomsten: (incomeResult.data || []).map((row, idx) => ({
-      id: row.id,
+      id: fromCloudRowId(householdKey, row.id),
       naam: row.name || '',
       bedrag: Number(row.amount || 0),
       volgorde: Number(row.sort_order || (idx + 1))
     })),
     categorieen: (categoryResult.data || []).map((row, idx) => ({
-      id: row.id,
+      id: fromCloudRowId(householdKey, row.id),
       naam: row.name || '',
       volgorde: Number(row.sort_order || (idx + 1))
     })),
     budget: (budgetResult.data || []).map((row, idx) => ({
-      id: row.id,
-      categorieId: row.category_id || '',
+      id: fromCloudRowId(householdKey, row.id),
+      categorieId: fromCloudRowId(householdKey, row.category_id || ''),
       post: row.name || '',
       budget: Number(row.amount || 0),
       volgorde: Number(row.sort_order || (idx + 1))
     })),
     leningen: (loanResult.data || []).map((row, idx) => ({
-      id: row.id,
+      id: fromCloudRowId(householdKey, row.id),
       naam: row.name || '',
       totaal: Number(row.total || 0),
       betaald: Number(row.paid || 0),
@@ -704,7 +727,7 @@ async function fetchCloudState(){
 
 async function replaceHouseholdTable(tableName, householdKey, rows, mapRow){
   const supabase = getSupabaseClient();
-  const ids = rows.map(row => String(row.id)).filter(Boolean);
+  const ids = rows.map(row => toCloudRowId(householdKey, row.id)).filter(Boolean);
 
   let deleteQuery = supabase
     .from(tableName)
@@ -716,7 +739,7 @@ async function replaceHouseholdTable(tableName, householdKey, rows, mapRow){
   }
 
   const { error: deleteError } = await deleteQuery;
-  if(deleteError) throw deleteError;
+  if(deleteError) throw new Error(`${tableName}: ${deleteError.message || 'verwijderen mislukt'}`);
 
   if(!rows.length) return;
 
@@ -725,7 +748,7 @@ async function replaceHouseholdTable(tableName, householdKey, rows, mapRow){
     .from(tableName)
     .upsert(payload, { onConflict:'id' });
 
-  if(upsertError) throw upsertError;
+  if(upsertError) throw new Error(`${tableName}: ${upsertError.message || 'opslaan mislukt'}`);
 }
 
 async function saveCloudState(data){
@@ -737,7 +760,7 @@ async function saveCloudState(data){
 
   try{
     await replaceHouseholdTable('income_items', householdKey, data.inkomsten || [], (row) => ({
-      id: String(row.id),
+      id: toCloudRowId(householdKey, row.id),
       household_key: householdKey,
       name: row.naam || '',
       amount: Number(row.bedrag || 0),
@@ -746,7 +769,7 @@ async function saveCloudState(data){
     }));
 
     await replaceHouseholdTable('categories', householdKey, data.categorieen || [], (row) => ({
-      id: String(row.id),
+      id: toCloudRowId(householdKey, row.id),
       household_key: householdKey,
       name: row.naam || '',
       sort_order: Number(row.volgorde || 0),
@@ -754,9 +777,9 @@ async function saveCloudState(data){
     }));
 
     await replaceHouseholdTable('budget_items', householdKey, data.budget || [], (row) => ({
-      id: String(row.id),
+      id: toCloudRowId(householdKey, row.id),
       household_key: householdKey,
-      category_id: String(row.categorieId || ''),
+      category_id: toCloudRowId(householdKey, row.categorieId || ''),
       name: row.post || '',
       amount: Number(row.budget || 0),
       sort_order: Number(row.volgorde || 0),
@@ -764,7 +787,7 @@ async function saveCloudState(data){
     }));
 
     await replaceHouseholdTable('loans', householdKey, data.leningen || [], (row) => ({
-      id: String(row.id),
+      id: toCloudRowId(householdKey, row.id),
       household_key: householdKey,
       name: row.naam || '',
       total: Number(row.totaal || 0),

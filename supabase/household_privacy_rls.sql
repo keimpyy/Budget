@@ -8,6 +8,24 @@ alter table public.categories enable row level security;
 alter table public.budget_items enable row level security;
 alter table public.loans enable row level security;
 
+create or replace function public.is_household_member(target_household_key text)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from public.household_members hm
+    where hm.user_id = auth.uid()
+      and hm.household_key = target_household_key
+  );
+$$;
+
+revoke all on function public.is_household_member(text) from public;
+grant execute on function public.is_household_member(text) to authenticated;
+
 do $$
 declare
   household_identity_expression text;
@@ -46,17 +64,17 @@ begin
   execute 'create policy "Authenticated users can create households" on public.households for insert to authenticated with check (true)';
 
   execute format(
-    'create policy "Household members can view households" on public.households for select to authenticated using (%s in (select hm.household_key from public.household_members hm where hm.user_id = (select auth.uid())))',
+    'create policy "Household members can view households" on public.households for select to authenticated using (public.is_household_member(%s::text))',
     household_identity_expression
   );
 
   execute format(
-    'create policy "Household members can update households" on public.households for update to authenticated using (%1$s in (select hm.household_key from public.household_members hm where hm.user_id = (select auth.uid()))) with check (%1$s in (select hm.household_key from public.household_members hm where hm.user_id = (select auth.uid())))',
+    'create policy "Household members can update households" on public.households for update to authenticated using (public.is_household_member(%1$s::text)) with check (public.is_household_member(%1$s::text))',
     household_identity_expression
   );
 
   execute format(
-    'create policy "Household members can delete households" on public.households for delete to authenticated using (%s in (select hm.household_key from public.household_members hm where hm.user_id = (select auth.uid())))',
+    'create policy "Household members can delete households" on public.households for delete to authenticated using (public.is_household_member(%s::text))',
     household_identity_expression
   );
 
@@ -118,46 +136,26 @@ create policy "Household members can view income"
 on public.income_items
 for select
 to authenticated
-using (household_key in (
-  select hm.household_key
-  from public.household_members hm
-  where hm.user_id = (select auth.uid())
-));
+using (public.is_household_member(household_key));
 
 create policy "Household members can create income"
 on public.income_items
 for insert
 to authenticated
-with check (household_key in (
-  select hm.household_key
-  from public.household_members hm
-  where hm.user_id = (select auth.uid())
-));
+with check (public.is_household_member(household_key));
 
 create policy "Household members can update income"
 on public.income_items
 for update
 to authenticated
-using (household_key in (
-  select hm.household_key
-  from public.household_members hm
-  where hm.user_id = (select auth.uid())
-))
-with check (household_key in (
-  select hm.household_key
-  from public.household_members hm
-  where hm.user_id = (select auth.uid())
-));
+using (public.is_household_member(household_key))
+with check (public.is_household_member(household_key));
 
 create policy "Household members can delete income"
 on public.income_items
 for delete
 to authenticated
-using (household_key in (
-  select hm.household_key
-  from public.household_members hm
-  where hm.user_id = (select auth.uid())
-));
+using (public.is_household_member(household_key));
 
 drop policy if exists "Household members can view categories" on public.categories;
 drop policy if exists "Household members can create categories" on public.categories;
@@ -168,46 +166,26 @@ create policy "Household members can view categories"
 on public.categories
 for select
 to authenticated
-using (household_key in (
-  select hm.household_key
-  from public.household_members hm
-  where hm.user_id = (select auth.uid())
-));
+using (public.is_household_member(household_key));
 
 create policy "Household members can create categories"
 on public.categories
 for insert
 to authenticated
-with check (household_key in (
-  select hm.household_key
-  from public.household_members hm
-  where hm.user_id = (select auth.uid())
-));
+with check (public.is_household_member(household_key));
 
 create policy "Household members can update categories"
 on public.categories
 for update
 to authenticated
-using (household_key in (
-  select hm.household_key
-  from public.household_members hm
-  where hm.user_id = (select auth.uid())
-))
-with check (household_key in (
-  select hm.household_key
-  from public.household_members hm
-  where hm.user_id = (select auth.uid())
-));
+using (public.is_household_member(household_key))
+with check (public.is_household_member(household_key));
 
 create policy "Household members can delete categories"
 on public.categories
 for delete
 to authenticated
-using (household_key in (
-  select hm.household_key
-  from public.household_members hm
-  where hm.user_id = (select auth.uid())
-));
+using (public.is_household_member(household_key));
 
 drop policy if exists "Household members can view budget items" on public.budget_items;
 drop policy if exists "Household members can create budget items" on public.budget_items;
@@ -218,46 +196,26 @@ create policy "Household members can view budget items"
 on public.budget_items
 for select
 to authenticated
-using (household_key in (
-  select hm.household_key
-  from public.household_members hm
-  where hm.user_id = (select auth.uid())
-));
+using (public.is_household_member(household_key));
 
 create policy "Household members can create budget items"
 on public.budget_items
 for insert
 to authenticated
-with check (household_key in (
-  select hm.household_key
-  from public.household_members hm
-  where hm.user_id = (select auth.uid())
-));
+with check (public.is_household_member(household_key));
 
 create policy "Household members can update budget items"
 on public.budget_items
 for update
 to authenticated
-using (household_key in (
-  select hm.household_key
-  from public.household_members hm
-  where hm.user_id = (select auth.uid())
-))
-with check (household_key in (
-  select hm.household_key
-  from public.household_members hm
-  where hm.user_id = (select auth.uid())
-));
+using (public.is_household_member(household_key))
+with check (public.is_household_member(household_key));
 
 create policy "Household members can delete budget items"
 on public.budget_items
 for delete
 to authenticated
-using (household_key in (
-  select hm.household_key
-  from public.household_members hm
-  where hm.user_id = (select auth.uid())
-));
+using (public.is_household_member(household_key));
 
 drop policy if exists "Household members can view loans" on public.loans;
 drop policy if exists "Household members can create loans" on public.loans;
@@ -268,43 +226,23 @@ create policy "Household members can view loans"
 on public.loans
 for select
 to authenticated
-using (household_key in (
-  select hm.household_key
-  from public.household_members hm
-  where hm.user_id = (select auth.uid())
-));
+using (public.is_household_member(household_key));
 
 create policy "Household members can create loans"
 on public.loans
 for insert
 to authenticated
-with check (household_key in (
-  select hm.household_key
-  from public.household_members hm
-  where hm.user_id = (select auth.uid())
-));
+with check (public.is_household_member(household_key));
 
 create policy "Household members can update loans"
 on public.loans
 for update
 to authenticated
-using (household_key in (
-  select hm.household_key
-  from public.household_members hm
-  where hm.user_id = (select auth.uid())
-))
-with check (household_key in (
-  select hm.household_key
-  from public.household_members hm
-  where hm.user_id = (select auth.uid())
-));
+using (public.is_household_member(household_key))
+with check (public.is_household_member(household_key));
 
 create policy "Household members can delete loans"
 on public.loans
 for delete
 to authenticated
-using (household_key in (
-  select hm.household_key
-  from public.household_members hm
-  where hm.user_id = (select auth.uid())
-));
+using (public.is_household_member(household_key));
