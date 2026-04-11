@@ -138,6 +138,109 @@ function getSupabaseClient(){
   throw new Error('Supabase client niet geladen');
 }
 
+function normalizeHouseholdSlug(lastName){
+  const fallback = 'huishouden';
+  const cleaned = String(lastName || '')
+    .trim()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+
+  return cleaned || fallback;
+}
+
+function buildHouseholdKey(lastName, userId){
+  const slug = normalizeHouseholdSlug(lastName);
+  const suffix = String(userId || '').replace(/-/g, '').slice(0, 8);
+  return suffix ? `${slug}-household-${suffix}` : `${slug}-household`;
+}
+
+function getSignupHouseholdKey(user){
+  const meta = user?.user_metadata || {};
+  return meta.household_key || buildHouseholdKey(meta.last_name || '', user?.id || '');
+}
+
+async function createCloudMemberForUser(user, householdKey, themePreference = 'midnight'){
+  if(!user?.id) throw new Error('Geen Supabase gebruiker gevonden');
+  const supabase = getSupabaseClient();
+  const resolvedHouseholdKey = householdKey || getSignupHouseholdKey(user);
+  const resolvedTheme = ALLOWED_THEMES.has(themePreference) ? themePreference : 'midnight';
+  const basePayload = {
+    user_id: user.id,
+    household_key: resolvedHouseholdKey
+  };
+
+  let { data, error } = await withCloudTimeout(
+    supabase
+      .from('household_members')
+      .insert([{ ...basePayload, theme_preference: resolvedTheme }])
+      .select('household_key, theme_preference')
+      .maybeSingle(),
+    CLOUD_REQUEST_TIMEOUT_MS,
+    'Huishouden aanmaken duurde te lang'
+  );
+
+  if(error && /theme_preference/i.test(error.message || '')){
+    const fallback = await withCloudTimeout(
+      supabase
+        .from('household_members')
+        .insert([basePayload])
+        .select('household_key')
+        .maybeSingle(),
+      CLOUD_REQUEST_TIMEOUT_MS,
+      'Huishouden aanmaken duurde te lang'
+    );
+
+    data = fallback.data ? {
+      household_key: fallback.data.household_key,
+      theme_preference: resolvedTheme
+    } : null;
+    error = fallback.error;
+  }
+
+  if(error && /duplicate|already exists|unique/i.test(error.message || '')){
+    const existing = await withCloudTimeout(
+      supabase
+        .from('household_members')
+        .select('household_key, theme_preference')
+        .eq('user_id', user.id)
+        .maybeSingle(),
+      CLOUD_REQUEST_TIMEOUT_MS,
+      'Huishouden ophalen duurde te lang'
+    );
+
+    if(existing.error && /theme_preference/i.test(existing.error.message || '')){
+      const fallback = await withCloudTimeout(
+        supabase
+          .from('household_members')
+          .select('household_key')
+          .eq('user_id', user.id)
+          .maybeSingle(),
+        CLOUD_REQUEST_TIMEOUT_MS,
+        'Huishouden ophalen duurde te lang'
+      );
+
+      if(fallback.error) throw fallback.error;
+      return fallback.data ? {
+        household_key: fallback.data.household_key,
+        theme_preference: resolvedTheme
+      } : null;
+    }
+
+    if(existing.error) throw existing.error;
+    return existing.data || null;
+  }
+
+  if(error) throw error;
+
+  return data || {
+    household_key: resolvedHouseholdKey,
+    theme_preference: resolvedTheme
+  };
+}
+
 async function getCloudUser(){
   const supabase = getSupabaseClient();
   setCloudLoadProgress(12, 'Sessie controleren...');
@@ -201,6 +304,15 @@ async function getCloudMemberRecord(){
   }
 
   if(error) throw error;
+  if(!data && (user?.user_metadata?.household_key || user?.user_metadata?.last_name)){
+    setCloudLoadProgress(42, 'Nieuw huishouden aanmaken...');
+    data = await createCloudMemberForUser(
+      user,
+      user.user_metadata.household_key,
+      user.user_metadata.theme_preference || 'midnight'
+    );
+  }
+
   return data || null;
 }
 
@@ -805,6 +917,78 @@ async function signInToCloud(emailArg, passwordArg){
     setCloudStatus(e.message || 'Inloggen mislukt');
     showToast('Inloggen mislukt');
     return { ok:false, error:e.message || 'Inloggen mislukt' };
+  }
+}
+
+async function createCloudAccount(emailArg, passwordArg, lastNameArg){
+  const email = String(emailArg || '').trim();
+  const password = String(passwordArg || '');
+  const lastName = String(lastNameArg || '').trim();
+
+  if(!email || !password || !lastName){
+    setCloudStatus('Vul e-mail, wachtwoord en achternaam in');
+    showToast('Vul alles in');
+    return { ok:false, error:'Vul e-mail, wachtwoord en achternaam in' };
+  }
+
+  if(password.length < 6){
+    setCloudStatus('Gebruik minimaal 6 tekens voor het wachtwoord');
+    showToast('Wachtwoord is te kort');
+    return { ok:false, error:'Gebruik minimaal 6 tekens voor het wachtwoord' };
+  }
+
+  state.cloudCreatingAccount = true;
+  setCloudStatus('Account aanmaken...');
+
+  try{
+    const supabase = getSupabaseClient();
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          last_name: lastName,
+          theme_preference: state.cloudThemePreference || 'midnight'
+        }
+      }
+    });
+
+    if(error) throw error;
+
+    const user = data?.user || null;
+    const session = data?.session || null;
+    let householdKey = buildHouseholdKey(lastName, user?.id || '');
+
+    if(user?.id){
+      householdKey = buildHouseholdKey(lastName, user.id);
+
+      if(session){
+        const member = await createCloudMemberForUser(
+          user,
+          householdKey,
+          state.cloudThemePreference || 'midnight'
+        );
+        householdKey = member?.household_key || householdKey;
+      }else{
+        householdKey = getSignupHouseholdKey(user);
+      }
+    }
+
+    setCloudStatus(session ? 'Account en huishouden aangemaakt' : 'Check je e-mail om het account te bevestigen');
+    showToast(session ? 'Account aangemaakt' : 'Check je e-mail');
+
+    return {
+      ok:true,
+      email:user?.email || email,
+      needsConfirmation:!session,
+      householdKey
+    };
+  }catch(e){
+    setCloudStatus(e.message || 'Account aanmaken mislukt');
+    showToast('Account aanmaken mislukt');
+    return { ok:false, error:e.message || 'Account aanmaken mislukt' };
+  }finally{
+    state.cloudCreatingAccount = false;
   }
 }
 

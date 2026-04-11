@@ -10,6 +10,8 @@ const state = {
   cloudHouseholdKey: '',
   cloudUserEmail: '',
   cloudThemePreference: 'midnight',
+  cloudAuthMode: 'login',
+  cloudCreatingAccount: false,
   startupProgress: 8,
   startupStatus: 'App starten...',
   accountMenuOpen:false,

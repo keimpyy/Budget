@@ -370,13 +370,23 @@ function renderAppModal(){
   }
 
   if(state.appModalType === 'cloud-login'){
+    const isCreateMode = state.cloudAuthMode === 'create';
+    const submitLabel = state.cloudCreatingAccount
+      ? 'Aanmaken...'
+      : (isCreateMode ? 'Account maken' : 'Inloggen');
+
     content = `
       <div class="budget-modal-backdrop" onclick="closeAppModal()">
         <div class="budget-modal-sheet" onclick="event.stopPropagation()">
           <div class="budget-modal-handle"></div>
 
-          <div class="budget-modal-title">Inloggen</div>
-          <div class="budget-modal-copy">Log in met jullie account om meteen te synchroniseren tussen apparaten.</div>
+          <div class="budget-modal-title">${isCreateMode ? 'Account maken' : 'Inloggen'}</div>
+          <div class="budget-modal-copy">${isCreateMode ? 'Maak een nieuw huishouden aan met jullie achternaam.' : 'Log in met jullie account om meteen te synchroniseren tussen apparaten.'}</div>
+
+          <div class="auth-mode-row" role="tablist" aria-label="Account keuze">
+            <button class="btn ${isCreateMode ? 'secondary' : ''}" type="button" onclick="setCloudAuthMode('login')" aria-selected="${!isCreateMode}">Inloggen</button>
+            <button class="btn ${isCreateMode ? '' : 'secondary'}" type="button" onclick="setCloudAuthMode('create')" aria-selected="${isCreateMode}">Nieuw account</button>
+          </div>
 
           <div class="stack">
             <div>
@@ -389,6 +399,18 @@ function renderAppModal(){
                 placeholder="naam@email.com"
               >
             </div>
+            ${isCreateMode ? `
+              <div>
+                <div class="budget-inline-label">Achternaam huishouden</div>
+                <input
+                  id="cloud-signup-last-name"
+                  class="input"
+                  type="text"
+                  autocomplete="family-name"
+                  placeholder="Veenstra"
+                >
+              </div>
+            ` : ''}
             <div>
               <div class="budget-inline-label">Wachtwoord</div>
               <div class="password-field">
@@ -396,7 +418,7 @@ function renderAppModal(){
                   id="cloud-login-password"
                   class="input password-field-input"
                   type="password"
-                  autocomplete="current-password"
+                  autocomplete="${isCreateMode ? 'new-password' : 'current-password'}"
                   placeholder="Wachtwoord"
                 >
                 <button
@@ -411,7 +433,7 @@ function renderAppModal(){
 
           <div class="budget-modal-actions">
             <button class="btn secondary" onclick="closeAppModal()">Annuleren</button>
-            <button class="btn" onclick="submitLoginModal()">Inloggen</button>
+            <button class="btn" onclick="submitLoginModal()" ${state.cloudCreatingAccount ? 'disabled' : ''}>${submitLabel}</button>
           </div>
         </div>
       </div>

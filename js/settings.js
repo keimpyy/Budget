@@ -278,15 +278,31 @@ function setAccountTheme(theme){
 
 function openLoginModal(){
   state.accountMenuOpen = false;
+  state.cloudAuthMode = 'login';
   renderHeaderActions();
   openAppModal('cloud-login');
+}
+
+function setCloudAuthMode(mode){
+  state.cloudAuthMode = mode === 'create' ? 'create' : 'login';
+  renderAppModal();
 }
 
 async function submitLoginModal(){
   const email = document.getElementById('cloud-login-email')?.value || '';
   const password = document.getElementById('cloud-login-password')?.value || '';
-  const result = await signInToCloud(email, password);
+  const lastName = document.getElementById('cloud-signup-last-name')?.value || '';
+  const isCreateMode = state.cloudAuthMode === 'create';
+  const result = isCreateMode
+    ? await createCloudAccount(email, password, lastName)
+    : await signInToCloud(email, password);
+
   if(result?.ok){
+    if(result.needsConfirmation){
+      closeAppModal();
+      return;
+    }
+
     closeAppModal();
     if(typeof finalizeCloudLogin === 'function'){
       finalizeCloudLogin(result.email || email);
