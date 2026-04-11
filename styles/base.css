@@ -445,11 +445,11 @@ body[data-theme="midnight"]{
   }
 
   .account-menu-panel{
-    position:absolute;
-    top:calc(100% + 8px);
-    right:0;
+    position:fixed;
+    top:auto;
+    right:24px;
     left:auto;
-    bottom:auto;
+    bottom:24px;
     width:min(250px, calc(100vw - 40px));
     max-width:none;
     margin:0;

@@ -180,6 +180,16 @@ function ensureHeaderActionsHost(){
   return host;
 }
 
+function ensureAccountMenuRoot(){
+  let root = document.getElementById('account-menu-root');
+  if(root) return root;
+
+  root = document.createElement('div');
+  root.id = 'account-menu-root';
+  document.body.appendChild(root);
+  return root;
+}
+
 function renderHeaderActions(){
   const root = ensureHeaderActionsHost();
   if(!root) return;
@@ -239,6 +249,15 @@ function renderHeaderActions(){
       <button class="badge-btn" onclick="openSettings()">Instellingen</button>
     </div>
   `;
+
+  const accountMenuRoot = ensureAccountMenuRoot();
+  accountMenuRoot.innerHTML = '';
+
+  const accountBackdrop = root.querySelector('.account-menu-backdrop');
+  const accountPanel = root.querySelector('.account-menu-panel');
+  if(accountBackdrop && accountPanel){
+    accountMenuRoot.append(accountBackdrop, accountPanel);
+  }
 }
 
 function toggleAccountMenu(){
