@@ -15,16 +15,10 @@ const state = {
   startupProgress: 8,
   startupStatus: 'App starten...',
   accountMenuOpen:false,
-  inkomsten: [
-    { naam:'KT', bedrag:2950 },
-    { naam:'Ryanne', bedrag:1581.89 },
-  ],
+  inkomsten: [],
   categorieen: [],
   budget: [],
-  leningen: [
-    { id:'l1', naam:'Auto 1', totaal:2700, betaald:750, kleur:'#7c6af7' },
-    { id:'l2', naam:'Auto 2', totaal:7500, betaald:0, kleur:'#4ecdc4' },
-  ],
+  leningen: [],
   openCats:{},
   budgetSubtab:'categorieen',
   currentView:'dashboard',
@@ -42,6 +36,19 @@ const state = {
 };
 
 function uid(prefix){ return `${prefix}_${Date.now()}_${Math.floor(Math.random()*100000)}`; }
+function resetBudgetData(){
+  state.inkomsten = [];
+  state.categorieen = [];
+  state.budget = [];
+  state.leningen = [];
+  state.openCats = {};
+  state.budgetSelectedCategoryId = null;
+  state.budgetFocusCategoryId = null;
+  state.budgetComposerOpen = false;
+  state.budgetComposerMode = 'category';
+  state.budgetComposerTargetId = null;
+  state.budgetComposerCategoryId = null;
+}
 function fmt(n){ const v = Number(n || 0); return '€ ' + v.toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.'); }
 function fmtShort(n){ return '€' + Math.round(Number(n || 0)).toLocaleString('nl'); }
 function inkomstenTotaal(){ return state.inkomsten.reduce((s,r)=>s + Number(r.bedrag || 0), 0); }

@@ -211,11 +211,6 @@ function addIncomeRow(){
 function removeIncomeRow(idx){
   if(!state.inkomsten[idx]) return;
 
-  if(state.inkomsten.length <= 1){
-    showToast('Laat minimaal één inkomstenregel staan');
-    return;
-  }
-
   openConfirmModal('Verwijderen?', 'Inkomstenregel verwijderen?', () => {
     state.inkomsten.splice(idx,1);
     persistAndSync();

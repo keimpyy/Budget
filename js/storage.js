@@ -414,6 +414,9 @@ async function syncCloudSession(){
     state.cloudUserEmail = '';
     state.cloudHouseholdKey = '';
     state.cloudThemePreference = 'midnight';
+    if(typeof resetBudgetData === 'function'){
+      resetBudgetData();
+    }
     if(typeof applyTheme === 'function'){
       applyTheme('midnight', {
         persist:false,
@@ -1091,6 +1094,9 @@ async function signOutFromCloud(){
     clearCloudAuthState();
     closeAppModal();
     clearCloudAuthStorage();
+    if(typeof resetBudgetData === 'function'){
+      resetBudgetData();
+    }
     if(typeof applyTheme === 'function'){
       applyTheme('midnight', { persist:false, skipCloudPersist:true });
     }
