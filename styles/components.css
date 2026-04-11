@@ -17,7 +17,8 @@
 .btn.danger{background:rgba(255,107,107,.14);color:var(--red);border:1px solid rgba(255,107,107,.25)}
 .btn.sm{padding:7px 10px;border-radius:10px;font-size:12px}
 .stack{display:flex;flex-direction:column;gap:8px}
-.auth-mode-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+.budget-modal-linkrow{margin-top:10px}
+.budget-modal-linkrow .btn{width:100%}
 .inline{display:flex;gap:8px;align-items:center}
 .muted{color:var(--muted)}
 .mono{font-family:monospace}

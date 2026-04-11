@@ -278,24 +278,41 @@ function setAccountTheme(theme){
 
 function openLoginModal(){
   state.accountMenuOpen = false;
-  state.cloudAuthMode = 'login';
   renderHeaderActions();
   openAppModal('cloud-login');
 }
 
-function setCloudAuthMode(mode){
-  state.cloudAuthMode = mode === 'create' ? 'create' : 'login';
-  renderAppModal();
+function openSignupModal(){
+  state.accountMenuOpen = false;
+  renderHeaderActions();
+  openAppModal('cloud-signup');
 }
 
 async function submitLoginModal(){
   const email = document.getElementById('cloud-login-email')?.value || '';
   const password = document.getElementById('cloud-login-password')?.value || '';
+  const result = await signInToCloud(email, password);
+
+  if(result?.ok){
+    closeAppModal();
+    if(typeof finalizeCloudLogin === 'function'){
+      finalizeCloudLogin(result.email || email);
+    }
+    if(typeof rerenderCurrentView === 'function'){
+      rerenderCurrentView();
+    }else if(typeof rerenderAll === 'function'){
+      rerenderAll();
+    }else if(typeof renderHeaderActions === 'function'){
+      renderHeaderActions();
+    }
+  }
+}
+
+async function submitSignupModal(){
+  const email = document.getElementById('cloud-signup-email')?.value || '';
+  const password = document.getElementById('cloud-signup-password')?.value || '';
   const lastName = document.getElementById('cloud-signup-last-name')?.value || '';
-  const isCreateMode = state.cloudAuthMode === 'create';
-  const result = isCreateMode
-    ? await createCloudAccount(email, password, lastName)
-    : await signInToCloud(email, password);
+  const result = await createCloudAccount(email, password, lastName);
 
   if(result?.ok){
     if(result.needsConfirmation){
