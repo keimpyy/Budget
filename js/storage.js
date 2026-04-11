@@ -940,6 +940,8 @@ async function createCloudAccount(emailArg, passwordArg, lastNameArg){
   state.cloudCreatingAccount = true;
   setCloudStatus('Account aanmaken...');
 
+  let createdUserEmail = '';
+
   try{
     const supabase = getSupabaseClient();
     const { data, error } = await supabase.auth.signUp({
@@ -957,6 +959,7 @@ async function createCloudAccount(emailArg, passwordArg, lastNameArg){
 
     const user = data?.user || null;
     const session = data?.session || null;
+    createdUserEmail = user?.email || email;
     let householdKey = buildHouseholdKey(lastName, user?.id || '');
 
     if(user?.id){
@@ -979,14 +982,20 @@ async function createCloudAccount(emailArg, passwordArg, lastNameArg){
 
     return {
       ok:true,
-      email:user?.email || email,
+      email:createdUserEmail || email,
       needsConfirmation:!session,
       householdKey
     };
   }catch(e){
-    setCloudStatus(e.message || 'Account aanmaken mislukt');
-    showToast('Account aanmaken mislukt');
-    return { ok:false, error:e.message || 'Account aanmaken mislukt' };
+    const message = e.message || 'Account aanmaken mislukt';
+    const accountLikelyExists = Boolean(createdUserEmail);
+    const status = accountLikelyExists
+      ? `Account bestaat, maar huishouden koppelen mislukt: ${message}`
+      : message;
+
+    setCloudStatus(status);
+    showToast(accountLikelyExists ? 'Huishouden koppelen mislukt' : 'Account aanmaken mislukt');
+    return { ok:false, error:status };
   }finally{
     state.cloudCreatingAccount = false;
   }
