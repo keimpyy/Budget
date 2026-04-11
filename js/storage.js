@@ -162,11 +162,59 @@ function getSignupHouseholdKey(user){
   return meta.household_key || buildHouseholdKey(meta.last_name || '', user?.id || '');
 }
 
+async function ensureCloudHouseholdRecord(householdKey, householdName){
+  const resolvedHouseholdKey = String(householdKey || '').trim();
+  if(!resolvedHouseholdKey) throw new Error('Geen huishoudsleutel gevonden');
+
+  const supabase = getSupabaseClient();
+  const name = String(householdName || resolvedHouseholdKey).trim();
+  const shapes = [
+    { household_key: resolvedHouseholdKey, name },
+    { id: resolvedHouseholdKey, name }
+  ];
+  const attempts = shapes.flatMap(payload => ([
+    { payload, mode:'upsert' },
+    { payload, mode:'insert' }
+  ]));
+
+  let lastError = null;
+  for(const attempt of attempts){
+    const keyColumn = Object.keys(attempt.payload)[0];
+    const query = attempt.mode === 'upsert'
+      ? supabase.from('households').upsert([attempt.payload], { onConflict:keyColumn })
+      : supabase.from('households').insert([attempt.payload]);
+
+    const { error } = await withCloudTimeout(
+      query,
+      CLOUD_REQUEST_TIMEOUT_MS,
+      'Huishouden aanmaken duurde te lang'
+    );
+
+    if(!error) return { ok:true };
+    if(/duplicate|already exists|unique/i.test(error.message || '')) return { ok:true };
+
+    lastError = error;
+    const message = error.message || '';
+    if(!/column|schema cache|Could not find|PGRST204|does not exist|no unique|exclusion constraint|ON CONFLICT/i.test(message)){
+      break;
+    }
+  }
+
+  if(lastError && /Could not find the table|does not exist/i.test(lastError.message || '')){
+    return { ok:true, skipped:true };
+  }
+
+  if(lastError) throw lastError;
+  return { ok:true };
+}
+
 async function createCloudMemberForUser(user, householdKey, themePreference = 'midnight'){
   if(!user?.id) throw new Error('Geen Supabase gebruiker gevonden');
   const supabase = getSupabaseClient();
   const resolvedHouseholdKey = householdKey || getSignupHouseholdKey(user);
   const resolvedTheme = ALLOWED_THEMES.has(themePreference) ? themePreference : 'midnight';
+  await ensureCloudHouseholdRecord(resolvedHouseholdKey, user.user_metadata?.last_name || resolvedHouseholdKey);
+
   const basePayload = {
     user_id: user.id,
     household_key: resolvedHouseholdKey
@@ -304,6 +352,10 @@ async function getCloudMemberRecord(){
   }
 
   if(error) throw error;
+  if(data?.household_key){
+    await ensureCloudHouseholdRecord(data.household_key, user.user_metadata?.last_name || data.household_key);
+  }
+
   if(!data && (user?.user_metadata?.household_key || user?.user_metadata?.last_name)){
     setCloudLoadProgress(42, 'Nieuw huishouden aanmaken...');
     data = await createCloudMemberForUser(
