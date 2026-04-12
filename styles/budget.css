@@ -412,7 +412,7 @@
 }
 
 .password-field-input{
-  padding-right:52px;
+  padding-right:78px;
 }
 
 .password-toggle-btn{
@@ -420,13 +420,14 @@
   top:50%;
   right:10px;
   transform:translateY(-50%);
-  width:34px;
+  width:60px;
   height:34px;
   border-radius:10px;
   border:1px solid var(--border);
   background:var(--surface3);
   color:var(--text);
-  font-size:14px;
+  font-size:12px;
+  font-weight:800;
   cursor:pointer;
 }
 

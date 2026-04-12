@@ -99,7 +99,7 @@ function renderInstellingen(){
           </span>
           <span class="settings-row-side">
             <span class="settings-value current-theme-value">${themeLabel}</span>
-            <span class="settings-chevron">›</span>
+            <span class="settings-chevron">&gt;</span>
           </span>
         </button>
 
@@ -149,7 +149,7 @@ function renderInstellingen(){
           </span>
           <span class="settings-row-side">
             <span class="settings-value">Open</span>
-            <span class="settings-chevron">â€º</span>
+            <span class="settings-chevron">&gt;</span>
           </span>
         </button>
         <button class="btn secondary settings-back-btn" onclick="closeSettings()">Terug</button>
@@ -258,7 +258,7 @@ function renderHeaderActions(){
       ` : `
         <button class="badge-btn" onclick="openLoginModal()">Inloggen</button>
       `}
-      <button class="badge-btn" onclick="openSettings()">Instellingen</button>
+      <button class="settings-icon-btn" onclick="openSettings()" aria-label="Instellingen" title="Instellingen">&#9881;</button>
     </div>
   `;
 

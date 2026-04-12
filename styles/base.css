@@ -211,13 +211,31 @@ body[data-theme="midnight"]{
 .account-avatar-btn{
   width:34px;
   height:34px;
-  border-radius:12px;
+  border-radius:999px;
   border:1px solid var(--border);
   background:linear-gradient(135deg,var(--accent),var(--accent2));
   color:#fff;
   font-family:inherit;
   font-size:13px;
   font-weight:900;
+  cursor:pointer;
+  box-shadow:var(--shadow);
+}
+
+.settings-icon-btn{
+  width:34px;
+  height:34px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:var(--surface2);
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:inherit;
+  font-size:18px;
+  font-weight:900;
+  line-height:1;
   cursor:pointer;
   box-shadow:var(--shadow);
 }

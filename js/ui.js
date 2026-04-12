@@ -295,7 +295,7 @@ function togglePasswordVisibility(inputId, button){
 
   const nextType = input.type === 'password' ? 'text' : 'password';
   input.type = nextType;
-  button.textContent = nextType === 'password' ? '👁' : '🙈';
+  button.textContent = nextType === 'password' ? 'Toon' : 'Verberg';
   button.setAttribute('aria-label', nextType === 'password' ? 'Toon wachtwoord' : 'Verberg wachtwoord');
 }
 
@@ -404,7 +404,7 @@ function renderAppModal(){
                   class="password-toggle-btn"
                   onclick="togglePasswordVisibility('cloud-login-password', this)"
                   aria-label="Toon wachtwoord"
-                >👁</button>
+                >Toon</button>
               </div>
             </div>
           </div>
@@ -451,7 +451,7 @@ function renderAppModal(){
                 class="input"
                 type="text"
                 autocomplete="family-name"
-                placeholder="Veenstra"
+                placeholder="Achternaam"
               >
             </div>
             <div>
@@ -469,7 +469,7 @@ function renderAppModal(){
                   class="password-toggle-btn"
                   onclick="togglePasswordVisibility('cloud-signup-password', this)"
                   aria-label="Toon wachtwoord"
-                >ðŸ‘</button>
+                >Toon</button>
               </div>
             </div>
           </div>
