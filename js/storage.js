@@ -196,8 +196,8 @@ async function ensureCloudHouseholdRecord(householdKey, householdName){
     { id: resolvedHouseholdKey, name }
   ];
   const attempts = shapes.flatMap(payload => ([
-    { payload, mode:'upsert' },
-    { payload, mode:'insert' }
+    { payload, mode:'insert' },
+    { payload, mode:'upsert' }
   ]));
 
   let lastError = null;
@@ -218,6 +218,9 @@ async function ensureCloudHouseholdRecord(householdKey, householdName){
 
     lastError = error;
     const message = error.message || '';
+    if(attempt.mode === 'upsert' && /row-level security|rls policy/i.test(message)){
+      continue;
+    }
     if(!/column|schema cache|Could not find|PGRST204|does not exist|no unique|exclusion constraint|ON CONFLICT/i.test(message)){
       break;
     }
@@ -236,6 +239,30 @@ async function createCloudMemberForUser(user, householdKey, themePreference = 'm
   const supabase = getSupabaseClient();
   const resolvedHouseholdKey = householdKey || getSignupHouseholdKey(user);
   const resolvedTheme = ALLOWED_THEMES.has(themePreference) ? themePreference : 'midnight';
+
+  const rpcResult = await withCloudTimeout(
+    supabase
+      .rpc('ensure_own_household_member', {
+        p_household_key: resolvedHouseholdKey,
+        p_household_name: user.user_metadata?.last_name || resolvedHouseholdKey,
+        p_theme_preference: resolvedTheme
+      }),
+    CLOUD_REQUEST_TIMEOUT_MS,
+    'Huishouden aanmaken duurde te lang'
+  );
+
+  if(!rpcResult.error){
+    const row = Array.isArray(rpcResult.data) ? rpcResult.data[0] : rpcResult.data;
+    return {
+      household_key: row?.household_key || resolvedHouseholdKey,
+      theme_preference: row?.theme_preference || resolvedTheme
+    };
+  }
+
+  if(!/ensure_own_household_member|function.*not found|schema cache|PGRST202|Could not find/i.test(rpcResult.error.message || '')){
+    throw rpcResult.error;
+  }
+
   await ensureCloudHouseholdRecord(resolvedHouseholdKey, user.user_metadata?.last_name || resolvedHouseholdKey);
 
   const basePayload = {
@@ -1017,6 +1044,9 @@ async function createCloudAccount(emailArg, passwordArg, lastNameArg){
 
   state.cloudCreatingAccount = true;
   setCloudStatus('Account aanmaken...');
+  if(typeof renderAppModal === 'function'){
+    renderAppModal();
+  }
 
   let createdUserEmail = '';
 
@@ -1076,6 +1106,9 @@ async function createCloudAccount(emailArg, passwordArg, lastNameArg){
     return { ok:false, error:status };
   }finally{
     state.cloudCreatingAccount = false;
+    if(typeof renderAppModal === 'function' && state.appModalOpen && state.appModalType === 'cloud-signup'){
+      renderAppModal();
+    }
   }
 }
 
