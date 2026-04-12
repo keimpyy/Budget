@@ -179,7 +179,7 @@ function syncSakuraPetals(){
   const layer = document.getElementById('sakura-layer');
   if(!layer) return;
 
-  const theme = document.body.getAttribute('data-theme') || 'midnight';
+  const theme = normalizeThemePreference(document.body.getAttribute('data-theme'));
   layer.innerHTML = '';
 
   const w = window.innerWidth;
@@ -191,11 +191,11 @@ function syncSakuraPetals(){
   else if(w >= 768) petalCount = 26;
   else petalCount = 18;
 
-  if(theme === 'midnight'){
+  if(theme === 'kuro'){
     const sheenCount = w >= 1100 ? 10 : 7;
     for(let i = 0; i < sheenCount; i++){
       const sheen = document.createElement('span');
-      sheen.className = 'theme-particle theme-particle-midnight';
+      sheen.className = 'theme-particle theme-particle-kuro';
       sheen.style.left = `${-20 + Math.random() * 120}%`;
       sheen.style.top = `${Math.random() * 100}%`;
       sheen.style.animationDelay = `${-Math.random() * 14}s`;

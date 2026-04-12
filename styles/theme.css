@@ -56,6 +56,7 @@ body[data-theme="neon"]{
 
 /* Theme 3: Kuro Steel */
 body:not([data-theme]),
+body[data-theme="kuro"],
 body[data-theme="midnight"]{
   --bg:#050606;
   --surface:#0d0f0e;
@@ -142,12 +143,17 @@ body[data-theme="neon"] .loan-percent-badge{
   color:transparent;
 }
 
+body[data-theme="kuro"] .btn,
 body[data-theme="midnight"] .btn,
 body:not([data-theme]) .btn{
   background:linear-gradient(135deg,#f4f7f2,#a5101b);
   box-shadow:0 5px 20px rgba(165,16,27,.22);
 }
 
+body[data-theme="kuro"] .fill,
+body[data-theme="kuro"] .budget-progress__fill,
+body[data-theme="kuro"] .prog-fill,
+body[data-theme="kuro"] .alloc-fill,
 body[data-theme="midnight"] .fill,
 body[data-theme="midnight"] .budget-progress__fill,
 body[data-theme="midnight"] .prog-fill,
@@ -159,6 +165,8 @@ body:not([data-theme]) .alloc-fill{
   background:linear-gradient(90deg,#f4f7f2,#c7d7cf,#a5101b);
 }
 
+body[data-theme="kuro"] .hero-amount.pos,
+body[data-theme="kuro"] .hero-amount.neg,
 body[data-theme="midnight"] .hero-amount.pos,
 body[data-theme="midnight"] .hero-amount.neg,
 body:not([data-theme]) .hero-amount.pos,
@@ -169,6 +177,8 @@ body:not([data-theme]) .hero-amount.neg{
   color:transparent;
 }
 
+body[data-theme="kuro"] .loan-hero-pct,
+body[data-theme="kuro"] .loan-percent-badge,
 body[data-theme="midnight"] .loan-hero-pct,
 body[data-theme="midnight"] .loan-percent-badge,
 body:not([data-theme]) .loan-hero-pct,
@@ -212,6 +222,7 @@ body:not([data-theme]) .loan-percent-badge{
   animation-iteration-count:infinite, infinite;
 }
 
+.theme-particle-kuro,
 .theme-particle-midnight{
   width:190px;
   height:1px;

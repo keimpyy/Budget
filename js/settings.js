@@ -1,19 +1,21 @@
 const THEME_COLORS = {
-  midnight: '#050606',
+  kuro: '#050606',
   sakura: '#140d15',
   neon: '#0a0706'
 };
 
-const ALLOWED_THEMES = new Set(['midnight', 'sakura', 'neon']);
+const ALLOWED_THEMES = new Set(['kuro', 'sakura', 'neon']);
 
 function updateThemeMeta(theme){
   const meta = document.querySelector('meta[name="theme-color"]');
-  if(meta) meta.setAttribute('content', THEME_COLORS[theme] || THEME_COLORS.midnight);
+  const resolved = normalizeThemePreference(theme);
+  if(meta) meta.setAttribute('content', THEME_COLORS[resolved] || THEME_COLORS[DEFAULT_THEME]);
 }
 
 function getThemeLabel(theme){
-  if(theme === 'midnight') return 'Kuro Steel';
-  if(theme === 'neon') return 'Ronin Ember';
+  const resolved = normalizeThemePreference(theme);
+  if(resolved === 'kuro') return 'Kuro Steel';
+  if(resolved === 'neon') return 'Ronin Ember';
   return 'Sakura v2';
 }
 
@@ -37,7 +39,7 @@ function syncThemeSelection(theme){
 }
 
 function applyTheme(theme, options = {}){
-  const resolved = ALLOWED_THEMES.has(theme) ? theme : 'midnight';
+  const resolved = normalizeThemePreference(theme);
   const shouldPersist = options.persist !== false;
 
   document.body.setAttribute('data-theme', resolved);
@@ -69,11 +71,11 @@ function applyTheme(theme, options = {}){
 }
 
 function loadTheme(){
-  applyTheme(state.cloudThemePreference || 'midnight', { persist:false, skipCloudPersist:true });
+  applyTheme(state.cloudThemePreference || DEFAULT_THEME, { persist:false, skipCloudPersist:true });
 }
 
 function renderInstellingen(){
-  const currentTheme = document.body.getAttribute('data-theme') || 'midnight';
+  const currentTheme = normalizeThemePreference(document.body.getAttribute('data-theme'));
   const themeLabel = getThemeLabel(currentTheme);
 
   document.getElementById('v-instellingen').innerHTML = `
@@ -102,8 +104,8 @@ function renderInstellingen(){
         </button>
 
         <div class="theme-picker" role="listbox" aria-label="Theme keuze">
-          <button class="theme-tile ${currentTheme==='midnight'?'active':''}" data-theme="midnight" onclick="applyTheme('midnight')" aria-selected="${currentTheme==='midnight'}">
-            <span class="theme-swatch theme-swatch-midnight"></span>
+          <button class="theme-tile ${currentTheme==='kuro'?'active':''}" data-theme="kuro" onclick="applyTheme('kuro')" aria-selected="${currentTheme==='kuro'}">
+            <span class="theme-swatch theme-swatch-kuro"></span>
             <span class="theme-copy">
               <span class="theme-name">Kuro Steel</span>
               <span class="theme-note">Black steel, blade rain, red edge</span>
@@ -147,8 +149,8 @@ function renderInstellingen(){
 }
 
 function cycleTheme(){
-  const order = ['midnight', 'neon', 'sakura'];
-  const current = document.body.getAttribute('data-theme') || 'midnight';
+  const order = ['kuro', 'neon', 'sakura'];
+  const current = normalizeThemePreference(document.body.getAttribute('data-theme'));
   const idx = order.indexOf(current);
   applyTheme(order[(idx + 1) % order.length]);
 }
@@ -195,7 +197,7 @@ function renderHeaderActions(){
   if(!root) return;
 
   const signedIn = typeof isCloudSignedIn === 'function' ? isCloudSignedIn() : false;
-  const currentTheme = document.body.getAttribute('data-theme') || 'midnight';
+  const currentTheme = normalizeThemePreference(document.body.getAttribute('data-theme'));
   const loadLabel = state.cloudLoading ? 'Ophalen...' : 'Ophalen';
   const signOutLabel = state.cloudSigningOut ? 'Uitloggen...' : 'Uitloggen';
   const loadProgress = Math.max(0, Math.min(100, Number(state.cloudLoadProgress || 0)));
@@ -220,7 +222,7 @@ function renderHeaderActions(){
               <div class="account-menu-group">
                 <div class="account-menu-label">Theme</div>
                 <div class="account-theme-row">
-                  <button class="account-theme-chip ${currentTheme==='midnight'?'active':''}" onclick="setAccountTheme('midnight')">Kuro</button>
+                  <button class="account-theme-chip ${currentTheme==='kuro'?'active':''}" onclick="setAccountTheme('kuro')">Kuro</button>
                   <button class="account-theme-chip ${currentTheme==='neon'?'active':''}" onclick="setAccountTheme('neon')">Ronin</button>
                   <button class="account-theme-chip ${currentTheme==='sakura'?'active':''}" onclick="setAccountTheme('sakura')">Sakura</button>
                 </div>

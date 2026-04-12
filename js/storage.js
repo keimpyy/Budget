@@ -52,17 +52,17 @@ function setCloudHouseholdKey(householdKey){
 }
 
 function setCloudThemePreference(theme){
-  state.cloudThemePreference = theme || 'midnight';
+  state.cloudThemePreference = normalizeThemePreference(theme);
   persistCloudSessionMeta({
     email: state.cloudUserEmail || '',
-    themePreference: state.cloudThemePreference || 'midnight'
+    themePreference: state.cloudThemePreference || DEFAULT_THEME
   });
 }
 
 function clearCloudAuthState(){
   state.cloudUserEmail = '';
   state.cloudHouseholdKey = '';
-  state.cloudThemePreference = 'midnight';
+  state.cloudThemePreference = DEFAULT_THEME;
   state.accountMenuOpen = false;
   state.cloudLoading = false;
   setCloudLoadProgress(0, '');
@@ -99,7 +99,7 @@ function persistCloudSessionMeta(meta){
 
     window.localStorage.setItem(CLOUD_AUTH_META_KEY, JSON.stringify({
       email: meta.email || '',
-      themePreference: meta.themePreference || 'midnight'
+      themePreference: normalizeThemePreference(meta.themePreference)
     }));
   }catch(e){}
 }
@@ -111,7 +111,7 @@ function restoreCloudSessionMeta(){
 
     const parsed = JSON.parse(raw);
     state.cloudUserEmail = parsed?.email || '';
-    state.cloudThemePreference = parsed?.themePreference || 'midnight';
+    state.cloudThemePreference = normalizeThemePreference(parsed?.themePreference);
   }catch(e){}
 }
 
@@ -234,11 +234,11 @@ async function ensureCloudHouseholdRecord(householdKey, householdName){
   return { ok:true };
 }
 
-async function createCloudMemberForUser(user, householdKey, themePreference = 'midnight'){
+async function createCloudMemberForUser(user, householdKey, themePreference = DEFAULT_THEME){
   if(!user?.id) throw new Error('Geen Supabase gebruiker gevonden');
   const supabase = getSupabaseClient();
   const resolvedHouseholdKey = householdKey || getSignupHouseholdKey(user);
-  const resolvedTheme = ALLOWED_THEMES.has(themePreference) ? themePreference : 'midnight';
+  const resolvedTheme = normalizeThemePreference(themePreference);
 
   const rpcResult = await withCloudTimeout(
     supabase
@@ -355,7 +355,7 @@ async function getCloudUser(){
   if(user){
     persistCloudSessionMeta({
       email: user.email || '',
-      themePreference: state.cloudThemePreference || 'midnight'
+      themePreference: state.cloudThemePreference || DEFAULT_THEME
     });
     setCloudLoadProgress(24, 'Sessie gevonden');
   }else{
@@ -396,7 +396,7 @@ async function getCloudMemberRecord(){
 
     data = fallback.data ? {
       household_key: fallback.data.household_key,
-      theme_preference: 'midnight'
+      theme_preference: DEFAULT_THEME
     } : null;
     error = fallback.error;
   }
@@ -411,7 +411,7 @@ async function getCloudMemberRecord(){
     data = await createCloudMemberForUser(
       user,
       user.user_metadata.household_key,
-      user.user_metadata.theme_preference || 'midnight'
+      user.user_metadata.theme_preference || DEFAULT_THEME
     );
   }
 
@@ -428,12 +428,12 @@ async function getCloudHouseholdKey(){
   }
 
   setCloudHouseholdKey(householdKey);
-  setCloudThemePreference(member?.theme_preference || 'midnight');
+  setCloudThemePreference(member?.theme_preference || DEFAULT_THEME);
   return householdKey;
 }
 
 async function saveThemePreference(theme){
-  const resolved = ALLOWED_THEMES.has(theme) ? theme : 'midnight';
+  const resolved = normalizeThemePreference(theme);
   const user = await getCloudUser();
   if(!user) return { ok:false, error:'Log eerst in om je theme op te slaan' };
 
@@ -463,12 +463,12 @@ async function syncCloudSession(){
   if(!user){
     state.cloudUserEmail = '';
     state.cloudHouseholdKey = '';
-    state.cloudThemePreference = 'midnight';
+    state.cloudThemePreference = DEFAULT_THEME;
     if(typeof resetBudgetData === 'function'){
       resetBudgetData();
     }
     if(typeof applyTheme === 'function'){
-      applyTheme('midnight', {
+      applyTheme(DEFAULT_THEME, {
         persist:false,
         skipCloudPersist:true
       });
@@ -488,14 +488,14 @@ async function syncCloudSession(){
     await getCloudHouseholdKey();
     setCloudLoadProgress(48, 'Cloud sessie klaar');
     if(typeof applyTheme === 'function'){
-      applyTheme(state.cloudThemePreference || 'midnight', {
+      applyTheme(state.cloudThemePreference || DEFAULT_THEME, {
         persist:false,
         skipCloudPersist:true
       });
     }
   }catch(e){
     state.cloudHouseholdKey = '';
-    state.cloudThemePreference = 'midnight';
+    state.cloudThemePreference = DEFAULT_THEME;
     setCloudStatus(e.message || 'Cloud koppeling niet beschikbaar');
     console.error('Cloud sessie koppelen mislukt:', e);
   }
@@ -1018,7 +1018,7 @@ async function signInToCloud(emailArg, passwordArg){
   }catch(e){
     state.cloudUserEmail = '';
     state.cloudHouseholdKey = '';
-    state.cloudThemePreference = 'midnight';
+    state.cloudThemePreference = DEFAULT_THEME;
     setCloudStatus(e.message || 'Inloggen mislukt');
     showToast('Inloggen mislukt');
     return { ok:false, error:e.message || 'Inloggen mislukt' };
@@ -1058,7 +1058,7 @@ async function createCloudAccount(emailArg, passwordArg, lastNameArg){
       options: {
         data: {
           last_name: lastName,
-          theme_preference: state.cloudThemePreference || 'midnight'
+          theme_preference: state.cloudThemePreference || DEFAULT_THEME
         }
       }
     });
@@ -1077,7 +1077,7 @@ async function createCloudAccount(emailArg, passwordArg, lastNameArg){
         const member = await createCloudMemberForUser(
           user,
           householdKey,
-          state.cloudThemePreference || 'midnight'
+          state.cloudThemePreference || DEFAULT_THEME
         );
         householdKey = member?.household_key || householdKey;
       }else{
@@ -1116,10 +1116,10 @@ function finalizeCloudLogin(email){
   state.cloudUserEmail = email || '';
   state.accountMenuOpen = false;
   setCloudHouseholdKey('');
-  setCloudThemePreference('midnight');
+  setCloudThemePreference(DEFAULT_THEME);
 
   if(typeof applyTheme === 'function'){
-    applyTheme('midnight', { persist:false, skipCloudPersist:true });
+    applyTheme(DEFAULT_THEME, { persist:false, skipCloudPersist:true });
   }
 
   setCloudStatus(`Ingelogd als ${state.cloudUserEmail}`);
@@ -1154,7 +1154,7 @@ async function signOutFromCloud(){
       resetBudgetData();
     }
     if(typeof applyTheme === 'function'){
-      applyTheme('midnight', { persist:false, skipCloudPersist:true });
+      applyTheme(DEFAULT_THEME, { persist:false, skipCloudPersist:true });
     }
     if(typeof renderInstellingen === 'function'){
       renderInstellingen();

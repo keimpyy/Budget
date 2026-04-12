@@ -29,6 +29,7 @@ body[data-theme="neon"]{
   --nav-exit-duration:.16s;
 }
 
+body[data-theme="kuro"],
 body[data-theme="midnight"]{
   --nav-tilt:8deg;
   --nav-shift:16px;

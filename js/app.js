@@ -1,3 +1,38 @@
+function refreshOnceForNewAppVersion(){
+  const version = typeof APP_VERSION === 'string' ? APP_VERSION : '';
+  if(!version) return false;
+
+  const storageKey = 'budget-app-version';
+  const reloadMarkerKey = 'budget-app-version-reload';
+  let previousVersion = '';
+  let reloadMarker = '';
+
+  try{
+    previousVersion = window.localStorage.getItem(storageKey) || '';
+    reloadMarker = window.sessionStorage.getItem(reloadMarkerKey) || '';
+  }catch(e){}
+
+  if(previousVersion && previousVersion !== version && reloadMarker !== version){
+    try{
+      window.sessionStorage.setItem(reloadMarkerKey, version);
+      window.localStorage.setItem(storageKey, version);
+    }catch(e){}
+
+    const url = new URL(window.location.href);
+    url.searchParams.set('app_v', version);
+    window.location.replace(url.toString());
+    return true;
+  }
+
+  try{
+    window.localStorage.setItem(storageKey, version);
+  }catch(e){}
+
+  return false;
+}
+
+const appRefreshInProgress = refreshOnceForNewAppVersion();
+
 function setStartupProgress(progress, status){
   state.startupProgress = Math.max(0, Math.min(100, Number(progress || 0)));
   if(status) state.startupStatus = status;
@@ -88,20 +123,22 @@ async function init(){
 
 }
 
-loadTheme();
+if(!appRefreshInProgress){
+  loadTheme();
 
-if(typeof renderHeaderActions === 'function'){
-  renderHeaderActions();
+  if(typeof renderHeaderActions === 'function'){
+    renderHeaderActions();
+  }
+
+  if(typeof syncSakuraPetals === 'function'){
+    window.addEventListener('resize', syncSakuraPetals);
+  }
+
+  window.addEventListener('click', (e) => {
+    const target = e.target;
+    if(target instanceof Element && target.closest('.account-menu-panel, .account-avatar-btn, #app-modal-root')) return;
+    if(typeof closeAccountMenu === 'function') closeAccountMenu();
+  });
+
+  init();
 }
-
-if(typeof syncSakuraPetals === 'function'){
-  window.addEventListener('resize', syncSakuraPetals);
-}
-
-window.addEventListener('click', (e) => {
-  const target = e.target;
-  if(target instanceof Element && target.closest('.account-menu-panel, .account-avatar-btn, #app-modal-root')) return;
-  if(typeof closeAccountMenu === 'function') closeAccountMenu();
-});
-
-init();

@@ -29,7 +29,7 @@ grant execute on function public.is_household_member(text) to authenticated;
 create or replace function public.ensure_own_household_member(
   p_household_key text,
   p_household_name text default null,
-  p_theme_preference text default 'midnight'
+  p_theme_preference text default 'kuro'
 )
 returns table (household_key text, theme_preference text)
 language plpgsql
@@ -39,7 +39,10 @@ as $$
 declare
   resolved_household_key text := nullif(trim(p_household_key), '');
   resolved_household_name text := nullif(trim(coalesce(p_household_name, p_household_key)), '');
-  resolved_theme text := coalesce(nullif(trim(p_theme_preference), ''), 'midnight');
+  resolved_theme text := case
+    when nullif(trim(p_theme_preference), '') = 'midnight' then 'kuro'
+    else coalesce(nullif(trim(p_theme_preference), ''), 'kuro')
+  end;
   household_key_column text := null;
   has_household_name boolean := false;
   has_theme_preference boolean := false;
@@ -121,6 +124,24 @@ $$;
 
 revoke all on function public.ensure_own_household_member(text, text, text) from public;
 grant execute on function public.ensure_own_household_member(text, text, text) to authenticated;
+
+do $$
+begin
+  if exists (
+    select 1
+    from information_schema.columns
+    where table_schema = 'public'
+      and table_name = 'household_members'
+      and column_name = 'theme_preference'
+  ) then
+    alter table public.household_members
+      alter column theme_preference set default 'kuro';
+
+    update public.household_members
+    set theme_preference = 'kuro'
+    where theme_preference = 'midnight';
+  end if;
+end $$;
 
 do $$
 declare

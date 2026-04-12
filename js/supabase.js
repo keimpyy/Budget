@@ -58,9 +58,9 @@ window.supabaseClient.auth.onAuthStateChange(async (event, session) => {
       console.error('Auth state sync mislukt:', e);
     }
   }else{
-    state.cloudThemePreference = 'midnight';
+    state.cloudThemePreference = DEFAULT_THEME;
     if(typeof applyTheme === 'function'){
-      applyTheme('midnight', { persist:false, skipCloudPersist:true });
+      applyTheme(DEFAULT_THEME, { persist:false, skipCloudPersist:true });
     }
   }
 
