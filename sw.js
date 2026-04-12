@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'budget-app-20260412c';
+const CACHE_VERSION = 'budget-app-20260412d';
 const APP_SHELL = [
   '/',
   '/index.html',
@@ -7,7 +7,7 @@ const APP_SHELL = [
   '/budget-icon-192.png',
   '/budget-icon-512.png',
   '/vendor/supabase-js.js?v=20260409b',
-  '/styles/app.css?v=20260412c',
+  '/styles/app.css?v=20260412d',
   '/styles/theme.css',
   '/styles/base.css',
   '/styles/components.css',
@@ -16,15 +16,15 @@ const APP_SHELL = [
   '/styles/loans.css',
   '/styles/settings.css',
   '/styles/modal.css',
-  '/js/state.js?v=20260412c',
-  '/js/storage.js?v=20260412c',
-  '/js/supabase.js?v=20260412c',
-  '/js/ui.js?v=20260412c',
-  '/js/dashboard.js?v=20260412c',
-  '/js/budget.js?v=20260412c',
-  '/js/loans.js?v=20260412c',
-  '/js/settings.js?v=20260412c',
-  '/js/app.js?v=20260412c'
+  '/js/state.js?v=20260412d',
+  '/js/storage.js?v=20260412d',
+  '/js/supabase.js?v=20260412d',
+  '/js/ui.js?v=20260412d',
+  '/js/dashboard.js?v=20260412d',
+  '/js/budget.js?v=20260412d',
+  '/js/loans.js?v=20260412d',
+  '/js/settings.js?v=20260412d',
+  '/js/app.js?v=20260412d'
 ];
 
 self.addEventListener('install', event => {

@@ -71,7 +71,7 @@ async function showInstallHelp(){
   }
 
   if(isIos){
-    alert('Op iPhone: tik op de deelknop in Safari en kies "Zet op beginscherm".');
+    alert('Op iPhone of iPad: tik op de deelknop in je browser en kies "Zet op beginscherm" of "Add to Home Screen".');
     return;
   }
 
