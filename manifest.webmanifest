@@ -1,0 +1,59 @@
+{
+  "name": "Budget",
+  "short_name": "Budget",
+  "description": "Budget en huishoudfinancien bijhouden.",
+  "id": "/",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui", "browser"],
+  "orientation": "portrait",
+  "background_color": "#050606",
+  "theme_color": "#050606",
+  "categories": ["finance", "productivity"],
+  "icons": [
+    {
+      "src": "/budget-icon-180.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/budget-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/budget-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "url": "/?source=pwa#dashboard",
+      "icons": [
+        {
+          "src": "/budget-icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Budget",
+      "short_name": "Budget",
+      "url": "/?source=pwa#budget",
+      "icons": [
+        {
+          "src": "/budget-icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
+}

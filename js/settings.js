@@ -142,6 +142,16 @@ function renderInstellingen(){
           </span>
           <span class="settings-value">Actief</span>
         </div>
+        <button class="settings-row settings-row-button" onclick="showInstallHelp()">
+          <span class="settings-row-main">
+            <span class="settings-row-label">Installeren op dit apparaat</span>
+            <span class="settings-row-note">Zet Budget op je beginscherm voor sneller openen.</span>
+          </span>
+          <span class="settings-row-side">
+            <span class="settings-value">Open</span>
+            <span class="settings-chevron">â€º</span>
+          </span>
+        </button>
         <button class="btn secondary settings-back-btn" onclick="closeSettings()">Terug</button>
       </div>
     </div>

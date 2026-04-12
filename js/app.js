@@ -32,6 +32,51 @@ function refreshOnceForNewAppVersion(){
 }
 
 const appRefreshInProgress = refreshOnceForNewAppVersion();
+let deferredInstallPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (event) => {
+  event.preventDefault();
+  deferredInstallPrompt = event;
+});
+
+window.addEventListener('appinstalled', () => {
+  deferredInstallPrompt = null;
+});
+
+function registerServiceWorker(){
+  if(!('serviceWorker' in navigator)) return;
+  if(!window.isSecureContext && window.location.hostname !== 'localhost') return;
+
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(error => {
+      console.error('Service worker registratie mislukt:', error);
+    });
+  });
+}
+
+async function showInstallHelp(){
+  if(deferredInstallPrompt){
+    deferredInstallPrompt.prompt();
+    await deferredInstallPrompt.userChoice;
+    deferredInstallPrompt = null;
+    return;
+  }
+
+  const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent || '');
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
+  if(isStandalone){
+    alert('Budget staat al als app op dit apparaat.');
+    return;
+  }
+
+  if(isIos){
+    alert('Op iPhone: tik op de deelknop in Safari en kies "Zet op beginscherm".');
+    return;
+  }
+
+  alert('Open het browsermenu en kies "App installeren" of "Toevoegen aan startscherm".');
+}
 
 function setStartupProgress(progress, status){
   state.startupProgress = Math.max(0, Math.min(100, Number(progress || 0)));
@@ -124,6 +169,7 @@ async function init(){
 }
 
 if(!appRefreshInProgress){
+  registerServiceWorker();
   loadTheme();
 
   if(typeof renderHeaderActions === 'function'){

@@ -1,0 +1,81 @@
+const CACHE_VERSION = 'budget-app-20260412b';
+const APP_SHELL = [
+  '/',
+  '/index.html',
+  '/manifest.webmanifest',
+  '/budget-icon-180.png',
+  '/budget-icon-192.png',
+  '/budget-icon-512.png',
+  '/vendor/supabase-js.js?v=20260409b',
+  '/styles/app.css?v=20260412b',
+  '/styles/theme.css',
+  '/styles/base.css',
+  '/styles/components.css',
+  '/styles/dashboard.css',
+  '/styles/budget.css',
+  '/styles/loans.css',
+  '/styles/settings.css',
+  '/styles/modal.css',
+  '/js/state.js?v=20260412b',
+  '/js/storage.js?v=20260412b',
+  '/js/supabase.js?v=20260412b',
+  '/js/ui.js?v=20260412b',
+  '/js/dashboard.js?v=20260412b',
+  '/js/budget.js?v=20260412b',
+  '/js/loans.js?v=20260412b',
+  '/js/settings.js?v=20260412b',
+  '/js/app.js?v=20260412b'
+];
+
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_VERSION)
+      .then(cache => cache.addAll(APP_SHELL))
+      .then(() => self.skipWaiting())
+  );
+});
+
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys()
+      .then(keys => Promise.all(
+        keys
+          .filter(key => key !== CACHE_VERSION)
+          .map(key => caches.delete(key))
+      ))
+      .then(() => self.clients.claim())
+  );
+});
+
+self.addEventListener('fetch', event => {
+  const request = event.request;
+  const url = new URL(request.url);
+
+  if(request.method !== 'GET' || url.origin !== self.location.origin){
+    return;
+  }
+
+  if(request.mode === 'navigate'){
+    event.respondWith(
+      fetch(request)
+        .then(response => {
+          const copy = response.clone();
+          caches.open(CACHE_VERSION).then(cache => cache.put('/index.html', copy));
+          return response;
+        })
+        .catch(() => caches.match('/index.html'))
+    );
+    return;
+  }
+
+  event.respondWith(
+    caches.match(request)
+      .then(cached => cached || fetch(request).then(response => {
+        if(response && response.ok){
+          const copy = response.clone();
+          caches.open(CACHE_VERSION).then(cache => cache.put(request, copy));
+        }
+        return response;
+      }))
+  );
+});
