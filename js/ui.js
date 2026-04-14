@@ -128,6 +128,7 @@ function go(name, btn, options = {}){
   if(name === 'dashboard') renderDashboard();
   if(name === 'budget') renderBudget();
   if(name === 'leningen') renderLeningen();
+  if(name === 'sparen') renderSparen();
   if(name === 'instellingen') renderInstellingen();
 
   const nextEl = document.getElementById('v-' + name);
