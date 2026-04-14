@@ -261,8 +261,7 @@ function renderHeaderActions(){
 
   const signedIn = typeof isCloudSignedIn === 'function' ? isCloudSignedIn() : false;
   const currentTheme = normalizeThemePreference(document.body.getAttribute('data-theme'));
-  const loadLabel = state.cloudLoading ? 'Ophalen...' : 'Ophalen';
-  const signOutLabel = state.cloudSigningOut ? 'Uitloggen...' : 'Uitloggen';
+  const themeLabel = getThemeLabel(currentTheme);
   const loadProgress = Math.max(0, Math.min(100, Number(state.cloudLoadProgress || 0)));
   const loadStep = escapeHtml(state.cloudLoadStep || 'Bezig met laden...');
 
@@ -278,23 +277,41 @@ function renderHeaderActions(){
             <div class="account-menu-panel" role="dialog" aria-modal="true" aria-label="Account menu" onclick="event.stopPropagation()">
               <button class="account-menu-close" type="button" onclick="closeAccountMenu()" aria-label="Sluit account menu">×</button>
               <div class="account-menu-handle" aria-hidden="true"></div>
+
               <div class="account-menu-head">
                 <div class="account-menu-kicker">Ingelogd</div>
                 <div class="account-menu-email mono">${escapeHtml(state.cloudUserEmail || '')}</div>
               </div>
-              <div class="account-menu-group">
-                <div class="account-menu-label">Thema</div>
-                <div class="account-theme-row account-theme-row--4">
-                  <button class="account-theme-chip ${currentTheme==='donker'?'active':''}" onclick="setAccountTheme('donker')">Donker</button>
-                  <button class="account-theme-chip ${currentTheme==='wit'?'active':''}" onclick="setAccountTheme('wit')">Wit</button>
-                  <button class="account-theme-chip ${currentTheme==='sakura'?'active':''}" onclick="setAccountTheme('sakura')">Sakura</button>
-                  <button class="account-theme-chip ${currentTheme==='vuur'?'active':''}" onclick="setAccountTheme('vuur')">Vuur</button>
-                </div>
+
+              <div class="account-action-list">
+                <button class="account-action-row" onclick="loadFromCloud()" ${state.cloudLoading ? 'disabled' : ''}>
+                  <span class="account-action-left">
+                    <span class="account-action-icon">&#8635;</span>
+                    <span>${state.cloudLoading ? 'Ophalen...' : 'Ophalen'}</span>
+                  </span>
+                  ${!state.cloudLoading ? '<span class="account-action-chevron">&#8250;</span>' : ''}
+                </button>
+
+                <button class="account-action-row" onclick="closeAccountMenu();openThema()">
+                  <span class="account-action-left">
+                    <span class="account-action-icon">&#9673;</span>
+                    <span>Thema</span>
+                  </span>
+                  <span class="account-action-right">
+                    <span class="account-action-value">${themeLabel}</span>
+                    <span class="account-action-chevron">&#8250;</span>
+                  </span>
+                </button>
+
+                <button class="account-action-row" onclick="closeAccountMenu();openSettings()">
+                  <span class="account-action-left">
+                    <span class="account-action-icon">&#9881;</span>
+                    <span>Instellingen</span>
+                  </span>
+                  <span class="account-action-chevron">&#8250;</span>
+                </button>
               </div>
-              <div class="account-menu-actions">
-                <button class="btn secondary btn.sm" onclick="loadFromCloud()" ${state.cloudLoading ? 'disabled' : ''}>${loadLabel}</button>
-                <button class="btn secondary btn.sm" onclick="signOutFromCloud()" ${state.cloudSigningOut ? 'disabled' : ''}>${signOutLabel}</button>
-              </div>
+
               ${state.cloudLoading ? `
                 <div class="account-menu-sync">
                   <div class="account-menu-sync__top">
@@ -306,13 +323,17 @@ function renderHeaderActions(){
                   </div>
                 </div>
               ` : ''}
+
+              <button class="account-action-signout" onclick="signOutFromCloud()" ${state.cloudSigningOut ? 'disabled' : ''}>
+                ${state.cloudSigningOut ? 'Uitloggen...' : 'Uitloggen'}
+              </button>
             </div>
           ` : ''}
         </div>
       ` : `
         <button class="badge-btn" onclick="openLoginModal()">Inloggen</button>
+        <button class="settings-icon-btn" onclick="openSettings()" aria-label="Instellingen" title="Instellingen">&#9881;</button>
       `}
-      <button class="settings-icon-btn" onclick="openSettings()" aria-label="Instellingen" title="Instellingen">&#9881;</button>
     </div>
   `;
 
