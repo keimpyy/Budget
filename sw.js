@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'budget-app-20260414h';
+const CACHE_VERSION = 'budget-app-20260414i';
 const APP_SHELL = [
   '/',
   '/index.html',
@@ -7,7 +7,7 @@ const APP_SHELL = [
   '/budget-icon-192.png',
   '/budget-icon-512.png',
   '/vendor/supabase-js.js?v=20260409b',
-  '/styles/app.css?v=20260414h',
+  '/styles/app.css?v=20260414i',
   '/styles/theme.css',
   '/styles/base.css',
   '/styles/components.css',
@@ -17,15 +17,15 @@ const APP_SHELL = [
   '/styles/sparen.css',
   '/styles/settings.css',
   '/styles/modal.css',
-  '/js/state.js?v=20260414h',
+  '/js/state.js?v=20260414i',
   '/js/storage.js?v=20260414c',
   '/js/supabase.js?v=20260412d',
-  '/js/ui.js?v=20260414h',
+  '/js/ui.js?v=20260414i',
   '/js/dashboard.js?v=20260414e',
   '/js/budget.js?v=20260412d',
   '/js/loans.js?v=20260412d',
   '/js/sparen.js?v=20260414c',
-  '/js/settings.js?v=20260414h',
+  '/js/settings.js?v=20260414i',
   '/js/app.js?v=20260412d'
 ];
 

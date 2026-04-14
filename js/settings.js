@@ -1,22 +1,22 @@
 const THEME_COLORS = {
-  kuro: '#0a0a0f',
+  donker: '#0a0a0f',
+  wit: '#f4f4fa',
   sakura: '#0f0a11',
-  neon: '#f4f4fa',
   vuur: '#060304'
 };
 
-const ALLOWED_THEMES = new Set(['kuro', 'sakura', 'neon', 'vuur']);
+const ALLOWED_THEMES = new Set(['donker', 'wit', 'sakura', 'vuur']);
 
 function updateThemeMeta(theme){
   const meta = document.querySelector('meta[name="theme-color"]');
   const resolved = normalizeThemePreference(theme);
-  if(meta) meta.setAttribute('content', THEME_COLORS[resolved] || THEME_COLORS[DEFAULT_THEME]);
+  if(meta) meta.setAttribute('content', THEME_COLORS[resolved] || THEME_COLORS['donker']);
 }
 
 function getThemeLabel(theme){
   const resolved = normalizeThemePreference(theme);
-  if(resolved === 'kuro') return 'Donker';
-  if(resolved === 'neon') return 'Wit';
+  if(resolved === 'donker') return 'Donker';
+  if(resolved === 'wit') return 'Wit';
   if(resolved === 'vuur') return 'Vuur';
   return 'Sakura';
 }
@@ -80,7 +80,13 @@ function applyTheme(theme, options = {}){
 }
 
 function loadTheme(){
-  applyTheme(state.cloudThemePreference || DEFAULT_THEME, { persist:false, skipCloudPersist:true });
+  const stored = state.cloudThemePreference || DEFAULT_THEME;
+  const resolved = normalizeThemePreference(stored);
+  applyTheme(resolved, { persist:false, skipCloudPersist:true });
+  // Auto-migrate old theme keys (kuro→donker, neon→wit) in Supabase
+  if(stored !== resolved && typeof isCloudSignedIn === 'function' && isCloudSignedIn() && typeof saveThemePreference === 'function'){
+    saveThemePreference(resolved).catch(() => {});
+  }
 }
 
 function renderInstellingen(){
@@ -160,8 +166,8 @@ function renderThema(){
         <div class="settings-group-title">Beschikbare thema's</div>
 
         <div class="theme-picker" role="listbox" aria-label="Thema keuze">
-          <button class="theme-tile ${currentTheme==='kuro'?'active':''}" data-theme="kuro" onclick="applyTheme('kuro')" aria-selected="${currentTheme==='kuro'}">
-            <span class="theme-swatch theme-swatch-kuro"></span>
+          <button class="theme-tile ${currentTheme==='donker'?'active':''}" data-theme="donker" onclick="applyTheme('donker')" aria-selected="${currentTheme==='donker'}">
+            <span class="theme-swatch theme-swatch-donker"></span>
             <span class="theme-copy">
               <span class="theme-name">Donker</span>
               <span class="theme-note">Strak zwart, indigo accent, rustig</span>
@@ -169,8 +175,8 @@ function renderThema(){
             <span class="theme-check">✓</span>
           </button>
 
-          <button class="theme-tile ${currentTheme==='neon'?'active':''}" data-theme="neon" onclick="applyTheme('neon')" aria-selected="${currentTheme==='neon'}">
-            <span class="theme-swatch theme-swatch-neon"></span>
+          <button class="theme-tile ${currentTheme==='wit'?'active':''}" data-theme="wit" onclick="applyTheme('wit')" aria-selected="${currentTheme==='wit'}">
+            <span class="theme-swatch theme-swatch-wit"></span>
             <span class="theme-copy">
               <span class="theme-name">Wit</span>
               <span class="theme-note">Helder wit, clean en fris</span>
@@ -206,7 +212,7 @@ function renderThema(){
 }
 
 function cycleTheme(){
-  const order = ['kuro', 'neon', 'sakura', 'vuur'];
+  const order = ['donker', 'wit', 'sakura', 'vuur'];
   const current = normalizeThemePreference(document.body.getAttribute('data-theme'));
   const idx = order.indexOf(current);
   applyTheme(order[(idx + 1) % order.length]);
@@ -279,8 +285,8 @@ function renderHeaderActions(){
               <div class="account-menu-group">
                 <div class="account-menu-label">Thema</div>
                 <div class="account-theme-row account-theme-row--4">
-                  <button class="account-theme-chip ${currentTheme==='kuro'?'active':''}" onclick="setAccountTheme('kuro')">Donker</button>
-                  <button class="account-theme-chip ${currentTheme==='neon'?'active':''}" onclick="setAccountTheme('neon')">Wit</button>
+                  <button class="account-theme-chip ${currentTheme==='donker'?'active':''}" onclick="setAccountTheme('donker')">Donker</button>
+                  <button class="account-theme-chip ${currentTheme==='wit'?'active':''}" onclick="setAccountTheme('wit')">Wit</button>
                   <button class="account-theme-chip ${currentTheme==='sakura'?'active':''}" onclick="setAccountTheme('sakura')">Sakura</button>
                   <button class="account-theme-chip ${currentTheme==='vuur'?'active':''}" onclick="setAccountTheme('vuur')">Vuur</button>
                 </div>
