@@ -567,7 +567,7 @@ function normalizeData(){
     volgorde: Number(row.volgorde || (idx + 1))
   }));
 
-  state.sparen = state.sparen.map((row, idx) => ({
+  state.sparen = (state.sparen || []).map((row, idx) => ({
     id: String(row.id || uid('sp')),
     naam: String(row.naam || 'Nieuw spaardoel'),
     doel: Number(row.doel || 0),
@@ -679,6 +679,7 @@ function applyCloudData(data, options = {}){
     }));
   }
 
+  if(!Array.isArray(state.sparen)) state.sparen = [];
   normalizeData();
   if(!options.skipLocalPersist){
     persistLocal();

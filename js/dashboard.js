@@ -6,8 +6,9 @@ function renderDashboard(){
   const sorted = cats.slice().sort((a,b)=>totalForCategory(b.id)-totalForCategory(a.id));
   const top3 = sorted.slice(0,3);
 
-  const totaalGespaart = state.sparen.reduce((acc, g) => acc + Number(g.gespaart || 0), 0);
-  const totaalDoel = state.sparen.reduce((acc, g) => acc + Number(g.doel || 0), 0);
+  const goals = state.sparen || [];
+  const totaalGespaart = goals.reduce((acc, g) => acc + Number(g.gespaart || 0), 0);
+  const totaalDoel = goals.reduce((acc, g) => acc + Number(g.doel || 0), 0);
   const sparenTab = [...document.querySelectorAll('.tab')].find(b => b.textContent.trim().toLowerCase() === 'sparen');
 
   document.getElementById('v-dashboard').innerHTML = `
@@ -39,10 +40,10 @@ function renderDashboard(){
       <div class="sq-note">${o >= 0 ? 'Je houdt geld over' : 'Je budget is hoger dan je inkomen'}</div>
     </div>
 
-    ${state.sparen.length > 0 ? `
+    ${goals.length > 0 ? `
       <div class="sec">Spaardoelen</div>
       <div class="dash-sparen-wrap">
-        ${state.sparen.map(g => {
+        ${goals.map(g => {
           const pct = Number(g.doel || 0)
             ? Math.min(100, (Number(g.gespaart || 0) / Number(g.doel || 0)) * 100)
             : 0;

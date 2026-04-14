@@ -1,4 +1,5 @@
 function renderSparen(){
+  if(!Array.isArray(state.sparen)) state.sparen = [];
   const totaalGespaart = state.sparen.reduce((s,g) => s + Number(g.gespaart || 0), 0);
   const totaalDoel = state.sparen.reduce((s,g) => s + Number(g.doel || 0), 0);
   const totaalNogTeGaan = Math.max(0, totaalDoel - totaalGespaart);
