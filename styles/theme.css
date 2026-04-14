@@ -35,44 +35,44 @@ body[data-theme="sakura"]{
     0 0 18px rgba(255,121,176,.08);
 }
 
-/* Theme 2: Ronin Ember */
+/* Theme 2: Cosmos */
 body[data-theme="neon"]{
-  --bg:#0a0706;
-  --surface:#15110f;
-  --surface2:#1d1612;
-  --surface3:#281b15;
-  --border:rgba(255,198,126,0.12);
-  --text:#fff7ec;
-  --muted:#c8aa91;
-  --accent:#d9412e;
-  --accent2:#f3b256;
-  --green:#5fe0a2;
-  --red:#ff5a45;
-  --amber:#f3b256;
+  --bg:#04020c;
+  --surface:#0e0820;
+  --surface2:#160f30;
+  --surface3:#1e1542;
+  --border:rgba(150,80,255,0.12);
+  --text:#f0eaff;
+  --muted:#8060b0;
+  --accent:#9040ff;
+  --accent2:#ff40ee;
+  --green:#40ffc0;
+  --red:#ff3d6e;
+  --amber:#ffb340;
   --shadow:
-    0 14px 30px rgba(0,0,0,.28),
-    0 0 20px rgba(217,65,46,.08);
+    0 14px 30px rgba(0,0,0,.32),
+    0 0 22px rgba(144,64,255,.09);
 }
 
-/* Theme 3: Kuro Steel */
+/* Theme 3: Cyber */
 body:not([data-theme]),
 body[data-theme="kuro"],
 body[data-theme="midnight"]{
-  --bg:#050606;
-  --surface:#0d0f0e;
-  --surface2:#151816;
-  --surface3:#20251f;
-  --border:rgba(218,233,225,0.1);
-  --text:#f4f7f2;
-  --muted:#9aa69e;
-  --accent:#c7d7cf;
-  --accent2:#a5101b;
-  --green:#49d391;
-  --red:#e1464f;
-  --amber:#e6c56f;
+  --bg:#020509;
+  --surface:#060d16;
+  --surface2:#0b1724;
+  --surface3:#10202e;
+  --border:rgba(0,200,255,0.1);
+  --text:#d8f0ff;
+  --muted:#4d7e9a;
+  --accent:#00c8ff;
+  --accent2:#0066ff;
+  --green:#00ffa3;
+  --red:#ff2255;
+  --amber:#ffb300;
   --shadow:
-    0 12px 28px rgba(0,0,0,.26),
-    0 0 18px rgba(165,16,27,.07);
+    0 12px 28px rgba(0,0,0,.3),
+    0 0 20px rgba(0,200,255,.07);
 }
 
 /* Theme-specific UI polish */
@@ -110,44 +110,48 @@ body[data-theme="sakura"] .card{
     0 0 12px rgba(255,121,176,.05);
 }
 
+/* Cosmos UI polish */
 body[data-theme="neon"] .btn{
-  background:linear-gradient(135deg,#a5101b,#d9412e 56%,#f3b256);
-  box-shadow:0 5px 20px rgba(217,65,46,.28);
+  background:linear-gradient(135deg,#9040ff,#cc30dd,#ff40ee);
+  box-shadow:0 5px 20px rgba(144,64,255,.38);
 }
 
 body[data-theme="neon"] .fill,
 body[data-theme="neon"] .budget-progress__fill,
 body[data-theme="neon"] .prog-fill,
 body[data-theme="neon"] .alloc-fill{
-  background:linear-gradient(90deg,#a5101b,#d9412e,#f3b256);
+  background:linear-gradient(90deg,#9040ff,#ff40ee,#40ffc0);
 }
 
 body[data-theme="neon"] .hero-amount.pos,
 body[data-theme="neon"] .hero-amount.neg{
-  background:none;
-  -webkit-background-clip:initial;
-  background-clip:initial;
-  color:#f3b256;
-  text-shadow:0 0 18px rgba(217,65,46,.2);
-}
-
-body[data-theme="neon"] .hero-amount.neg{
-  color:#ff5a45;
-}
-
-body[data-theme="neon"] .loan-hero-pct,
-body[data-theme="neon"] .loan-percent-badge{
-  background:linear-gradient(90deg,#a5101b,#d9412e,#f3b256);
+  background:linear-gradient(90deg,#9040ff,#cc30dd,#ff40ee);
   -webkit-background-clip:text;
   background-clip:text;
   color:transparent;
 }
 
+body[data-theme="neon"] .loan-hero-pct,
+body[data-theme="neon"] .loan-percent-badge,
+body[data-theme="neon"] .sparen-hero-amount{
+  background:linear-gradient(90deg,#9040ff,#ff40ee);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+
+body[data-theme="neon"] .card{
+  box-shadow:
+    0 10px 22px rgba(0,0,0,.22),
+    0 0 14px rgba(144,64,255,.06);
+}
+
+/* Cyber UI polish */
 body[data-theme="kuro"] .btn,
 body[data-theme="midnight"] .btn,
 body:not([data-theme]) .btn{
-  background:linear-gradient(135deg,#f4f7f2,#a5101b);
-  box-shadow:0 5px 20px rgba(165,16,27,.22);
+  background:linear-gradient(135deg,#00c8ff,#0066ff);
+  box-shadow:0 5px 20px rgba(0,200,255,.32);
 }
 
 body[data-theme="kuro"] .fill,
@@ -162,7 +166,7 @@ body:not([data-theme]) .fill,
 body:not([data-theme]) .budget-progress__fill,
 body:not([data-theme]) .prog-fill,
 body:not([data-theme]) .alloc-fill{
-  background:linear-gradient(90deg,#f4f7f2,#c7d7cf,#a5101b);
+  background:linear-gradient(90deg,#00c8ff,#0066ff,#00ffa3);
 }
 
 body[data-theme="kuro"] .hero-amount.pos,
@@ -171,7 +175,7 @@ body[data-theme="midnight"] .hero-amount.pos,
 body[data-theme="midnight"] .hero-amount.neg,
 body:not([data-theme]) .hero-amount.pos,
 body:not([data-theme]) .hero-amount.neg{
-  background:linear-gradient(90deg,#f4f7f2,#c7d7cf,#a5101b);
+  background:linear-gradient(90deg,#00c8ff,#0066ff);
   -webkit-background-clip:text;
   background-clip:text;
   color:transparent;
@@ -179,14 +183,25 @@ body:not([data-theme]) .hero-amount.neg{
 
 body[data-theme="kuro"] .loan-hero-pct,
 body[data-theme="kuro"] .loan-percent-badge,
+body[data-theme="kuro"] .sparen-hero-amount,
 body[data-theme="midnight"] .loan-hero-pct,
 body[data-theme="midnight"] .loan-percent-badge,
+body[data-theme="midnight"] .sparen-hero-amount,
 body:not([data-theme]) .loan-hero-pct,
-body:not([data-theme]) .loan-percent-badge{
-  background:linear-gradient(90deg,#f4f7f2,#c7d7cf,#a5101b);
+body:not([data-theme]) .loan-percent-badge,
+body:not([data-theme]) .sparen-hero-amount{
+  background:linear-gradient(90deg,#00c8ff,#0066ff);
   -webkit-background-clip:text;
   background-clip:text;
   color:transparent;
+}
+
+body[data-theme="kuro"] .card,
+body[data-theme="midnight"] .card,
+body:not([data-theme]) .card{
+  box-shadow:
+    0 10px 22px rgba(0,0,0,.22),
+    0 0 14px rgba(0,200,255,.04);
 }
 
 /* Theme atmosphere */
@@ -222,29 +237,31 @@ body:not([data-theme]) .loan-percent-badge{
   animation-iteration-count:infinite, infinite;
 }
 
+/* Cyber: electric data stream */
 .theme-particle-kuro,
 .theme-particle-midnight{
-  width:190px;
+  width:220px;
   height:1px;
   border-radius:999px;
-  background:linear-gradient(90deg, transparent, rgba(244,247,242,.88), rgba(165,16,27,.52), transparent);
+  background:linear-gradient(90deg, transparent, rgba(0,200,255,.9), rgba(0,102,255,.7), transparent);
   box-shadow:
-    0 0 12px rgba(244,247,242,.16),
-    0 0 24px rgba(165,16,27,.12);
-  opacity:.34;
+    0 0 10px rgba(0,200,255,.35),
+    0 0 22px rgba(0,102,255,.2);
+  opacity:.38;
   animation-name:katanaSheen, bladeFlicker;
   animation-timing-function:linear, ease-in-out;
   animation-iteration-count:infinite, infinite;
 }
 
+/* Cosmos: violet nebula drift */
 .theme-particle-ronin-mist{
-  width:280px;
-  height:58px;
+  width:320px;
+  height:80px;
   border-radius:999px;
   background:
-    radial-gradient(ellipse at 50% 50%, rgba(255,247,236,.15) 0 12%, rgba(243,178,86,.08) 28%, rgba(217,65,46,.05) 48%, transparent 72%);
-  filter:blur(18px);
-  opacity:.22;
+    radial-gradient(ellipse at 50% 50%, rgba(170,80,255,.2) 0 14%, rgba(255,64,238,.1) 32%, rgba(144,64,255,.06) 52%, transparent 74%);
+  filter:blur(22px);
+  opacity:.3;
   animation:moonlitMist linear infinite;
 }
 

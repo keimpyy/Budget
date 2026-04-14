@@ -1,6 +1,6 @@
 const SUPABASE_URL = 'https://jxihwwdnowvwgzpgviab.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_2dWE27Su68lB3zFIVZRs_A_mFMd7haz';
-const APP_VERSION = '20260414a';
+const APP_VERSION = '20260414f';
 const DEFAULT_THEME = 'kuro';
 
 function normalizeThemePreference(theme){

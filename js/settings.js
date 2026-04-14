@@ -1,7 +1,7 @@
 const THEME_COLORS = {
-  kuro: '#050606',
-  sakura: '#140d15',
-  neon: '#0a0706'
+  kuro: '#020509',
+  sakura: '#0f0a11',
+  neon: '#04020c'
 };
 
 const ALLOWED_THEMES = new Set(['kuro', 'sakura', 'neon']);
@@ -14,9 +14,9 @@ function updateThemeMeta(theme){
 
 function getThemeLabel(theme){
   const resolved = normalizeThemePreference(theme);
-  if(resolved === 'kuro') return 'Kuro Steel';
-  if(resolved === 'neon') return 'Ronin Ember';
-  return 'Sakura v2';
+  if(resolved === 'kuro') return 'Cyber';
+  if(resolved === 'neon') return 'Cosmos';
+  return 'Sakura';
 }
 
 function syncThemeSelection(theme){
@@ -107,8 +107,8 @@ function renderInstellingen(){
           <button class="theme-tile ${currentTheme==='kuro'?'active':''}" data-theme="kuro" onclick="applyTheme('kuro')" aria-selected="${currentTheme==='kuro'}">
             <span class="theme-swatch theme-swatch-kuro"></span>
             <span class="theme-copy">
-              <span class="theme-name">Kuro Steel</span>
-              <span class="theme-note">Black steel, blade rain, red edge</span>
+              <span class="theme-name">Cyber</span>
+              <span class="theme-note">Electric blue, data streams, high tech</span>
             </span>
             <span class="theme-check">✓</span>
           </button>
@@ -116,8 +116,8 @@ function renderInstellingen(){
           <button class="theme-tile ${currentTheme==='neon'?'active':''}" data-theme="neon" onclick="applyTheme('neon')" aria-selected="${currentTheme==='neon'}">
             <span class="theme-swatch theme-swatch-neon"></span>
             <span class="theme-copy">
-              <span class="theme-name">Ronin Ember</span>
-              <span class="theme-note">Crimson, ember drift, battle heat</span>
+              <span class="theme-name">Cosmos</span>
+              <span class="theme-note">Deep space, violet nebula, cosmic glow</span>
             </span>
             <span class="theme-check">✓</span>
           </button>
@@ -125,7 +125,7 @@ function renderInstellingen(){
           <button class="theme-tile ${currentTheme==='sakura'?'active':''}" data-theme="sakura" onclick="applyTheme('sakura')" aria-selected="${currentTheme==='sakura'}">
             <span class="theme-swatch theme-swatch-sakura"></span>
             <span class="theme-copy">
-              <span class="theme-name">Sakura v2</span>
+              <span class="theme-name">Sakura</span>
               <span class="theme-note">Donker, blossom glow, luxe</span>
             </span>
             <span class="theme-check">✓</span>
@@ -232,8 +232,8 @@ function renderHeaderActions(){
               <div class="account-menu-group">
                 <div class="account-menu-label">Theme</div>
                 <div class="account-theme-row">
-                  <button class="account-theme-chip ${currentTheme==='kuro'?'active':''}" onclick="setAccountTheme('kuro')">Kuro</button>
-                  <button class="account-theme-chip ${currentTheme==='neon'?'active':''}" onclick="setAccountTheme('neon')">Ronin</button>
+                  <button class="account-theme-chip ${currentTheme==='kuro'?'active':''}" onclick="setAccountTheme('kuro')">Cyber</button>
+                  <button class="account-theme-chip ${currentTheme==='neon'?'active':''}" onclick="setAccountTheme('neon')">Cosmos</button>
                   <button class="account-theme-chip ${currentTheme==='sakura'?'active':''}" onclick="setAccountTheme('sakura')">Sakura</button>
                 </div>
               </div>
