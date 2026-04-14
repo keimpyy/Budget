@@ -6,6 +6,10 @@ function renderDashboard(){
   const sorted = cats.slice().sort((a,b)=>totalForCategory(b.id)-totalForCategory(a.id));
   const top3 = sorted.slice(0,3);
 
+  const totaalGespaart = state.sparen.reduce((acc, g) => acc + Number(g.gespaart || 0), 0);
+  const totaalDoel = state.sparen.reduce((acc, g) => acc + Number(g.doel || 0), 0);
+  const sparenTab = [...document.querySelectorAll('.tab')].find(b => b.textContent.trim().toLowerCase() === 'sparen');
+
   document.getElementById('v-dashboard').innerHTML = `
     <div class="hero">
       <div class="hero-label">MAANDELIJKS RESULTAAT</div>
@@ -19,6 +23,10 @@ function renderDashboard(){
           <div class="hero-sub-label">BUDGET</div>
           <div class="hero-sub-val" style="color:var(--text)">${fmtShort(total)}</div>
         </div>
+        <div>
+          <div class="hero-sub-label">GESPAARD</div>
+          <div class="hero-sub-val" style="color:var(--green)">${fmtShort(totaalGespaart)}</div>
+        </div>
       </div>
     </div>
 
@@ -30,6 +38,39 @@ function renderDashboard(){
       <div class="track"><div class="fill" style="width:${Math.min(100, Math.max(0, s))}%"></div></div>
       <div class="sq-note">${o >= 0 ? 'Je houdt geld over' : 'Je budget is hoger dan je inkomen'}</div>
     </div>
+
+    ${state.sparen.length > 0 ? `
+      <div class="sec">Spaardoelen</div>
+      <div class="dash-sparen-wrap">
+        ${state.sparen.map(g => {
+          const pct = Number(g.doel || 0)
+            ? Math.min(100, (Number(g.gespaart || 0) / Number(g.doel || 0)) * 100)
+            : 0;
+          const isVoltooid = Number(g.doel || 0) > 0 && Number(g.gespaart || 0) >= Number(g.doel || 0);
+          return `
+            <div class="dash-sparen-row">
+              <div class="dash-sparen-top">
+                <div class="dash-sparen-name">${isVoltooid ? '✓ ' : ''}${escapeHtml(g.naam)}</div>
+                <div class="dash-sparen-pct${isVoltooid ? ' dash-sparen-pct--done' : ''}">${pct.toFixed(0)}%</div>
+              </div>
+              <div class="track dash-sparen-track">
+                <div class="fill dash-sparen-fill" style="width:${pct}%"></div>
+              </div>
+              <div class="dash-sparen-meta">
+                <span>${fmt(Number(g.gespaart || 0))}</span>
+                <span>${fmt(Number(g.doel || 0))}</span>
+              </div>
+            </div>
+          `;
+        }).join('')}
+        ${totaalDoel > 0 ? `
+          <div class="dash-sparen-total">
+            <span>Totaal ${Math.min(100, totaalDoel ? (totaalGespaart/totaalDoel*100) : 0).toFixed(0)}% gespaard</span>
+            <button class="dash-sparen-link" onclick="openDashboardSparen()">Bekijk doelen →</button>
+          </div>
+        ` : ''}
+      </div>
+    ` : ''}
 
     <div class="sec">Grootste uitgaven</div>
     <div class="dashboard-top3">
@@ -67,6 +108,13 @@ function renderDashboard(){
       </div>
     </div>
   `;
+}
+
+function openDashboardSparen(){
+  const sparenTab = [...document.querySelectorAll('.tab')].find(
+    btn => btn.textContent.trim().toLowerCase() === 'sparen'
+  );
+  go('sparen', sparenTab || null);
 }
 
 function openDashboardBudgetCategory(catId){
