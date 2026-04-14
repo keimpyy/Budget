@@ -9,32 +9,8 @@ body{
   background:var(--bg);
   color:var(--text);
   font-family:'Segoe UI',system-ui,sans-serif;
-  --nav-tilt:9deg;
-  --nav-shift:16px;
-  --nav-enter-duration:.26s;
-  --nav-exit-duration:.18s;
-}
-
-body[data-theme="sakura"]{
-  --nav-tilt:7deg;
-  --nav-shift:14px;
-  --nav-enter-duration:.3s;
-  --nav-exit-duration:.2s;
-}
-
-body[data-theme="neon"]{
-  --nav-tilt:10deg;
-  --nav-shift:18px;
-  --nav-enter-duration:.22s;
-  --nav-exit-duration:.16s;
-}
-
-body[data-theme="kuro"],
-body[data-theme="midnight"]{
-  --nav-tilt:8deg;
-  --nav-shift:16px;
-  --nav-enter-duration:.26s;
-  --nav-exit-duration:.18s;
+  --nav-enter-duration:.2s;
+  --nav-exit-duration:.13s;
 }
 
 .shell{
@@ -48,59 +24,29 @@ body[data-theme="midnight"]{
 .content{
   flex:1;
   padding:10px 20px calc(env(safe-area-inset-bottom,0px) + 40px);
-  perspective:1400px;
 }
 
 .view{display:none}
 .view.active{display:block}
 
-.view.anim-enter-right{display:block;transform-origin:left center;animation:pageFlipEnterFromRight var(--nav-enter-duration) cubic-bezier(.2,.8,.2,1) both}
-.view.anim-enter-left{display:block;transform-origin:right center;animation:pageFlipEnterFromLeft var(--nav-enter-duration) cubic-bezier(.2,.8,.2,1) both}
-.view.anim-exit-left{display:block;transform-origin:left center;animation:pageFlipExitToLeft var(--nav-exit-duration) cubic-bezier(.3,.7,.3,1) both}
-.view.anim-exit-right{display:block;transform-origin:right center;animation:pageFlipExitToRight var(--nav-exit-duration) cubic-bezier(.3,.7,.3,1) both}
+.view.anim-enter-right{display:block;animation:viewSlideInRight var(--nav-enter-duration) cubic-bezier(.22,1,.36,1) both}
+.view.anim-enter-left{display:block;animation:viewSlideInLeft var(--nav-enter-duration) cubic-bezier(.22,1,.36,1) both}
+.view.anim-exit-left{display:block;animation:viewFadeOut var(--nav-exit-duration) ease-in both;pointer-events:none}
+.view.anim-exit-right{display:block;animation:viewFadeOut var(--nav-exit-duration) ease-in both;pointer-events:none}
 
-@keyframes pageFlipEnterFromRight{
-  from{
-    opacity:0;
-    transform:translateX(var(--nav-shift)) rotateY(calc(var(--nav-tilt) * -1));
-  }
-  to{
-    opacity:1;
-    transform:translateX(0) rotateY(0);
-  }
+@keyframes viewSlideInRight{
+  from{opacity:.05;transform:translateX(22px)}
+  to{opacity:1;transform:translateX(0)}
 }
 
-@keyframes pageFlipEnterFromLeft{
-  from{
-    opacity:0;
-    transform:translateX(calc(var(--nav-shift) * -1)) rotateY(var(--nav-tilt));
-  }
-  to{
-    opacity:1;
-    transform:translateX(0) rotateY(0);
-  }
+@keyframes viewSlideInLeft{
+  from{opacity:.05;transform:translateX(-22px)}
+  to{opacity:1;transform:translateX(0)}
 }
 
-@keyframes pageFlipExitToLeft{
-  from{
-    opacity:1;
-    transform:translateX(0) rotateY(0);
-  }
-  to{
-    opacity:.18;
-    transform:translateX(calc(var(--nav-shift) * -0.6)) rotateY(calc(var(--nav-tilt) * .45));
-  }
-}
-
-@keyframes pageFlipExitToRight{
-  from{
-    opacity:1;
-    transform:translateX(0) rotateY(0);
-  }
-  to{
-    opacity:.18;
-    transform:translateX(calc(var(--nav-shift) * .6)) rotateY(calc(var(--nav-tilt) * -.45));
-  }
+@keyframes viewFadeOut{
+  from{opacity:1}
+  to{opacity:0}
 }
 
 .header{
