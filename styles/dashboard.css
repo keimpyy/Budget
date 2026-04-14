@@ -39,8 +39,6 @@
 .insight-line{font-size:14px;line-height:1.6}
 .insight-line strong{color:var(--text)}
 
-.sq-bar--link{cursor:pointer;width:100%;text-align:left;transition:border-color .18s ease}
-.sq-bar--link:hover{border-color:color-mix(in srgb,var(--accent) 36%,var(--border))}
 .sq-val--green{color:var(--green)}
 .sq-fill--green{background:linear-gradient(90deg,var(--accent),var(--green))}
 

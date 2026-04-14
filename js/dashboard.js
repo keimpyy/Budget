@@ -40,20 +40,25 @@ function renderDashboard(){
       <div class="sq-note">${o >= 0 ? 'Je houdt geld over' : 'Je budget is hoger dan je inkomen'}</div>
     </div>
 
-    ${goals.length > 0 ? (() => {
-      const overallPct = totaalDoel > 0 ? Math.min(100, (totaalGespaart / totaalDoel) * 100) : 0;
-      const voltooid = goals.filter(g => Number(g.doel||0) > 0 && Number(g.gespaart||0) >= Number(g.doel||0)).length;
-      return `
-        <button class="sq-bar sq-bar--link" onclick="openDashboardSparen()">
-          <div class="sq-top">
-            <span class="sq-label">Spaardoelen</span>
-            <span class="sq-val sq-val--green">${overallPct.toFixed(0)}%</span>
-          </div>
-          <div class="track"><div class="fill sq-fill--green" style="width:${overallPct}%"></div></div>
-          <div class="sq-note">${fmt(totaalGespaart)} gespaard van ${fmt(totaalDoel)}${voltooid > 0 ? ` · ${voltooid} ${voltooid === 1 ? 'doel' : 'doelen'} bereikt` : ''}</div>
-        </button>
-      `;
-    })() : ''}
+    ${goals.length > 0 ? `
+      <div class="sec">Spaardoelen</div>
+      <div class="dashboard-top3">
+        ${goals.map(g => {
+          const pct = Number(g.doel||0) ? Math.min(100, (Number(g.gespaart||0) / Number(g.doel||0)) * 100) : 0;
+          const isVoltooid = Number(g.doel||0) > 0 && Number(g.gespaart||0) >= Number(g.doel||0);
+          return `
+            <button class="top3-row is-clickable" type="button" onclick="openDashboardSparen()">
+              <div class="top3-head">
+                <div class="top3-name">${isVoltooid ? '✓ ' : ''}${escapeHtml(g.naam)}</div>
+                <div class="top3-amount">${pct.toFixed(0)}%</div>
+              </div>
+              <div class="track" style="margin:8px 0 6px"><div class="fill sq-fill--green" style="width:${pct}%"></div></div>
+              <div class="top3-sub">${fmt(Number(g.gespaart||0))} gespaard van ${fmt(Number(g.doel||0))}</div>
+            </button>
+          `;
+        }).join('')}
+      </div>
+    ` : ''}
 
     <div class="sec">Grootste uitgaven</div>
     <div class="dashboard-top3">

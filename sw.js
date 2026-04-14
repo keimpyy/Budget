@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'budget-app-20260414d';
+const CACHE_VERSION = 'budget-app-20260414e';
 const APP_SHELL = [
   '/',
   '/index.html',
@@ -21,7 +21,7 @@ const APP_SHELL = [
   '/js/storage.js?v=20260414c',
   '/js/supabase.js?v=20260412d',
   '/js/ui.js?v=20260414a',
-  '/js/dashboard.js?v=20260414d',
+  '/js/dashboard.js?v=20260414e',
   '/js/budget.js?v=20260412d',
   '/js/loans.js?v=20260412d',
   '/js/sparen.js?v=20260414c',
