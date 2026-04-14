@@ -18,7 +18,7 @@
 
   <title>Budget</title>
 
-  <link rel="stylesheet" href="styles/app.css?v=20260412d"/>
+  <link rel="stylesheet" href="styles/app.css?v=20260414a"/>
 </head>
 <body data-theme="kuro">
   <div id="sakura-layer"></div>
@@ -39,6 +39,7 @@
         <button class="tab active" onclick="go('dashboard',this)">Dashboard</button>
         <button class="tab" onclick="go('budget',this)">Budget</button>
         <button class="tab" onclick="go('leningen',this)">Leningen</button>
+        <button class="tab" onclick="go('sparen',this)">Sparen</button>
         <button class="tab" id="settings-tab-btn" onclick="go('instellingen',this)" style="display:none">Instellingen</button>
       </div>
     </div>
@@ -47,6 +48,7 @@
       <div class="view active" id="v-dashboard"></div>
       <div class="view" id="v-budget"></div>
       <div class="view" id="v-leningen"></div>
+      <div class="view" id="v-sparen"></div>
       <div class="view" id="v-instellingen"></div>
     </div>
   </div>
@@ -72,13 +74,14 @@
   <canvas id="confetti-layer"></canvas>
 
   <script src="vendor/supabase-js.js?v=20260409b"></script>
-  <script src="js/state.js?v=20260412d"></script>
-  <script src="js/storage.js?v=20260412d"></script>
+  <script src="js/state.js?v=20260414a"></script>
+  <script src="js/storage.js?v=20260414a"></script>
   <script src="js/supabase.js?v=20260412d"></script>
-  <script src="js/ui.js?v=20260412d"></script>
+  <script src="js/ui.js?v=20260414a"></script>
   <script src="js/dashboard.js?v=20260412d"></script>
   <script src="js/budget.js?v=20260412d"></script>
   <script src="js/loans.js?v=20260412d"></script>
+  <script src="js/sparen.js?v=20260414a"></script>
   <script src="js/settings.js?v=20260412d"></script>
   <script src="js/app.js?v=20260412d"></script>
 </body>

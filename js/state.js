@@ -1,6 +1,6 @@
 const SUPABASE_URL = 'https://jxihwwdnowvwgzpgviab.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_2dWE27Su68lB3zFIVZRs_A_mFMd7haz';
-const APP_VERSION = '20260412d';
+const APP_VERSION = '20260414a';
 const DEFAULT_THEME = 'kuro';
 
 function normalizeThemePreference(theme){
@@ -26,6 +26,7 @@ const state = {
   categorieen: [],
   budget: [],
   leningen: [],
+  sparen: [],
   openCats:{},
   budgetSubtab:'categorieen',
   currentView:'dashboard',
@@ -39,7 +40,8 @@ const state = {
   appModalOpen:false,
   appModalType:null,
   appModalPayload:null,
-  appModalOnConfirm:null
+  appModalOnConfirm:null,
+  editingSparenId:null
 };
 
 function uid(prefix){ return `${prefix}_${Date.now()}_${Math.floor(Math.random()*100000)}`; }
@@ -48,6 +50,7 @@ function resetBudgetData(){
   state.categorieen = [];
   state.budget = [];
   state.leningen = [];
+  state.sparen = [];
   state.openCats = {};
   state.budgetSelectedCategoryId = null;
   state.budgetFocusCategoryId = null;

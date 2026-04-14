@@ -1,4 +1,4 @@
-const VIEW_ORDER = ['dashboard','budget','leningen','instellingen'];
+const VIEW_ORDER = ['dashboard','budget','leningen','sparen','instellingen'];
 
 const appSwipe = { startX:0, startY:0, dx:0, dy:0 };
 
@@ -6,6 +6,7 @@ function rerenderAll(){
   if(typeof renderDashboard === 'function') renderDashboard();
   if(typeof renderBudget === 'function') renderBudget();
   if(typeof renderLeningen === 'function') renderLeningen();
+  if(typeof renderSparen === 'function') renderSparen();
   if(typeof renderInstellingen === 'function') renderInstellingen();
   if(typeof renderHeaderActions === 'function') renderHeaderActions();
 }
@@ -16,6 +17,7 @@ function rerenderCurrentView(){
   if(current === 'dashboard' && typeof renderDashboard === 'function') renderDashboard();
   if(current === 'budget' && typeof renderBudget === 'function') renderBudget();
   if(current === 'leningen' && typeof renderLeningen === 'function') renderLeningen();
+  if(current === 'sparen' && typeof renderSparen === 'function') renderSparen();
   if(current === 'instellingen' && typeof renderInstellingen === 'function') renderInstellingen();
   if(typeof renderHeaderActions === 'function') renderHeaderActions();
 }
@@ -369,6 +371,45 @@ function renderAppModal(){
     `;
   }
 
+  if(state.appModalType === 'savings-deposit'){
+    const { idx } = state.appModalPayload || {};
+    const goal = state.sparen[idx];
+
+    if(!goal){
+      root.innerHTML = '';
+      return;
+    }
+
+    content = `
+      <div class="budget-modal-backdrop" onclick="closeAppModal()">
+        <div class="budget-modal-sheet" onclick="event.stopPropagation()">
+          <div class="budget-modal-handle"></div>
+
+          <div class="budget-modal-title">Bedrag storten</div>
+          <div class="budget-modal-copy">${escapeHtml(goal.naam || '')}</div>
+
+          <div class="stack">
+            <div>
+              <div class="budget-inline-label">Bedrag</div>
+              <input
+                id="savings-deposit-input"
+                class="input composer-amount-input"
+                type="number"
+                inputmode="decimal"
+                placeholder="0"
+              >
+            </div>
+          </div>
+
+          <div class="budget-modal-actions">
+            <button class="btn secondary" onclick="closeAppModal()">Annuleren</button>
+            <button class="btn" onclick="confirmSavingsDeposit(${idx})">Opslaan</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
   if(state.appModalType === 'cloud-login'){
     content = `
       <div class="budget-modal-backdrop" onclick="closeAppModal()">
@@ -488,6 +529,13 @@ function renderAppModal(){
   if(state.appModalType === 'loan-payment'){
     setTimeout(() => {
       const el = document.getElementById('loan-payment-input');
+      if(el) el.focus();
+    }, 30);
+  }
+
+  if(state.appModalType === 'savings-deposit'){
+    setTimeout(() => {
+      const el = document.getElementById('savings-deposit-input');
       if(el) el.focus();
     }, 30);
   }

@@ -7,6 +7,7 @@ alter table public.income_items enable row level security;
 alter table public.categories enable row level security;
 alter table public.budget_items enable row level security;
 alter table public.loans enable row level security;
+alter table public.savings_goals enable row level security;
 
 create or replace function public.is_household_member(target_household_key text)
 returns boolean
@@ -360,6 +361,36 @@ with check (public.is_household_member(household_key));
 
 create policy "Household members can delete loans"
 on public.loans
+for delete
+to authenticated
+using (public.is_household_member(household_key));
+
+drop policy if exists "Household members can view savings goals" on public.savings_goals;
+drop policy if exists "Household members can create savings goals" on public.savings_goals;
+drop policy if exists "Household members can update savings goals" on public.savings_goals;
+drop policy if exists "Household members can delete savings goals" on public.savings_goals;
+
+create policy "Household members can view savings goals"
+on public.savings_goals
+for select
+to authenticated
+using (public.is_household_member(household_key));
+
+create policy "Household members can create savings goals"
+on public.savings_goals
+for insert
+to authenticated
+with check (public.is_household_member(household_key));
+
+create policy "Household members can update savings goals"
+on public.savings_goals
+for update
+to authenticated
+using (public.is_household_member(household_key))
+with check (public.is_household_member(household_key));
+
+create policy "Household members can delete savings goals"
+on public.savings_goals
 for delete
 to authenticated
 using (public.is_household_member(household_key));

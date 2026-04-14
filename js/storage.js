@@ -567,6 +567,14 @@ function normalizeData(){
     volgorde: Number(row.volgorde || (idx + 1))
   }));
 
+  state.sparen = state.sparen.map((row, idx) => ({
+    id: String(row.id || uid('sp')),
+    naam: String(row.naam || 'Nieuw spaardoel'),
+    doel: Number(row.doel || 0),
+    gespaart: Number(row.gespaart || 0),
+    volgorde: Number(row.volgorde || (idx + 1))
+  }));
+
   const validCatIds = new Set(state.categorieen.map(c => c.id));
   state.budget = state.budget.filter(r => validCatIds.has(r.categorieId));
 
@@ -611,6 +619,13 @@ function toRows(){
       betaald: Number(r.betaald || 0),
       kleur: String(r.kleur || ''),
       volgorde: Number(r.volgorde || 0)
+    })),
+    sparen: state.sparen.map(r => ({
+      id: r.id,
+      naam: r.naam || '',
+      doel: Number(r.doel || 0),
+      gespaart: Number(r.gespaart || 0),
+      volgorde: Number(r.volgorde || 0)
     }))
   };
 }
@@ -654,6 +669,16 @@ function applyCloudData(data, options = {}){
     }));
   }
 
+  if(data.sparen){
+    state.sparen = data.sparen.map((r, i) => ({
+      id: String(r.id || uid('sp')),
+      naam: String(r.naam || ''),
+      doel: Number(r.doel || 0),
+      gespaart: Number(r.gespaart || 0),
+      volgorde: Number(r.volgorde || (i + 1))
+    }));
+  }
+
   normalizeData();
   if(!options.skipLocalPersist){
     persistLocal();
@@ -683,7 +708,8 @@ async function fetchCloudState(){
     incomeResult,
     categoryResult,
     budgetResult,
-    loanResult
+    loanResult,
+    savingsResult
   ] = await withCloudTimeout(
     Promise.all([
       supabase
@@ -704,6 +730,11 @@ async function fetchCloudState(){
       supabase
         .from('loans')
         .select('id,name,total,paid,color,sort_order')
+        .eq('household_key', householdKey)
+        .order('sort_order', { ascending:true }),
+      supabase
+        .from('savings_goals')
+        .select('id,name,target_amount,current_amount,sort_order')
         .eq('household_key', householdKey)
         .order('sort_order', { ascending:true })
     ]),
@@ -747,6 +778,13 @@ async function fetchCloudState(){
       totaal: Number(row.total || 0),
       betaald: Number(row.paid || 0),
       kleur: row.color || '',
+      volgorde: Number(row.sort_order || (idx + 1))
+    })),
+    sparen: (savingsResult.data || []).map((row, idx) => ({
+      id: fromCloudRowId(householdKey, row.id),
+      naam: row.name || '',
+      doel: Number(row.target_amount || 0),
+      gespaart: Number(row.current_amount || 0),
       volgorde: Number(row.sort_order || (idx + 1))
     }))
   };
@@ -823,6 +861,16 @@ async function saveCloudState(data){
       sort_order: Number(row.volgorde || 0),
       updated_at: new Date().toISOString()
     }));
+
+    await replaceHouseholdTable('savings_goals', householdKey, data.sparen || [], (row) => ({
+      id: toCloudRowId(householdKey, row.id),
+      household_key: householdKey,
+      name: row.naam || '',
+      target_amount: Number(row.doel || 0),
+      current_amount: Number(row.gespaart || 0),
+      sort_order: Number(row.volgorde || 0),
+      updated_at: new Date().toISOString()
+    }));
   }catch(error){
     return { ok:false, error:error.message || 'Opslaan mislukt' };
   }
@@ -867,6 +915,8 @@ function persistAndSync(renderMode = 'all'){
     renderBudget();
   }else if(renderMode === 'loans' && typeof renderLeningen === 'function'){
     renderLeningen();
+  }else if(renderMode === 'sparen' && typeof renderSparen === 'function'){
+    renderSparen();
   }else if(renderMode === 'none'){
     // no-op
   }else{
