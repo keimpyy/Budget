@@ -40,38 +40,20 @@ function renderDashboard(){
       <div class="sq-note">${o >= 0 ? 'Je houdt geld over' : 'Je budget is hoger dan je inkomen'}</div>
     </div>
 
-    ${goals.length > 0 ? `
-      <div class="sec">Spaardoelen</div>
-      <div class="dash-sparen-wrap">
-        ${goals.map(g => {
-          const pct = Number(g.doel || 0)
-            ? Math.min(100, (Number(g.gespaart || 0) / Number(g.doel || 0)) * 100)
-            : 0;
-          const isVoltooid = Number(g.doel || 0) > 0 && Number(g.gespaart || 0) >= Number(g.doel || 0);
-          return `
-            <div class="dash-sparen-row">
-              <div class="dash-sparen-top">
-                <div class="dash-sparen-name">${isVoltooid ? '✓ ' : ''}${escapeHtml(g.naam)}</div>
-                <div class="dash-sparen-pct${isVoltooid ? ' dash-sparen-pct--done' : ''}">${pct.toFixed(0)}%</div>
-              </div>
-              <div class="track dash-sparen-track">
-                <div class="fill dash-sparen-fill" style="width:${pct}%"></div>
-              </div>
-              <div class="dash-sparen-meta">
-                <span>${fmt(Number(g.gespaart || 0))}</span>
-                <span>${fmt(Number(g.doel || 0))}</span>
-              </div>
-            </div>
-          `;
-        }).join('')}
-        ${totaalDoel > 0 ? `
-          <div class="dash-sparen-total">
-            <span>Totaal ${Math.min(100, totaalDoel ? (totaalGespaart/totaalDoel*100) : 0).toFixed(0)}% gespaard</span>
-            <button class="dash-sparen-link" onclick="openDashboardSparen()">Bekijk doelen →</button>
+    ${goals.length > 0 ? (() => {
+      const overallPct = totaalDoel > 0 ? Math.min(100, (totaalGespaart / totaalDoel) * 100) : 0;
+      const voltooid = goals.filter(g => Number(g.doel||0) > 0 && Number(g.gespaart||0) >= Number(g.doel||0)).length;
+      return `
+        <button class="sq-bar sq-bar--link" onclick="openDashboardSparen()">
+          <div class="sq-top">
+            <span class="sq-label">Spaardoelen</span>
+            <span class="sq-val sq-val--green">${overallPct.toFixed(0)}%</span>
           </div>
-        ` : ''}
-      </div>
-    ` : ''}
+          <div class="track"><div class="fill sq-fill--green" style="width:${overallPct}%"></div></div>
+          <div class="sq-note">${fmt(totaalGespaart)} gespaard van ${fmt(totaalDoel)}${voltooid > 0 ? ` · ${voltooid} ${voltooid === 1 ? 'doel' : 'doelen'} bereikt` : ''}</div>
+        </button>
+      `;
+    })() : ''}
 
     <div class="sec">Grootste uitgaven</div>
     <div class="dashboard-top3">
