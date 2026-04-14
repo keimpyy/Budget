@@ -1,10 +1,11 @@
 const THEME_COLORS = {
-  kuro: '#020509',
+  kuro: '#0a0a0f',
   sakura: '#0f0a11',
-  neon: '#04020c'
+  neon: '#f4f4fa',
+  vuur: '#060304'
 };
 
-const ALLOWED_THEMES = new Set(['kuro', 'sakura', 'neon']);
+const ALLOWED_THEMES = new Set(['kuro', 'sakura', 'neon', 'vuur']);
 
 function updateThemeMeta(theme){
   const meta = document.querySelector('meta[name="theme-color"]');
@@ -14,27 +15,35 @@ function updateThemeMeta(theme){
 
 function getThemeLabel(theme){
   const resolved = normalizeThemePreference(theme);
-  if(resolved === 'kuro') return 'Cyber';
-  if(resolved === 'neon') return 'Cosmos';
+  if(resolved === 'kuro') return 'Donker';
+  if(resolved === 'neon') return 'Wit';
+  if(resolved === 'vuur') return 'Vuur';
   return 'Sakura';
 }
 
 function syncThemeSelection(theme){
-  const root = document.getElementById('v-instellingen');
-  if(!root || !root.children.length) return;
+  const roots = [
+    document.getElementById('v-instellingen'),
+    document.getElementById('v-thema')
+  ];
 
   const themeLabel = getThemeLabel(theme);
-  const badge = root.querySelector('.settings-badge');
-  const value = root.querySelector('.current-theme-value');
 
-  if(badge) badge.textContent = themeLabel;
-  if(value) value.textContent = themeLabel;
+  roots.forEach(root => {
+    if(!root || !root.children.length) return;
 
-  root.querySelectorAll('.theme-tile').forEach(tile => {
-    const tileTheme = tile.getAttribute('data-theme');
-    const active = tileTheme === theme;
-    tile.classList.toggle('active', active);
-    tile.setAttribute('aria-selected', String(active));
+    const badge = root.querySelector('.settings-badge');
+    const value = root.querySelector('.current-theme-value');
+
+    if(badge) badge.textContent = themeLabel;
+    if(value) value.textContent = themeLabel;
+
+    root.querySelectorAll('.theme-tile').forEach(tile => {
+      const tileTheme = tile.getAttribute('data-theme');
+      const active = tileTheme === theme;
+      tile.classList.toggle('active', active);
+      tile.setAttribute('aria-selected', String(active));
+    });
   });
 }
 
@@ -43,7 +52,7 @@ function applyTheme(theme, options = {}){
   const shouldPersist = options.persist !== false;
 
   document.body.setAttribute('data-theme', resolved);
-  document.documentElement.style.colorScheme = 'dark';
+  document.documentElement.style.colorScheme = resolved === 'neon' ? 'light' : 'dark';
   updateThemeMeta(resolved);
   state.cloudThemePreference = resolved;
 
@@ -92,45 +101,16 @@ function renderInstellingen(){
       <div class="settings-group card">
         <div class="settings-group-title">Weergave</div>
 
-        <button class="settings-row settings-row-button" onclick="cycleTheme()">
+        <button class="settings-row settings-row-button" onclick="openThema()">
           <span class="settings-row-main">
-            <span class="settings-row-label">Actief theme</span>
-            <span class="settings-row-note">Tik om door de themes te wisselen</span>
+            <span class="settings-row-label">Thema</span>
+            <span class="settings-row-note">Kies een kleurthema voor de app</span>
           </span>
           <span class="settings-row-side">
             <span class="settings-value current-theme-value">${themeLabel}</span>
             <span class="settings-chevron">&gt;</span>
           </span>
         </button>
-
-        <div class="theme-picker" role="listbox" aria-label="Theme keuze">
-          <button class="theme-tile ${currentTheme==='kuro'?'active':''}" data-theme="kuro" onclick="applyTheme('kuro')" aria-selected="${currentTheme==='kuro'}">
-            <span class="theme-swatch theme-swatch-kuro"></span>
-            <span class="theme-copy">
-              <span class="theme-name">Cyber</span>
-              <span class="theme-note">Electric blue, data streams, high tech</span>
-            </span>
-            <span class="theme-check">✓</span>
-          </button>
-
-          <button class="theme-tile ${currentTheme==='neon'?'active':''}" data-theme="neon" onclick="applyTheme('neon')" aria-selected="${currentTheme==='neon'}">
-            <span class="theme-swatch theme-swatch-neon"></span>
-            <span class="theme-copy">
-              <span class="theme-name">Cosmos</span>
-              <span class="theme-note">Deep space, violet nebula, cosmic glow</span>
-            </span>
-            <span class="theme-check">✓</span>
-          </button>
-
-          <button class="theme-tile ${currentTheme==='sakura'?'active':''}" data-theme="sakura" onclick="applyTheme('sakura')" aria-selected="${currentTheme==='sakura'}">
-            <span class="theme-swatch theme-swatch-sakura"></span>
-            <span class="theme-copy">
-              <span class="theme-name">Sakura</span>
-              <span class="theme-note">Donker, blossom glow, luxe</span>
-            </span>
-            <span class="theme-check">✓</span>
-          </button>
-        </div>
       </div>
 
       <div class="settings-group card">
@@ -158,8 +138,75 @@ function renderInstellingen(){
   `;
 }
 
+function renderThema(){
+  const root = document.getElementById('v-thema');
+  if(!root) return;
+
+  const currentTheme = normalizeThemePreference(document.body.getAttribute('data-theme'));
+  const themeLabel = getThemeLabel(currentTheme);
+
+  root.innerHTML = `
+    <div class="settings-panel">
+      <div class="settings-hero card">
+        <div>
+          <div class="settings-kicker">Uiterlijk</div>
+          <div class="settings-title">Thema kiezen</div>
+          <div class="settings-subtitle">Kies een look die bij je past. Wordt per account opgeslagen.</div>
+        </div>
+        <div class="settings-badge">${themeLabel}</div>
+      </div>
+
+      <div class="settings-group card">
+        <div class="settings-group-title">Beschikbare thema's</div>
+
+        <div class="theme-picker" role="listbox" aria-label="Thema keuze">
+          <button class="theme-tile ${currentTheme==='kuro'?'active':''}" data-theme="kuro" onclick="applyTheme('kuro')" aria-selected="${currentTheme==='kuro'}">
+            <span class="theme-swatch theme-swatch-kuro"></span>
+            <span class="theme-copy">
+              <span class="theme-name">Donker</span>
+              <span class="theme-note">Strak zwart, indigo accent, rustig</span>
+            </span>
+            <span class="theme-check">✓</span>
+          </button>
+
+          <button class="theme-tile ${currentTheme==='neon'?'active':''}" data-theme="neon" onclick="applyTheme('neon')" aria-selected="${currentTheme==='neon'}">
+            <span class="theme-swatch theme-swatch-neon"></span>
+            <span class="theme-copy">
+              <span class="theme-name">Wit</span>
+              <span class="theme-note">Helder wit, clean en fris</span>
+            </span>
+            <span class="theme-check">✓</span>
+          </button>
+
+          <button class="theme-tile ${currentTheme==='sakura'?'active':''}" data-theme="sakura" onclick="applyTheme('sakura')" aria-selected="${currentTheme==='sakura'}">
+            <span class="theme-swatch theme-swatch-sakura"></span>
+            <span class="theme-copy">
+              <span class="theme-name">Sakura</span>
+              <span class="theme-note">Donker, blossom glow, luxe</span>
+            </span>
+            <span class="theme-check">✓</span>
+          </button>
+
+          <button class="theme-tile ${currentTheme==='vuur'?'active':''}" data-theme="vuur" onclick="applyTheme('vuur')" aria-selected="${currentTheme==='vuur'}">
+            <span class="theme-swatch theme-swatch-vuur"></span>
+            <span class="theme-copy">
+              <span class="theme-name">Vuur</span>
+              <span class="theme-note">Donker, vlammen, stoer &amp; mannelijk</span>
+            </span>
+            <span class="theme-check">✓</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="settings-group card">
+        <button class="btn secondary settings-back-btn" onclick="closeThema()">Terug naar instellingen</button>
+      </div>
+    </div>
+  `;
+}
+
 function cycleTheme(){
-  const order = ['kuro', 'neon', 'sakura'];
+  const order = ['kuro', 'neon', 'sakura', 'vuur'];
   const current = normalizeThemePreference(document.body.getAttribute('data-theme'));
   const idx = order.indexOf(current);
   applyTheme(order[(idx + 1) % order.length]);
@@ -230,11 +277,12 @@ function renderHeaderActions(){
                 <div class="account-menu-email mono">${escapeHtml(state.cloudUserEmail || '')}</div>
               </div>
               <div class="account-menu-group">
-                <div class="account-menu-label">Theme</div>
-                <div class="account-theme-row">
-                  <button class="account-theme-chip ${currentTheme==='kuro'?'active':''}" onclick="setAccountTheme('kuro')">Cyber</button>
-                  <button class="account-theme-chip ${currentTheme==='neon'?'active':''}" onclick="setAccountTheme('neon')">Cosmos</button>
+                <div class="account-menu-label">Thema</div>
+                <div class="account-theme-row account-theme-row--4">
+                  <button class="account-theme-chip ${currentTheme==='kuro'?'active':''}" onclick="setAccountTheme('kuro')">Donker</button>
+                  <button class="account-theme-chip ${currentTheme==='neon'?'active':''}" onclick="setAccountTheme('neon')">Wit</button>
                   <button class="account-theme-chip ${currentTheme==='sakura'?'active':''}" onclick="setAccountTheme('sakura')">Sakura</button>
+                  <button class="account-theme-chip ${currentTheme==='vuur'?'active':''}" onclick="setAccountTheme('vuur')">Vuur</button>
                 </div>
               </div>
               <div class="account-menu-actions">
@@ -346,11 +394,26 @@ async function submitSignupModal(){
   }
 }
 
+function openSettings(){
+  if(typeof closeAccountMenu === 'function') closeAccountMenu();
+  const btn = document.getElementById('settings-tab-btn');
+  if(btn) go('instellingen', btn);
+}
+
 function closeSettings(){
   const target = state.lastNonSettingsView || 'dashboard';
   const btn = [...document.querySelectorAll('.tab')].find(
     b => b.textContent.trim().toLowerCase() === target
   ) || document.querySelector('.tab');
-
   if(btn) go(target, btn);
+}
+
+function openThema(){
+  const btn = document.getElementById('thema-tab-btn');
+  go('thema', btn);
+}
+
+function closeThema(){
+  const btn = document.getElementById('settings-tab-btn');
+  if(btn) go('instellingen', btn);
 }

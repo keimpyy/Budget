@@ -111,6 +111,7 @@
   transition:width .2s ease;
 }
 .settings-back-btn{width:100%;margin-top:10px}
+.account-theme-row--4{grid-template-columns:repeat(2,minmax(0,1fr))}
 .theme-picker{display:grid;grid-template-columns:1fr;gap:10px;margin-top:10px}
 .theme-tile{
   width:100%;display:flex;align-items:center;gap:12px;padding:14px;border-radius:8px;border:1px solid var(--border);
@@ -119,9 +120,10 @@
 .theme-tile.active{border-color:rgba(255,255,255,.14);box-shadow:0 12px 28px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.04)}
 .theme-swatch{width:42px;height:42px;border-radius:8px;display:block;flex-shrink:0;border:1px solid rgba(255,255,255,.08);box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
 .theme-swatch-kuro,
-.theme-swatch-midnight{background:linear-gradient(135deg,#020509,#0b1724 48%,#00c8ff)}
-.theme-swatch-neon{background:linear-gradient(135deg,#04020c,#160f30 50%,#9040ff 74%,#ff40ee)}
+.theme-swatch-midnight{background:linear-gradient(135deg,#0a0a0f,#1c1c2c 52%,#6366f1)}
+.theme-swatch-neon{background:linear-gradient(135deg,#ffffff,#eeeef6 50%,#4f46e5)}
 .theme-swatch-sakura{background:linear-gradient(135deg,#100b12,#261524 54%,#3d1f34)}
+.theme-swatch-vuur{background:linear-gradient(135deg,#060304,#1c0d0a 48%,#ff4500 78%,#ff8c00)}
 .theme-copy{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}
 .theme-name{font-size:15px;font-weight:800}
 .theme-note{font-size:12px;color:var(--muted)}

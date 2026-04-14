@@ -1,4 +1,4 @@
-const VIEW_ORDER = ['dashboard','budget','leningen','sparen','instellingen'];
+const VIEW_ORDER = ['dashboard','budget','leningen','sparen','instellingen','thema'];
 
 const appSwipe = { startX:0, startY:0, dx:0, dy:0 };
 
@@ -8,6 +8,7 @@ function rerenderAll(){
   if(typeof renderLeningen === 'function') renderLeningen();
   if(typeof renderSparen === 'function') renderSparen();
   if(typeof renderInstellingen === 'function') renderInstellingen();
+  if(typeof renderThema === 'function') renderThema();
   if(typeof renderHeaderActions === 'function') renderHeaderActions();
 }
 
@@ -19,6 +20,7 @@ function rerenderCurrentView(){
   if(current === 'leningen' && typeof renderLeningen === 'function') renderLeningen();
   if(current === 'sparen' && typeof renderSparen === 'function') renderSparen();
   if(current === 'instellingen' && typeof renderInstellingen === 'function') renderInstellingen();
+  if(current === 'thema' && typeof renderThema === 'function') renderThema();
   if(typeof renderHeaderActions === 'function') renderHeaderActions();
 }
 
@@ -121,8 +123,8 @@ function go(name, btn, options = {}){
     state.budgetFocusCategoryId = budgetScrollTarget || null;
   }
 
-  if(name === 'instellingen' && current && current !== 'instellingen') state.lastNonSettingsView = current;
-  if(name !== 'instellingen') state.lastNonSettingsView = name;
+  if((name === 'instellingen' || name === 'thema') && current && current !== 'instellingen' && current !== 'thema') state.lastNonSettingsView = current;
+  if(name !== 'instellingen' && name !== 'thema') state.lastNonSettingsView = name;
   state.currentView = name;
 
   if(name === 'dashboard') renderDashboard();
@@ -130,6 +132,7 @@ function go(name, btn, options = {}){
   if(name === 'leningen') renderLeningen();
   if(name === 'sparen') renderSparen();
   if(name === 'instellingen') renderInstellingen();
+  if(name === 'thema') renderThema();
 
   const nextEl = document.getElementById('v-' + name);
   if(!nextEl) return;
@@ -194,36 +197,32 @@ function syncSakuraPetals(){
   else if(w >= 768) petalCount = 26;
   else petalCount = 18;
 
+  // Donker (kuro) — clean dark, no particles
   if(theme === 'kuro'){
-    const sheenCount = w >= 1100 ? 10 : 7;
-    for(let i = 0; i < sheenCount; i++){
-      const sheen = document.createElement('span');
-      sheen.className = 'theme-particle theme-particle-kuro';
-      sheen.style.left = `${-20 + Math.random() * 120}%`;
-      sheen.style.top = `${Math.random() * 100}%`;
-      sheen.style.animationDelay = `${-Math.random() * 14}s`;
-      sheen.style.animationDuration = `${8 + Math.random() * 7}s`;
-      sheen.style.setProperty('--sheen-travel', `${160 + Math.random() * 220}px`);
-      sheen.style.setProperty('--scale', 0.7 + Math.random() * 0.8);
-      layer.appendChild(sheen);
-    }
     return;
   }
 
+  // Wit (neon) — white/light, no particles
   if(theme === 'neon'){
-    const mistCount = w >= 1100 ? 8 : 5;
+    return;
+  }
 
-    for(let i = 0; i < mistCount; i++){
-      const mist = document.createElement('span');
-      mist.className = 'theme-particle theme-particle-ronin-mist';
-      mist.style.left = `${-26 + Math.random() * 120}%`;
-      mist.style.top = `${58 + Math.random() * 34}%`;
-      mist.style.animationDelay = `${-Math.random() * 22}s`;
-      mist.style.animationDuration = `${18 + Math.random() * 12}s`;
-      mist.style.setProperty('--drift', `${80 + Math.random() * 180}px`);
-      mist.style.setProperty('--lift', `${-16 + Math.random() * 32}px`);
-      mist.style.setProperty('--scale', 0.8 + Math.random() * 1.25);
-      layer.appendChild(mist);
+  // Vuur — rising ember sparks
+  if(theme === 'vuur'){
+    const emberCount = w >= 1100 ? 52 : w >= 768 ? 38 : 26;
+    for(let i = 0; i < emberCount; i++){
+      const ember = document.createElement('span');
+      ember.className = 'theme-particle theme-particle-ember';
+      ember.style.left = `${Math.random() * 100}%`;
+      // Start at or below the bottom of the viewport
+      ember.style.top = `${95 + Math.random() * 20}%`;
+      ember.style.animationDelay = `${-Math.random() * 5}s`;
+      ember.style.animationDuration = `${2 + Math.random() * 4}s`;
+      ember.style.setProperty('--drift', `${-80 + Math.random() * 160}px`);
+      ember.style.setProperty('--rise', `${80 + Math.random() * 90}vh`);
+      ember.style.setProperty('--scale', 0.4 + Math.random() * 1.5);
+      ember.style.setProperty('--peak-opacity', String((0.5 + Math.random() * 0.45).toFixed(2)));
+      layer.appendChild(ember);
     }
     return;
   }

@@ -1,11 +1,11 @@
 const SUPABASE_URL = 'https://jxihwwdnowvwgzpgviab.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_2dWE27Su68lB3zFIVZRs_A_mFMd7haz';
-const APP_VERSION = '20260414f';
+const APP_VERSION = '20260414g';
 const DEFAULT_THEME = 'kuro';
 
 function normalizeThemePreference(theme){
   if(theme === 'midnight') return 'kuro';
-  if(theme === 'kuro' || theme === 'sakura' || theme === 'neon') return theme;
+  if(theme === 'kuro' || theme === 'sakura' || theme === 'neon' || theme === 'vuur') return theme;
   return DEFAULT_THEME;
 }
 
